@@ -5,7 +5,7 @@
 <h1 align="center">Stop prompting. Start crafting.</h1>
 
 <p align="center">
-  <em>Turn Claude Code into a team of expert developers<br/>that write production-ready code. Together.</em>
+  <em>Turn Claude Code into a team of Software Craft experts.<br/>Clean architecture. Result types. TDD. Domain-driven.<br/>Production-ready code, crafted together.</em>
 </p>
 
 ---
@@ -44,6 +44,72 @@ That's Spectre.
 ```bash
 curl -fsSL https://raw.githubusercontent.com/fredericvilcot/spectre-agents/main/install.sh | bash
 ```
+
+---
+
+## Software Craft — The Foundation
+
+Spectre is built on **Software Craft** principles — the philosophy that code is a craft, not just a task.
+
+> *"Any fool can write code that a computer can understand. Good programmers write code that humans can understand."* — Martin Fowler
+
+> *"The only way to go fast is to go well."* — Robert C. Martin
+
+### The Masters Behind the Craft
+
+Every Spectre agent embodies the teachings of:
+
+- **Kent Beck** — TDD, XP, "Make it work, make it right, make it fast"
+- **Robert C. Martin (Uncle Bob)** — Clean Code, SOLID, Clean Architecture
+- **Martin Fowler** — Refactoring, Enterprise Patterns
+- **Eric Evans** — Domain-Driven Design
+- **Alistair Cockburn** — Hexagonal Architecture (Ports & Adapters)
+
+### Architecture: Domain at the Center
+
+```
+┌─────────────────────────────────────────────┐
+│              INFRASTRUCTURE                  │
+│   (HTTP, DB, External APIs — replaceable)   │
+│  ┌───────────────────────────────────────┐  │
+│  │            APPLICATION                 │  │
+│  │         (Use Cases, Ports)            │  │
+│  │  ┌─────────────────────────────────┐  │  │
+│  │  │            DOMAIN               │  │  │
+│  │  │   (Entities, Value Objects)     │  │  │
+│  │  │        Pure. No deps.           │  │  │
+│  │  └─────────────────────────────────┘  │  │
+│  └───────────────────────────────────────┘  │
+└─────────────────────────────────────────────┘
+         Dependencies point INWARD →
+```
+
+### Craft Principles — Non-Negotiable
+
+| Principle | Why |
+|-----------|-----|
+| **No `any`** | Types are documentation. `any` is lying. |
+| **No `throw`** | Use `Result<T, E>`. Errors are values, not surprises. |
+| **No god classes** | Single responsibility. Small, focused units. |
+| **No code without tests** | TDD mindset. Tests are specs that run. |
+| **No implementation without spec** | Contracts first. PO spec → Architect design → Dev implements. |
+| **Domain is sacred** | No framework contamination. Pure business logic. |
+
+### Error Handling: Explicit, Not Exceptional
+
+```typescript
+// BAD — Caller doesn't know this can fail
+function getUser(id: string): User {
+  throw new Error('Not found');
+}
+
+// GOOD — Error is explicit in the type
+function getUser(id: string): Result<User, NotFoundError> {
+  return err(new NotFoundError(id));
+}
+```
+
+**Spectre agents write code where errors are values, not surprises.**
 
 ---
 
@@ -157,72 +223,6 @@ Then enforces them. Everywhere.
 | **Developer** | Implements with craft principles |
 | **QA Engineer** | Catches bugs before you do |
 | **Learning Agent** | Adapts everything to YOUR codebase |
-
----
-
-## Software Craft — The Foundation
-
-Spectre is built on **Software Craft** principles — the philosophy that code is a craft, not just a task.
-
-> *"Any fool can write code that a computer can understand. Good programmers write code that humans can understand."* — Martin Fowler
-
-> *"The only way to go fast is to go well."* — Robert C. Martin
-
-### The Masters Behind the Craft
-
-Every Spectre agent embodies the teachings of:
-
-- **Kent Beck** — TDD, XP, "Make it work, make it right, make it fast"
-- **Robert C. Martin (Uncle Bob)** — Clean Code, SOLID, Clean Architecture
-- **Martin Fowler** — Refactoring, Enterprise Patterns
-- **Eric Evans** — Domain-Driven Design
-- **Alistair Cockburn** — Hexagonal Architecture (Ports & Adapters)
-
-### Architecture: Domain at the Center
-
-```
-┌─────────────────────────────────────────────┐
-│              INFRASTRUCTURE                  │
-│   (HTTP, DB, External APIs — replaceable)   │
-│  ┌───────────────────────────────────────┐  │
-│  │            APPLICATION                 │  │
-│  │         (Use Cases, Ports)            │  │
-│  │  ┌─────────────────────────────────┐  │  │
-│  │  │            DOMAIN               │  │  │
-│  │  │   (Entities, Value Objects)     │  │  │
-│  │  │        Pure. No deps.           │  │  │
-│  │  └─────────────────────────────────┘  │  │
-│  └───────────────────────────────────────┘  │
-└─────────────────────────────────────────────┘
-         Dependencies point INWARD →
-```
-
-### Craft Principles — Non-Negotiable
-
-| Principle | Why |
-|-----------|-----|
-| **No `any`** | Types are documentation. `any` is lying. |
-| **No `throw`** | Use `Result<T, E>`. Errors are values, not surprises. |
-| **No god classes** | Single responsibility. Small, focused units. |
-| **No code without tests** | TDD mindset. Tests are specs that run. |
-| **No implementation without spec** | Contracts first. PO spec → Architect design → Dev implements. |
-| **Domain is sacred** | No framework contamination. Pure business logic. |
-
-### Error Handling: Explicit, Not Exceptional
-
-```typescript
-// BAD — Caller doesn't know this can fail
-function getUser(id: string): User {
-  throw new Error('Not found');
-}
-
-// GOOD — Error is explicit in the type
-function getUser(id: string): Result<User, NotFoundError> {
-  return err(new NotFoundError(id));
-}
-```
-
-**Spectre agents write code where errors are values, not surprises.**
 
 ---
 
