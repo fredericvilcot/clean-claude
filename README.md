@@ -13,9 +13,9 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/auto--learning-enabled-8A2BE2?style=flat-square" alt="Auto-learning"/>
-  <img src="https://img.shields.io/badge/reactive-loop-9400D3?style=flat-square" alt="Reactive"/>
-  <img src="https://img.shields.io/badge/craft-guard-8B008B?style=flat-square" alt="Craft Guard"/>
+  <img src="https://img.shields.io/badge/craft-first-8A2BE2?style=flat-square" alt="Craft First"/>
+  <img src="https://img.shields.io/badge/reactive-agents-9400D3?style=flat-square" alt="Reactive"/>
+  <img src="https://img.shields.io/badge/auto-learning-8B008B?style=flat-square" alt="Auto-learning"/>
 </p>
 
 ---
@@ -26,157 +26,112 @@
 curl -fsSL https://raw.githubusercontent.com/fredericvilcot/spectre-agents/main/install.sh | bash
 ```
 
-Then restart Claude Code. Done.
+Restart Claude Code. Done.
 
 ---
 
 ## Three Commands
 
 ```bash
-/craft    # Build features with the right agent team
-/heal     # Auto-fix everything (tests, build, types)
-/learn    # Adapt to YOUR codebase patterns
+/craft    # Build with the right agent team
+/heal     # Auto-fix everything
+/learn    # Adapt to YOUR patterns
 ```
 
 ---
 
 ## What is Spectre?
 
-Spectre transforms Claude Code into a **multi-agent craft system**. Instead of one AI generating code, specialized agents collaborate through **contracts**:
+Spectre is built on **three pillars**:
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                   SPECTRE: CONTRACT-DRIVEN                       │
-│                                                                  │
-│   /craft "a sexy counter"                                        │
-│       │                                                          │
-│       ▼                                                          │
-│   ┌─────────┐                                                    │
-│   │   PO    │ → .spectre/spec.md (FUNCTIONAL CONTRACT)           │
-│   └────┬────┘                                                    │
-│        │                                                          │
-│        ▼                                                          │
-│   ┌─────────┐                                                    │
-│   │Architect│ → .spectre/design.md (TECHNICAL CONTRACT)          │
-│   └────┬────┘                                                    │
-│        │                                                          │
-│        ▼                                                          │
-│   ┌───────────────────────────┐                                  │
-│   │   Dev ⇄ QA                │                                  │
-│   │   Implement design.md     │                                  │
-│   │   TO THE LETTER           │                                  │
-│   └───────────────────────────┘                                  │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
+### 1. Craft First
+
+No code without craft. Every agent enforces:
+- **Strict TypeScript** — No `any`, types are documentation
+- **Result Types** — `Result<T, E>` not `throw`, explicit errors
+- **Clean Architecture** — Domain at center, hexagonal structure
+- **Test-Driven** — Tests are executable specifications
+
+### 2. Reactive Collaboration
+
+Agents don't just execute — they **react** to each other:
+- QA finds bug → routes to Dev → Dev fixes → QA re-verifies
+- Violation detected → triggers Architect → proposes refactoring
+- Spec unclear → escalates to PO → PO clarifies
+
+No blocking. No waiting. Continuous feedback loop.
+
+### 3. Auto-Learning
+
+Spectre learns YOUR codebase:
+- Detects your stack, patterns, conventions
+- Adapts all agents to follow YOUR style
+- Guards against violations of YOUR standards
 
 ---
 
-## `/craft` — Smart Build
+## `/craft` — Build Features
 
-**Rule: All agents work from contracts (MD files).**
+Smart workflow that adapts to your input.
 
-### RULE: No Spec = No Code
+### Rule: No Spec = No Code
 
-**Nothing gets implemented without both contracts:**
+Nothing gets implemented without contracts:
 
-| Contract | Created By | Contains |
-|----------|------------|----------|
-| `.spectre/spec.md` | PO | User story, acceptance criteria, edge cases |
-| `.spectre/design.md` | Architect | File structure, code patterns, test specs |
+| Contract | Owner | Purpose |
+|----------|-------|---------|
+| `.spectre/spec.md` | PO | Functional spec (user story, criteria, edge cases) |
+| `.spectre/design.md` | Architect | Technical spec (files, patterns, tests) |
 
-Dev and QA implement `design.md` **exactly**. No improvisation. No shortcuts.
+Dev and QA implement `design.md` **exactly**. No improvisation.
 
 ### Smart Routing
 
-| Your Input | PO Action | Pipeline |
-|------------|-----------|----------|
-| "a sexy counter" | Creates spec.md | PO → Architect → Dev ⇄ QA |
-| "Counter with +/-, localStorage" | Creates spec.md | PO → Architect → Dev ⇄ QA |
-| Jira ticket PROJ-123 | Fetches + creates spec.md | PO → Architect → Dev ⇄ QA |
-| `docs/spec.md` file | Validates | Architect → Dev ⇄ QA |
-| "Fix the counter bug" | — | Dev → QA |
+| Your Input | What Happens |
+|------------|--------------|
+| "a sexy counter" | PO creates spec → Architect designs → Dev ⇄ QA |
+| Jira ticket | PO fetches + creates spec → Architect → Dev ⇄ QA |
+| `spec.md` file | Architect designs → Dev ⇄ QA |
+| "Fix the bug" | Dev → QA |
 
 ### Parallel Execution
 
-Dev and QA work **together**, not sequentially:
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                   DEV ⇄ QA PARALLEL                             │
-│                                                                 │
-│    Dev implements          QA writes tests                      │
-│         │                        │                              │
-│         │   ← shares context →   │                              │
-│         ▼                        ▼                              │
-│    Code ready              Tests ready                          │
-│         │                        │                              │
-│         └────────┬───────────────┘                              │
-│                  ▼                                              │
-│            QA runs tests                                        │
-│                  │                                              │
-│         ┌───────┴───────┐                                       │
-│        PASS            FAIL → Dev fixes → QA re-runs            │
-│         │                                                       │
-│       Done                                                      │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Work Contexts
-
-| Context | Pipeline | When |
-|---------|----------|------|
-| **Product Team** | PO → Architect → Dev ⇄ QA | Full specs, compliance |
-| **Startup** | Architect → Dev ⇄ QA | Fast, you're the PO |
-| **Freelance** | Dev ⇄ QA | Minimal overhead |
-| **Learning** | Single agent | Educational mode |
+Dev and QA work **together**:
+- Dev implements while QA writes tests
+- QA runs tests as Dev completes files
+- Failures route back instantly
 
 ---
 
-## `/heal` — Smart Repair
+## `/heal` — Auto-Repair
 
 Routes problems to the right expert:
 
 ```bash
-/heal           # Fix all (tests, build, types)
-/heal tests     # Fix failing tests only
+/heal           # Fix all
+/heal tests     # Fix failing tests
 /heal types     # Fix TypeScript errors
 ```
 
-| Problem | Routed To |
-|---------|-----------|
-| Test failure | Dev (file owner) |
+| Problem | Expert |
+|---------|--------|
+| Test failure | Dev |
 | Type error | Architect |
 | Design flaw | Architect |
-| Spec gap | Product Owner |
+| Spec gap | PO |
 
 ---
 
-## `/learn` — Reactive Learning
+## `/learn` — Adapt
 
-Analyzes your codebase, adapts to YOUR conventions:
+Learns your codebase, detects violations:
 
 ```bash
 /learn              # Full scan
-/learn --only src/  # Scan specific path
-/learn --show       # View learnings
+/learn --only src/  # Specific path
 ```
 
-**On violations** (any abuse, throw in business logic):
-
-```
-⚠️ Violations: 8x 'any', 3x 'throw'
-
-🔔 Triggering Architect...
-
-🏗️ Refactoring plan:
-   Phase 1: Add strict mode
-   Phase 2: Introduce Result<T, E>
-
-[ Start Phase 1 ] [ Details ] [ Later ]
-```
-
+On violations → triggers Architect with refactoring plan.
 Reactive, not punitive.
 
 ---
@@ -185,101 +140,29 @@ Reactive, not punitive.
 
 | Agent | Role |
 |-------|------|
-| **learning-agent** | Stack detection, pattern learning, violations |
-| **product-owner** | User stories, acceptance criteria |
-| **architect** | Design, clean architecture, code review |
-| **frontend-engineer** | React, components, accessibility |
-| **backend-engineer** | APIs, services, security |
+| **learning-agent** | Pattern detection, violations |
+| **product-owner** | Specs, acceptance criteria |
+| **architect** | Design, code review |
+| **frontend-engineer** | React, UI, accessibility |
+| **backend-engineer** | APIs, services |
 | **qa-engineer** | Tests, verification |
 
 ---
 
-## Reactive System
-
-Agents **react** to each other:
+## Reactive Mesh
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    REACTIVE MESH                                │
-│                                                                 │
-│   Learning Agent ─── violation ───▶ Architect                   │
-│                                          │                      │
-│   Product Owner ◀─── contradiction ───   │                      │
-│        │                                 │                      │
-│   spec_gap ◀─── Dev              design ─┘                      │
-│   unclear  ◀─── QA               review ───▶ Dev                │
-│        │                                    │                   │
-│        ▼                                    ▼                   │
-│   ┌─────────┐                        ┌───────────┐              │
-│   │   Dev   │◀─── test_failure ──────│    QA     │              │
-│   └─────────┘                        └───────────┘              │
-│                                                                 │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Craft Principles
-
-Every agent embodies:
-
-| Principle | How |
-|-----------|-----|
-| **Domain First** | Business logic at center |
-| **Type Safety** | Strict mode, no `any` |
-| **Explicit Errors** | `Result<T, E>` not `throw` |
-| **Test-Driven** | Tests are specs |
-
----
-
-## Example Session
-
-```
-> /craft "a sexy counter"
-
-📝 Input: Raw idea → PO will create spec first
-
-👤 Product Owner:
-   ✓ User story written
-   ✓ 8 acceptance criteria
-   ✓ Edge cases identified
-
-🏗️ Architect:
-   ✓ Feature folder structure
-   ✓ Result types for errors
-   ✓ Test scenarios for QA
-
-🚀 Parallel execution starting...
-
-   💻 Dev: Creating Counter.ts...
-   🧪 QA: Writing tests...
-
-   💻 Dev: ✓ useCounter.ts
-   🧪 QA: ✓ Running tests...
-
-   🧪 QA: ❌ FAIL: localStorage not synced
-   💻 Dev: 🔧 Fixing...
-
-   🧪 QA: ✓ 12/12 tests passing
-
-✨ Feature complete!
-```
-
----
-
-## Project Structure
-
-```
-~/.claude/
-├── agents/           # Installed agents
-│   ├── architect.md
-│   ├── product-owner.md
-│   ├── frontend-engineer.md
-│   └── ...
-└── skills/           # Installed skills
-    ├── craft/
-    ├── heal/
-    └── learn/
+Learning Agent ─── violation ───▶ Architect
+                                      │
+Product Owner ◀─── contradiction ─────┤
+     │                                │
+spec_gap ◀─── Dev              design ┘
+unclear  ◀─── QA               review ───▶ Dev
+     │                                    │
+     ▼                                    ▼
+┌─────────┐                        ┌───────────┐
+│   Dev   │◀─── test_failure ──────│    QA     │
+└─────────┘                        └───────────┘
 ```
 
 ---
