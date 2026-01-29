@@ -1,52 +1,69 @@
 ---
 name: heal
-description: "Auto-repair: detects what's broken and fixes it automatically. Just run /heal and let the agents work."
+description: "Auto-repair: detects what's broken (code, tests, specs) and fixes it automatically. Just run /heal."
 context: conversation
 allowed-tools: Read, Bash, Task, AskUserQuestion, Skill
 ---
 
 # Spectre Heal — Auto-Repair Mode
 
-Detects what's broken and fixes it automatically. No questions, just healing.
+Detects what's broken and fixes it automatically. Code, tests, or specs.
 
 ## Usage
 
 ```bash
 /heal           # Detect and fix whatever is broken
-/heal tests     # Fix failing tests specifically
-/heal build     # Fix build errors specifically
-/heal lint      # Fix lint errors specifically
+/heal tests     # Fix failing tests
+/heal build     # Fix build errors
+/heal types     # Fix TypeScript errors
+/heal lint      # Fix lint errors
+/heal spec      # Fix spec/implementation mismatch
 ```
+
+## What Can Be Healed
+
+### 🔧 Code Issues
+- Test failures
+- Build errors
+- TypeScript errors
+- Lint errors
+
+### 📋 Spec Issues
+- Spec doesn't match implementation
+- Missing acceptance criteria
+- Incomplete user stories
+- Contradictions in requirements
 
 ## How It Works
 
 ### Step 1: Diagnose
 
-Run diagnostics to detect what's broken:
-
+**For Code:**
 ```bash
-# Check for test failures
-npm test 2>&1 || pnpm test 2>&1 || yarn test 2>&1
+# Check tests, build, types, lint
+npm test && npm run build && npx tsc --noEmit && npm run lint
+```
 
-# Check for build errors
-npm run build 2>&1 || pnpm build 2>&1
+**For Specs:**
+```bash
+# Find spec files
+find . -name "*.spec.md" -o -name "*.story.md" -o -name "PRD*.md"
 
-# Check for lint errors
-npm run lint 2>&1 || pnpm lint 2>&1
-
-# Check for TypeScript errors
-npx tsc --noEmit 2>&1
+# Check .spectre/ for context
+cat .spectre/context.json
 ```
 
 ### Step 2: Identify Problem Type
 
 | Detection | Problem Type | Agent |
 |-----------|--------------|-------|
-| `FAIL`, `expect`, `assertion` | Test failure | `frontend-dev` or `backend-dev` |
-| `error TS`, `Cannot find`, `not assignable` | Type error | `software-craftsman` |
+| `FAIL`, `expect`, `assertion` | Test failure | `frontend-dev` / `backend-dev` |
+| `error TS`, `not assignable` | Type error | `software-craftsman` |
 | `Build failed`, `Module not found` | Build error | `software-craftsman` |
-| `eslint`, `prettier`, `Parsing error` | Lint error | Last active dev |
-| `ENOENT`, `Cannot resolve` | Missing dependency | `software-craftsman` |
+| `eslint`, `prettier` | Lint error | Last active dev |
+| Spec vs code mismatch | Spec drift | `product-owner` + `software-craftsman` |
+| Missing acceptance criteria | Incomplete spec | `product-owner` |
+| Implementation gaps | Missing features | `software-craftsman` + dev |
 
 ### Step 3: Gather Context
 
@@ -256,6 +273,95 @@ Focus only on TypeScript errors:
 3. Spawn dev for simple fixes
 4. Re-run type check to verify
 
+### `/heal spec`
+
+Fix specification issues:
+
+```bash
+/heal spec                    # Analyze spec vs implementation
+/heal spec user-login.md      # Fix specific spec file
+/heal spec --sync             # Sync spec to match implementation
+/heal spec --impl             # Update implementation to match spec
+```
+
+#### What It Detects
+
+| Issue | Description | Agent |
+|-------|-------------|-------|
+| **Spec drift** | Implementation doesn't match spec | `product-owner` analyzes |
+| **Missing criteria** | Acceptance criteria incomplete | `product-owner` completes |
+| **Untested criteria** | Criteria without tests | `qa-engineer` adds tests |
+| **Orphan code** | Code not in any spec | `product-owner` documents |
+| **Contradictions** | Conflicting requirements | `product-owner` resolves |
+
+#### Heal Flow for Specs
+
+```
+┌─────────────────┐         ┌─────────────────┐
+│  Read Spec      │         │  Read Code      │
+│  (*.spec.md)    │         │  (src/)         │
+└────────┬────────┘         └────────┬────────┘
+         │                           │
+         └─────────┬─────────────────┘
+                   │
+                   ▼
+         ┌─────────────────┐
+         │  Compare &      │
+         │  Find Gaps      │
+         └────────┬────────┘
+                   │
+         ┌─────────┴─────────┐
+         │                   │
+         ▼                   ▼
+┌─────────────────┐  ┌─────────────────┐
+│  Update Spec    │  │  Update Code    │
+│  (--sync)       │  │  (--impl)       │
+└─────────────────┘  └─────────────────┘
+```
+
+#### Example: Spec Drift
+
+```
+🔍 Analyzing spec vs implementation...
+
+📋 Spec: docs/specs/user-login.spec.md
+📁 Code: src/features/auth/
+
+Found 3 issues:
+
+1. ❌ Missing in code: "Remember me" checkbox (spec line 24)
+2. ❌ Missing in spec: Password strength indicator (src/Login.tsx:45)
+3. ⚠️ Mismatch: Spec says "5 attempts", code has "3 attempts"
+
+How to heal?
+  [Update spec to match code]
+  [Update code to match spec]
+  [Review each issue]
+```
+
+#### Example: Missing Acceptance Criteria
+
+```
+🔍 Analyzing spec completeness...
+
+📋 Spec: docs/specs/checkout.spec.md
+
+Found incomplete criteria:
+
+1. ⚠️ "User can apply discount code" — no success/error states defined
+2. ⚠️ "Order confirmation" — no email specification
+3. ❌ Missing: Edge case for empty cart
+
+🔧 Healing with product-owner...
+
+product-owner is completing the spec:
+  → Added success/error states for discount code
+  → Specified confirmation email content
+  → Added empty cart edge case
+
+✅ Spec healed! 3 criteria completed.
+```
+
 ---
 
 ## Smart Detection
@@ -264,10 +370,13 @@ If the user provides context, use it:
 
 | Input | Action |
 |-------|--------|
-| `/heal` | Full diagnostic, fix all |
+| `/heal` | Full diagnostic (code + specs), fix all |
 | `/heal tests` | Fix tests only |
+| `/heal spec` | Fix spec issues only |
 | `/heal Login.test.tsx` | Fix specific test file |
+| `/heal user-login.spec.md` | Fix specific spec file |
 | `/heal "Cannot find module"` | Fix that specific error |
+| `/heal "spec drift"` | Sync spec and implementation |
 
 ---
 

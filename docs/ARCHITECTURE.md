@@ -244,35 +244,58 @@ Caractéristiques : Mode éducatif, explications prioritaires.
 
 #### Le skill `/heal` en détail
 
-Auto-réparation : détecte ce qui est cassé et répare automatiquement.
+Auto-réparation : détecte ce qui est cassé (code OU specs) et répare automatiquement.
 
 ##### Usage
 
 ```bash
-/heal           # Diagnostique et répare tout
+/heal           # Diagnostique et répare tout (code + specs)
 /heal tests     # Répare les tests qui échouent
 /heal build     # Répare les erreurs de build
 /heal types     # Répare les erreurs TypeScript
 /heal lint      # Répare les erreurs de lint
+/heal spec      # Répare les écarts spec/implémentation
 ```
 
-##### Flow
+##### Ce qui peut être réparé
+
+**🔧 Code**
+- Tests qui échouent
+- Erreurs de build
+- Erreurs TypeScript
+- Erreurs de lint
+
+**📋 Specs**
+- Spec qui ne correspond pas à l'implémentation
+- Critères d'acceptation manquants
+- User stories incomplètes
+- Contradictions dans les requirements
+
+##### Flow Code
 
 ```
 ┌─────────────┐         ┌─────────────┐         ┌─────────────┐
 │  Diagnose   │ ──────▶ │    Fix      │ ──────▶ │   Verify    │
-│             │         │             │         │             │
-│ Tests?      │         │ Dev fixes   │         │ QA checks   │
-│ Build?      │         │ code        │         │ tests pass? │
-│ Types?      │         │             │         │             │
 └─────────────┘         └─────────────┘         └──────┬──────┘
                                                        │
                                             ┌──────────┴──────────┐
-                                            │                     │
                                           PASS                  FAIL
                                             │                     │
-                                            ▼                     ▼
                                       ✅ Healed!            🔄 Retry (max 3)
+```
+
+##### Flow Spec
+
+```
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│  Read Spec  │         │  Read Code  │         │   Compare   │
+└──────┬──────┘         └──────┬──────┘         └──────┬──────┘
+       └───────────────────────┴───────────────────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    ▼                     ▼
+             Update Spec           Update Code
+             (--sync)              (--impl)
 ```
 
 ##### Détection automatique
@@ -283,6 +306,8 @@ Auto-réparation : détecte ce qui est cassé et répare automatiquement.
 | `error TS`, `not assignable` | Type error | `software-craftsman` |
 | `Build failed`, `Module not found` | Build error | `software-craftsman` |
 | `eslint`, `prettier` | Lint error | Dernier dev actif |
+| Spec vs code mismatch | Spec drift | `product-owner` |
+| Missing acceptance criteria | Incomplete spec | `product-owner` |
 
 ##### Ordre de réparation
 
@@ -290,6 +315,7 @@ Auto-réparation : détecte ce qui est cassé et répare automatiquement.
 2. **Build** (on ne peut pas tester sans build)
 3. **Tests** (fonctionnalité core)
 4. **Lint** (qualité de code)
+5. **Specs** (documentation et alignment)
 
 ##### Learnings
 
@@ -824,10 +850,11 @@ project/
 ### `/heal` — Réparer
 
 ```bash
-/heal           # Diagnostique et répare tout
-/heal tests     # Répare uniquement les tests
-/heal build     # Répare uniquement le build
-/heal types     # Répare uniquement les types
+/heal           # Diagnostique et répare tout (code + specs)
+/heal tests     # Répare les tests
+/heal build     # Répare le build
+/heal types     # Répare les types
+/heal spec      # Répare les écarts spec/code
 ```
 
 ### Workflow typique

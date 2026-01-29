@@ -20,13 +20,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ### `/heal` — Auto-Repair
 
 ```bash
-/heal           # Detect and fix everything broken
+/heal           # Detect and fix everything (code + specs)
 /heal tests     # Fix failing tests
 /heal build     # Fix build errors
 /heal types     # Fix TypeScript errors
+/heal spec      # Fix spec/implementation mismatch
 ```
 
-Diagnoses → Fixes → Verifies → Loops until healed.
+- **Code:** Diagnoses → Fixes → Verifies → Loops until healed
+- **Specs:** Compares spec vs code → Syncs or updates
 
 ### `/guide` — Guided Build
 

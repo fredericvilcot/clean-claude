@@ -62,12 +62,14 @@ For building new features, the guide adapts to your work context.
 Something's broken? Just run `/heal`. Spectre detects the problem and fixes it.
 
 ```bash
-/heal           # Detect and fix everything
+/heal           # Detect and fix everything (code + specs)
 /heal tests     # Fix failing tests
 /heal build     # Fix build errors
 /heal types     # Fix TypeScript errors
+/heal spec      # Fix spec/implementation mismatch
 ```
 
+**Code healing:**
 ```
 🔍 Diagnosing...
 
@@ -76,16 +78,25 @@ Found 2 issues:
   ❌ Types: 1 error
 
 🔧 Healing...
-
   → software-craftsman fixed type error
   → frontend-dev fixed test
 
-🧪 Verifying...
-
-  ✓ All tests passing
-  ✓ Build successful
-
 ✅ Healed!
+```
+
+**Spec healing:**
+```
+🔍 Analyzing spec vs implementation...
+
+Found 2 issues:
+  ❌ Missing in code: "Remember me" checkbox
+  ⚠️ Mismatch: Spec says "5 attempts", code has "3"
+
+🔧 Healing...
+  → product-owner updated spec
+  → frontend-dev added missing feature
+
+✅ Spec synced!
 ```
 
 ---
