@@ -211,9 +211,10 @@ Something broke? **Don't debug. Just heal.**
 
 ```bash
 /learn                       # 📖 Full project analysis
+/learn <file>                # 📄 Learn from specific file
+/learn <folder>              # 📁 Learn from specific folder
 /learn --example <file>      # 🌟 "THIS is my gold standard"
 /learn --auto                # 🤖 Intelligent scan with craft guard
-/learn --auto --generate     # ⚡ Generate custom skills from patterns
 ```
 
 ```
@@ -248,13 +249,6 @@ Apply craft principles to specific areas:
 | `/react-craft` | Component design, hooks, accessibility |
 | `/test-craft` | TDD/BDD, test pyramid, proper mocks |
 | `/init-frontend` | Bootstrap React + Vite + TS + Vitest |
-
----
-
-## 📚 DOCUMENTATION
-
-- 📖 [Architecture Guide](docs/ARCHITECTURE.md) — How it works under the hood
-- 📝 [CLAUDE.md](CLAUDE.md) — Instructions for Claude Code
 
 ---
 

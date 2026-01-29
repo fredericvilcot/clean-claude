@@ -1,2 +1,5 @@
 # Spectre runtime state (regenerated per session)
 .spectre/
+
+# Local documentation (not committed)
+.local-docs/
