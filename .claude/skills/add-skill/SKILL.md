@@ -297,7 +297,7 @@ type Command =
 
 ```
 Task(
-  subagent_type: "software-craftsman",
+  subagent_type: "architect",
   prompt: """
     Validate if this skill is CRAFT-ALIGNED:
 
@@ -323,7 +323,7 @@ Task(
 
 ```
 Task(
-  subagent_type: "software-craftsman",
+  subagent_type: "architect",
   prompt: """
     Generate an expert-level skill document for: DDD
 

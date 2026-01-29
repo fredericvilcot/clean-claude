@@ -115,8 +115,8 @@ Architect designs → Frontend implements → QA verifies → errors route back
 ### 2. QA → Architect (Design Flaws)
 ```
 ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│     qa-      │ design  │   software-  │  new    │     dev      │
-│   engineer   │  flaw   │   craftsman  │ design  │              │
+│     qa-      │ design  │   architect  │  new    │     dev      │
+│   engineer   │  flaw   │              │ design  │              │
 └──────────────┘ ──────▶ └──────────────┘ ──────▶ └──────────────┘
        ▲                                                 │
        │                    re-verify                    │
@@ -142,8 +142,8 @@ Architect designs → Frontend implements → QA verifies → errors route back
 ### 4. Dev → Architect (Design Block)
 ```
 ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│  frontend-   │ blocked │   software-  │ adjust  │  frontend-   │
-│     dev      │   by    │   craftsman  │ design  │     dev      │
+│  frontend-   │ blocked │   architect  │ adjust  │  frontend-   │
+│     dev      │   by    │              │ design  │     dev      │
 └──────────────┘ design  └──────────────┘ ──────▶ └──────────────┘
                  ──────▶
 ```
@@ -167,8 +167,8 @@ Architect designs → Frontend implements → QA verifies → errors route back
 ### 6. Architect → PO (Feasibility)
 ```
 ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│   software-  │ contra- │   product-   │ decide  │   software-  │
-│   craftsman  │ diction │    owner     │ tradeoff│   craftsman  │
+│   architect  │ contra- │   product-   │ decide  │   architect  │
+│              │ diction │    owner     │ tradeoff│              │
 └──────────────┘ ──────▶ └──────────────┘ ──────▶ └──────────────┘
 ```
 **Trigger:** `contradiction`, `impossible`, `tradeoff needed`, `mutually exclusive`
@@ -179,8 +179,8 @@ Architect designs → Frontend implements → QA verifies → errors route back
 ### 7. Architect → Dev (Code Review)
 ```
 ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│   software-  │ review  │  frontend-   │ improve │   software-  │
-│   craftsman  │ feedback│     dev      │   code  │   craftsman  │
+│   architect  │ review  │  frontend-   │ improve │   architect  │
+│              │ feedback│     dev      │   code  │              │
 └──────────────┘ ──────▶ └──────────────┘ ──────▶ └──────────────┘
        │                                                 │
        └──────────────── approved ◀──────────────────────┘
@@ -220,8 +220,8 @@ Architect designs → Frontend implements → QA verifies → errors route back
 │          │ spec                                              │           │
 │          ▼                                    contradiction  │           │
 │  ┌───────────────┐◀────────────────────────────────────┐     │           │
-│  │   software-   │                                     │     │           │
-│  │   craftsman   │─────── design flaw ─────────────────│─────│───┐       │
+│  │   architect   │                                     │     │           │
+│  │               │─────── design flaw ─────────────────│─────│───┐       │
 │  └───────┬───────┘                                     │     │   │       │
 │          │ design                                      │     │   │       │
 │          ▼                              blocked by     │     │   │       │
