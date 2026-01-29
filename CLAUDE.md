@@ -10,11 +10,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Usage
 
-### The Only Command
+### Two Commands
 
 ```bash
-/guide
+/guide    # Build something — adapts to your context
+/heal     # Fix something — auto-repair
 ```
+
+### `/heal` — Auto-Repair
+
+```bash
+/heal           # Detect and fix everything broken
+/heal tests     # Fix failing tests
+/heal build     # Fix build errors
+/heal types     # Fix TypeScript errors
+```
+
+Diagnoses → Fixes → Verifies → Loops until healed.
+
+### `/guide` — Guided Build
 
 Spectre adapts to your work context and configures the right agents.
 

@@ -147,7 +147,8 @@ Détails d'exécution...
 
 | Skill | Description |
 |-------|-------------|
-| **/guide** | **Point d'entrée principal** — mode guidé interactif |
+| **/guide** | **Build** — mode guidé adapté au contexte |
+| **/heal** | **Fix** — auto-réparation (tests, build, types) |
 | **/typescript-craft** | Principes craft TypeScript |
 | **/react-craft** | Principes craft React |
 | **/test-craft** | TDD/BDD, test pyramid |
@@ -240,6 +241,59 @@ Caractéristiques : Implémentation directe, overhead minimal.
 | Testing | `/test-craft` |
 
 Caractéristiques : Mode éducatif, explications prioritaires.
+
+#### Le skill `/heal` en détail
+
+Auto-réparation : détecte ce qui est cassé et répare automatiquement.
+
+##### Usage
+
+```bash
+/heal           # Diagnostique et répare tout
+/heal tests     # Répare les tests qui échouent
+/heal build     # Répare les erreurs de build
+/heal types     # Répare les erreurs TypeScript
+/heal lint      # Répare les erreurs de lint
+```
+
+##### Flow
+
+```
+┌─────────────┐         ┌─────────────┐         ┌─────────────┐
+│  Diagnose   │ ──────▶ │    Fix      │ ──────▶ │   Verify    │
+│             │         │             │         │             │
+│ Tests?      │         │ Dev fixes   │         │ QA checks   │
+│ Build?      │         │ code        │         │ tests pass? │
+│ Types?      │         │             │         │             │
+└─────────────┘         └─────────────┘         └──────┬──────┘
+                                                       │
+                                            ┌──────────┴──────────┐
+                                            │                     │
+                                          PASS                  FAIL
+                                            │                     │
+                                            ▼                     ▼
+                                      ✅ Healed!            🔄 Retry (max 3)
+```
+
+##### Détection automatique
+
+| Pattern détecté | Type | Agent |
+|-----------------|------|-------|
+| `FAIL`, `expect`, `assertion` | Test failure | `frontend-dev` / `backend-dev` |
+| `error TS`, `not assignable` | Type error | `software-craftsman` |
+| `Build failed`, `Module not found` | Build error | `software-craftsman` |
+| `eslint`, `prettier` | Lint error | Dernier dev actif |
+
+##### Ordre de réparation
+
+1. **Types** (causent souvent d'autres erreurs)
+2. **Build** (on ne peut pas tester sans build)
+3. **Tests** (fonctionnalité core)
+4. **Lint** (qualité de code)
+
+##### Learnings
+
+Après une réparation réussie, le pattern est enregistré dans `.spectre/learnings.jsonl` pour accélérer les futures réparations similaires.
 
 ---
 
@@ -716,6 +770,7 @@ Crée :
 │   └── orchestrator.md
 └── skills/
     ├── guide/SKILL.md
+    ├── heal/SKILL.md
     ├── typescript-craft/SKILL.md
     ├── react-craft/SKILL.md
     ├── test-craft/SKILL.md
@@ -748,31 +803,44 @@ project/
 
 ## Utilisation
 
-### La seule commande à connaître
+### Deux commandes
+
+```bash
+/guide    # Construire quelque chose de nouveau
+/heal     # Réparer ce qui est cassé
+```
+
+### `/guide` — Construire
 
 ```bash
 /guide
+# → Contexte ? [ Product Team | Startup | Freelance | Learning ]
+# → Objectif ? [ Build | Fix | Improve | Think ]
+# → Questions contextuelles...
+# → Décrivez votre besoin
+# → Les agents travaillent
 ```
 
-C'est tout. Spectre vous pose des questions et configure les bons agents.
+### `/heal` — Réparer
+
+```bash
+/heal           # Diagnostique et répare tout
+/heal tests     # Répare uniquement les tests
+/heal build     # Répare uniquement le build
+/heal types     # Répare uniquement les types
+```
 
 ### Workflow typique
 
 ```bash
-# 1. Lancez le guide
+# 1. Nouveau projet ou feature
 /guide
 
-# 2. Répondez aux questions
-#    - Situation ? [ Build | Fix | Improve | Think ]
-#    - Point de départ ? [ Idée | Specs claires | Juste coder ]
-#    - Domaine ? [ UI | Backend | Les deux ]
-#    - Testé ? [ Oui | Non ]
+# 2. Si quelque chose casse
+/heal
 
-# 3. Décrivez votre besoin
-#    > "Password reset via email"
-
-# 4. Les agents travaillent automatiquement
-#    PO → Architect → Dev → QA → [fix loop] → Complete
+# 3. Les agents travaillent automatiquement
+#    Diagnose → Fix → Verify → Loop until healed
 ```
 
 ### Raccourcis

@@ -43,10 +43,50 @@ Restart Claude Code after installation.
 ### Use
 
 ```bash
-/guide
+/guide    # Build something new — adapts to your context
+/heal     # Something's broken — auto-repair
 ```
 
-That's it. Spectre adapts to how you work.
+That's it. Two commands for everything.
+
+---
+
+## The Two Commands
+
+### `/guide` — Build with Guidance
+
+For building new features, the guide adapts to your work context.
+
+### `/heal` — Auto-Repair
+
+Something's broken? Just run `/heal`. Spectre detects the problem and fixes it.
+
+```bash
+/heal           # Detect and fix everything
+/heal tests     # Fix failing tests
+/heal build     # Fix build errors
+/heal types     # Fix TypeScript errors
+```
+
+```
+🔍 Diagnosing...
+
+Found 2 issues:
+  ❌ Tests: 3 failing
+  ❌ Types: 1 error
+
+🔧 Healing...
+
+  → software-craftsman fixed type error
+  → frontend-dev fixed test
+
+🧪 Verifying...
+
+  ✓ All tests passing
+  ✓ Build successful
+
+✅ Healed!
+```
 
 ---
 
