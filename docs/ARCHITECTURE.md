@@ -26,22 +26,33 @@ Spectre Agents est une bibliothèque d'agents et skills pour Claude Code, orient
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                         SPECTRE AGENTS                                  │
 │                                                                         │
-│                    ┌─────────────┐   ┌─────────────┐                    │
-│                    │   /craft    │   │   /heal     │                    │
-│                    │   create    │   │   repair    │                    │
-│                    └──────┬──────┘   └──────┬──────┘                    │
-│                           └────────┬────────┘                           │
-│                                    ▼                                    │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌─────────────────────────┐ │
-│  │     AGENTS      │  │  CRAFT SKILLS   │  │    REACTIVE SYSTEM      │ │
-│  │                 │  │                 │  │                         │ │
-│  │ • software-     │  │ • typescript-   │  │ • hooks (SubagentStop)  │ │
-│  │   craftsman     │  │   craft         │  │ • shared state          │ │
-│  │ • product-owner │  │ • react-craft   │  │ • auto-correction loop  │ │
-│  │ • frontend-dev  │  │ • test-craft    │  │ • learnings             │ │
-│  │ • qa-engineer   │  │ • init-frontend │  │                         │ │
-│  │                 │  │                 │  │                         │ │
-│  └─────────────────┘  └─────────────────┘  └─────────────────────────┘ │
+│            ┌─────────────┐ ┌─────────────┐ ┌─────────────┐              │
+│            │   /learn    │ │   /craft    │ │   /heal     │              │
+│            │   adapt     │ │   create    │ │   repair    │              │
+│            └──────┬──────┘ └──────┬──────┘ └──────┬──────┘              │
+│                   │               │               │                     │
+│                   ▼               └───────┬───────┘                     │
+│            ┌─────────────┐                ▼                             │
+│            │  LEARNINGS  │◀────── injects into ────────┐                │
+│            │             │                             │                │
+│            │ • code      │     ┌─────────────────┐     │                │
+│            │ • tests     │     │     AGENTS      │     │                │
+│            │ • specs     │────▶│                 │◀────┘                │
+│            │ • style     │     │ • software-     │                      │
+│            └─────────────┘     │   craftsman     │                      │
+│                                │ • product-owner │                      │
+│  ┌─────────────────┐           │ • frontend-dev  │                      │
+│  │  CRAFT SKILLS   │           │ • qa-engineer   │                      │
+│  │                 │           │                 │                      │
+│  │ • typescript-   │           └────────┬────────┘                      │
+│  │   craft         │                    │                               │
+│  │ • react-craft   │           ┌────────▼────────┐                      │
+│  │ • test-craft    │           │ REACTIVE SYSTEM │                      │
+│  │ • init-frontend │           │                 │                      │
+│  │                 │           │ • 8 agent links │                      │
+│  └─────────────────┘           │ • smart routing │                      │
+│                                │ • auto-correct  │                      │
+│                                └─────────────────┘                      │
 │                                                                         │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -150,6 +161,7 @@ Détails d'exécution...
 |-------|-------------|
 | **/craft** | **Build** — mode guidé adapté au contexte |
 | **/heal** | **Fix** — auto-réparation (tests, build, types) |
+| **/learn** | **Adapt** — apprend les conventions du projet |
 | **/typescript-craft** | Principes craft TypeScript |
 | **/react-craft** | Principes craft React |
 | **/test-craft** | TDD/BDD, test pyramid |
@@ -322,6 +334,119 @@ Auto-réparation : détecte ce qui est cassé (code OU specs) et répare automat
 
 Après une réparation réussie, le pattern est enregistré dans `.spectre/learnings.jsonl` pour accélérer les futures réparations similaires.
 
+#### Le skill `/learn` en détail
+
+Auto-apprentissage des conventions du projet. Les agents s'adaptent à VOS pratiques.
+
+##### Usage
+
+```bash
+/learn                       # Analyse complète du projet
+/learn code                  # Architecture & patterns de code
+/learn tests                 # Conventions de test
+/learn specs                 # Format des specs
+/learn style                 # Naming & formatting
+/learn <file>                # Apprendre d'un fichier exemplaire
+/learn <folder>              # Apprendre d'un dossier spécifique
+/learn --example <file>      # Marquer comme gold standard
+/learn --show                # Afficher les apprentissages
+/learn --reset               # Reset
+```
+
+##### Fine-Tuning
+
+| Scope | Confiance | Usage |
+|-------|-----------|-------|
+| Projet complet | 0.6-0.8 | Vue d'ensemble |
+| Fichier spécifique | 0.85 | "Apprends de ce fichier" |
+| `--example` | 0.95 | "C'est LE standard" |
+| Correction user | 0.99 | Override explicite |
+
+```bash
+# Marquer un fichier comme référence
+/learn --example src/features/auth/AuthService.ts
+
+# Les agents référenceront ce fichier pour écrire des services similaires
+```
+
+##### Ce qui est appris
+
+| Catégorie | Patterns Détectés |
+|-----------|-------------------|
+| **Tech Stack** | Framework, build tool, test framework |
+| **Architecture** | Structure folders, layers, imports |
+| **Code Style** | Error handling, async patterns, exports |
+| **Test Style** | Framework, structure, mocking, fixtures |
+| **Spec Format** | Sections, user stories, acceptance criteria |
+| **Naming** | Files, components, functions, types |
+| **Formatting** | Prettier config, line length, quotes |
+
+##### Storage
+
+```
+.spectre/learnings/
+├── tech-stack.json       # Technologies détectées
+├── code-patterns.json    # Architecture & code
+├── test-patterns.json    # Testing
+├── spec-patterns.json    # Specs/PRD
+├── style-patterns.json   # Naming & formatting
+└── summary.md            # Résumé lisible
+```
+
+##### Exemple de code-patterns.json
+
+```json
+{
+  "architecture": {
+    "pattern": "feature-based",
+    "layers": {
+      "features": "src/features/",
+      "shared": "src/components/"
+    }
+  },
+  "imports": {
+    "style": "absolute",
+    "alias": "@/",
+    "barrels": true
+  },
+  "errorHandling": {
+    "pattern": "result-type",
+    "throwsExceptions": false
+  },
+  "confidence": 0.85
+}
+```
+
+##### Injection dans le Contexte Agent
+
+Quand un agent démarre, il reçoit les learnings :
+
+```
+## Conventions du Projet (via /learn)
+
+**Architecture:** Feature-based (src/features/)
+**Imports:** Absolus avec @/, barrel exports
+**Error handling:** Result<T, E>, pas d'exceptions
+**Tests:** Vitest, co-localisés, BDD naming
+**Specs:** Markdown avec Gherkin AC
+```
+
+##### Apprentissage Incrémental
+
+Les learnings s'améliorent avec le temps :
+
+| Source | Ce qui est appris |
+|--------|-------------------|
+| **Fixes** | Patterns qui marchent |
+| **Code reviews** | Feedback de l'architecte |
+| **User corrections** | Corrections explicites |
+
+Confiance ajustée :
+- Détection initiale : 0.7
+- Confirmé par usage : +0.1
+- Contredit : -0.2
+- Corrigé par user : → 0.95
+
 ---
 
 ### Scripts & Hooks
@@ -458,52 +583,103 @@ Dans `.claude/settings.json` du projet :
 
 ## Architecture Réactive
 
-### Vue d'ensemble
+### Vue d'ensemble — Tous les liens
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
-│                         REACTIVE LOOP                                   │
-│                                                                         │
-│  User: "Build login feature"                                            │
-│         │                                                               │
-│         ▼                                                               │
-│  ┌─────────────────┐                                                    │
-│  │   Orchestrator  │◀──────────────────────────────────────┐            │
-│  │   (coordinator) │                                       │            │
-│  └────────┬────────┘                                       │            │
-│           │ spawn                                          │            │
-│           ▼                                                │            │
-│  ┌──────────────┐     ┌──────────────┐     ┌────────────┐ │            │
-│  │   Product    │────▶│   Software   │────▶│  Frontend  │ │            │
-│  │    Owner     │     │   Craftsman  │     │    Dev     │ │            │
-│  └──────────────┘     └──────────────┘     └─────┬──────┘ │            │
-│         │                    │                   │        │            │
-│         ▼                    ▼                   ▼        │            │
-│  ┌──────────────┐     ┌──────────────┐     ┌────────────┐ │            │
-│  │  user-story  │     │   tech-spec  │     │    code    │ │            │
-│  │     .md      │     │     .md      │     │   + tests  │ │            │
-│  └──────────────┘     └──────────────┘     └─────┬──────┘ │            │
-│                                                  │        │            │
-│                                                  ▼        │            │
-│                                           ┌────────────┐  │            │
-│                                           │     QA     │  │            │
-│                                           │  Engineer  │  │            │
-│                                           └─────┬──────┘  │            │
-│                                                 │         │            │
-│                              ┌──────────────────┼─────────┘            │
-│                              │                  │                      │
-│                              ▼                  ▼                      │
-│                         [SUCCESS]          [ERROR]                     │
-│                              │                  │                      │
-│                              ▼                  ▼                      │
-│                         Complete         Retry (max 3)                 │
-│                                                 │                      │
-│                                                 ▼                      │
-│                                          Frontend Dev                  │
-│                                          (with error                   │
-│                                           context)                     │
-│                                                                        │
-└────────────────────────────────────────────────────────────────────────┘
+│                    COMPLETE REACTIVE SYSTEM                              │
+│                                                                          │
+│  ┌───────────────────────────────────────────────────────────────────┐  │
+│  │                        AGENT NETWORK                               │  │
+│  │                                                                    │  │
+│  │                    ┌─────────────────┐                             │  │
+│  │        ┌──────────▶│  product-owner  │◀──────────────┐             │  │
+│  │        │           └────────┬────────┘               │             │  │
+│  │        │                    │                        │             │  │
+│  │   contradiction        spec │                   spec_gap           │  │
+│  │   feasibility               │                   unclear            │  │
+│  │        │                    ▼                        │             │  │
+│  │        │           ┌─────────────────┐               │             │  │
+│  │        └───────────│    software-    │◀──────────────│─────┐       │  │
+│  │                    │    craftsman    │               │     │       │  │
+│  │        ┌──────────▶└────────┬────────┘               │     │       │  │
+│  │        │                    │                        │     │       │  │
+│  │   design_block         design│review            design_flaw│       │  │
+│  │        │                    │                              │       │  │
+│  │        │                    ▼                              │       │  │
+│  │        │           ┌─────────────────┐                     │       │  │
+│  │        └───────────│   frontend-dev  │─────────────────────│───┐   │  │
+│  │                    │   backend-dev   │                     │   │   │  │
+│  │                    └────────┬────────┘                     │   │   │  │
+│  │                             │                              │   │   │  │
+│  │                        code │                              │   │   │  │
+│  │                             ▼                              │   │   │  │
+│  │                    ┌─────────────────┐                     │   │   │  │
+│  │                    │   qa-engineer   │─────────────────────┘   │   │  │
+│  │                    └────────┬────────┘                         │   │  │
+│  │                             │                                  │   │  │
+│  │                       test_failure ────────────────────────────┘   │  │
+│  │                                                                    │  │
+│  └───────────────────────────────────────────────────────────────────┘  │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Matrice des Liens Réactifs
+
+| Source | Cible | Trigger | Description |
+|--------|-------|---------|-------------|
+| **QA → Dev** | frontend-dev / backend-dev | Test failure | Dev fixes failing tests |
+| **QA → Architect** | software-craftsman | Design flaw | Architect redesigns |
+| **QA → PO** | product-owner | Unclear criteria | PO clarifies spec |
+| **Dev → Architect** | software-craftsman | Design block | Architect adjusts design |
+| **Dev → PO** | product-owner | Spec gap | PO completes requirements |
+| **Architect → PO** | product-owner | Contradiction | PO arbitrates tradeoff |
+| **Architect → Dev** | frontend-dev / backend-dev | Code review | Dev improves code |
+
+### Détection des Types d'Erreur
+
+| Type | Patterns Détectés | Agent Cible |
+|------|-------------------|-------------|
+| `test_failure` | FAIL, expect, assertion, ✕ | Dev (owner) |
+| `type_error` | error TS, not assignable, Type | software-craftsman |
+| `design_flaw` | circular, race condition, deadlock, coupling | software-craftsman |
+| `build_error` | Build failed, Module not found, compilation | software-craftsman |
+| `lint_error` | eslint, prettier, warning | Dev (last active) |
+| `spec_gap` | edge case, not covered, what if, missing | product-owner |
+| `unclear_criteria` | ambiguous, not specified, undefined | product-owner |
+| `contradiction` | impossible, mutually exclusive, conflict | product-owner |
+| `design_block` | cannot implement, blocked, need decision | software-craftsman |
+| `spec_drift` | mismatch between spec and code | product-owner |
+
+### Workflow Visuel (Ancien vs Nouveau)
+
+**Avant (linéaire) :**
+```
+PO → Architect → Dev → QA → (fail?) → Dev → QA
+```
+
+**Maintenant (mesh réactif) :**
+```
+PO ◀──────────────────────────────────────────────┐
+ │                                                │
+ ├── contradiction ◀─────── Architect             │
+ ├── spec_gap ◀──────────── Dev                   │
+ └── unclear ◀───────────── QA                    │
+                                                  │
+Architect ◀───────────────────────────────────────│──┐
+ │                                                │  │
+ ├── design_block ◀────────── Dev                 │  │
+ └── design_flaw ◀─────────── QA                  │  │
+                                                  │  │
+Dev ◀─────────────────────────────────────────────│──│──┐
+ │                                                │  │  │
+ ├── test_failure ◀────────── QA ─────────────────┘  │  │
+ └── review_feedback ◀─────── Architect ─────────────┘  │
+                                                        │
+QA ◀────────────────────────────────────────────────────┘
+ │
+ └── (verifies everything, routes errors to right agent)
 ```
 
 ### Shared State (.spectre/)
@@ -513,11 +689,18 @@ Dans `.claude/settings.json` du projet :
 ├── state.json        # État du workflow
 ├── errors.jsonl      # Log des erreurs (append-only)
 ├── events.jsonl      # Log des événements
-├── learnings.jsonl   # Patterns appris
+├── learnings.jsonl   # Patterns appris (fixes)
 ├── ownership.json    # Qui a modifié quels fichiers
 ├── links.json        # Configuration des liens réactifs (/agent)
 ├── context.json      # Contexte de la feature courante
-└── trigger           # Fichier de déclenchement (transitoire)
+├── trigger           # Fichier de déclenchement (transitoire)
+└── learnings/        # Conventions du projet (/learn)
+    ├── tech-stack.json
+    ├── code-patterns.json
+    ├── test-patterns.json
+    ├── spec-patterns.json
+    ├── style-patterns.json
+    └── summary.md
 ```
 
 #### state.json
@@ -542,9 +725,29 @@ Dans `.claude/settings.json` du projet :
 #### errors.jsonl
 
 ```jsonl
-{"timestamp":"...","type":"test_failure","message":"Button not found","file":"src/Login.tsx","resolved":false}
-{"timestamp":"...","type":"type_error","message":"Property 'name' does not exist","file":"src/User.ts","resolved":true}
+{"timestamp":"...","type":"test_failure","message":"Button not found","file":"src/Login.tsx","resolved":false,"routedTo":"frontend-dev"}
+{"timestamp":"...","type":"type_error","message":"Property 'name' does not exist","file":"src/User.ts","resolved":true,"routedTo":"software-craftsman"}
+{"timestamp":"...","type":"design_flaw","message":"Circular dependency detected","file":"src/services/","resolved":false,"routedTo":"software-craftsman"}
+{"timestamp":"...","type":"spec_gap","message":"Edge case: empty cart not specified","file":"checkout.spec.md","resolved":true,"routedTo":"product-owner"}
+{"timestamp":"...","type":"unclear_criteria","message":"What does 'fast' mean?","file":"performance.spec.md","resolved":false,"routedTo":"product-owner"}
+{"timestamp":"...","type":"contradiction","message":"Offline + real-time sync conflict","file":"sync.spec.md","resolved":true,"routedTo":"product-owner"}
+{"timestamp":"...","type":"design_block","message":"Cannot implement without API change","file":"src/api/","resolved":false,"routedTo":"software-craftsman"}
 ```
+
+#### Error Types Reference
+
+| Type | Description | Routed To |
+|------|-------------|-----------|
+| `test_failure` | Test assertion failed | Dev (owner) |
+| `type_error` | TypeScript compilation error | software-craftsman |
+| `design_flaw` | Architectural issue (circular dep, race condition) | software-craftsman |
+| `build_error` | Build/compilation failure | software-craftsman |
+| `lint_error` | ESLint/Prettier violation | Dev (last active) |
+| `spec_gap` | Missing requirement or edge case | product-owner |
+| `unclear_criteria` | Ambiguous acceptance criteria | product-owner |
+| `contradiction` | Conflicting requirements | product-owner |
+| `design_block` | Implementation blocked by design | software-craftsman |
+| `spec_drift` | Code doesn't match specification | product-owner |
 
 #### learnings.jsonl
 
@@ -603,14 +806,15 @@ frontend-dev → qa-engineer → (error?) → frontend-dev → qa-engineer → .
 
 ### Phases du Workflow
 
-| Phase | Agent | Entrée | Sortie |
-|-------|-------|--------|--------|
-| `define` | product-owner | Feature description | user-story.md |
-| `design` | software-craftsman | User story | technical-design.md |
-| `implement` | frontend-dev | Tech spec | Code + tests |
-| `verify` | qa-engineer | Implementation | Test results |
-| `fix` | frontend-dev | Error details | Fixed code |
-| `complete` | — | All tests pass | Feature done |
+| Phase | Agent | Entrée | Sortie | Reactive Routes |
+|-------|-------|--------|--------|-----------------|
+| `define` | product-owner | Feature description | user-story.md | — |
+| `design` | software-craftsman | User story | technical-design.md | → PO (contradiction) |
+| `implement` | frontend-dev | Tech spec | Code + tests | → Architect (blocked), → PO (spec gap) |
+| `verify` | qa-engineer | Implementation | Test results | → Dev (test fail), → Architect (design flaw), → PO (unclear) |
+| `fix` | varies | Error details | Fixed code | Based on error type |
+| `review` | software-craftsman | Code | Review feedback | → Dev (improve) |
+| `complete` | — | All tests pass | Feature done | — |
 
 ### Mécanisme de Retry
 
@@ -699,51 +903,79 @@ QA Agent runs: npm test
   [Continue with SubagentStop]
 ```
 
-### 3. Boucle de correction
+### 3. Boucle de correction (Smart Routing)
 
 ```
-┌─────────────────────────────────────────┐
-│                                         │
-│  ┌─────────────┐    ┌─────────────┐    │
-│  │  QA finds   │───▶│   Router    │    │
-│  │   error     │    │  triggers   │    │
-│  └─────────────┘    └──────┬──────┘    │
-│                            │           │
-│                            ▼           │
-│                     ┌─────────────┐    │
-│                     │  Dev agent  │    │
-│                     │ with error  │    │
-│                     │  context    │    │
-│                     └──────┬──────┘    │
-│                            │           │
-│                            ▼           │
-│                     ┌─────────────┐    │
-│                     │  Dev fixes  │    │
-│                     │    code     │    │
-│                     └──────┬──────┘    │
-│                            │           │
-│         ┌──────────────────┘           │
-│         │                              │
-│         ▼                              │
-│  ┌─────────────┐                       │
-│  │   Router    │                       │
-│  │  triggers   │                       │
-│  └──────┬──────┘                       │
-│         │                              │
-│         ▼                              │
-│  ┌─────────────┐     ┌─────────────┐  │
-│  │  QA agent   │────▶│  Still has  │  │
-│  │  re-verify  │     │   errors?   │  │
-│  └─────────────┘     └──────┬──────┘  │
-│                             │         │
-│                    ┌────────┴────────┐│
-│                    │                 ││
-│                   YES               NO ││
-│                    │                 ││
-│                    ▼                 ▼ │
-│              [Loop again]      [Complete]│
-│                                         │
-└─────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         SMART ERROR ROUTING                              │
+│                                                                          │
+│  ┌─────────────┐                                                         │
+│  │  QA finds   │                                                         │
+│  │   error     │                                                         │
+│  └──────┬──────┘                                                         │
+│         │                                                                │
+│         ▼                                                                │
+│  ┌──────────────────────────────────────────────────────────────────┐   │
+│  │                      ERROR TYPE DETECTION                         │   │
+│  │                                                                   │   │
+│  │  test_failure? ─────────────────────────────────▶ Dev (owner)    │   │
+│  │  type_error? ───────────────────────────────────▶ Architect      │   │
+│  │  design_flaw? ──────────────────────────────────▶ Architect      │   │
+│  │  spec_gap? ─────────────────────────────────────▶ PO             │   │
+│  │  unclear_criteria? ─────────────────────────────▶ PO             │   │
+│  │  contradiction? ────────────────────────────────▶ PO             │   │
+│  │  design_block? ─────────────────────────────────▶ Architect      │   │
+│  │                                                                   │   │
+│  └──────────────────────────────────────────────────────────────────┘   │
+│         │                                                                │
+│         ▼                                                                │
+│  ┌─────────────┐     ┌─────────────┐     ┌─────────────┐                │
+│  │   Agent     │────▶│   Agent     │────▶│     QA      │                │
+│  │   fixes     │     │  completes  │     │  re-verify  │                │
+│  └─────────────┘     └─────────────┘     └──────┬──────┘                │
+│                                                  │                       │
+│                                     ┌────────────┴────────────┐          │
+│                                     │                         │          │
+│                                   ERROR                      OK          │
+│                                     │                         │          │
+│                                     ▼                         ▼          │
+│                              [Route again]              [Complete]       │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### 3b. Exemples de Routing
+
+**Test Failure → Dev**
+```
+QA: "Login button test fails"
+  → Check ownership: Login.tsx owned by frontend-dev
+  → Route to: frontend-dev
+  → Dev fixes → QA re-verifies
+```
+
+**Design Flaw → Architect**
+```
+QA: "Circular dependency between UserService and AuthService"
+  → Error type: design_flaw
+  → Route to: software-craftsman
+  → Architect redesigns → Dev updates → QA re-verifies
+```
+
+**Spec Gap → PO**
+```
+Dev: "What happens if user has 0 items in cart?"
+  → Error type: spec_gap
+  → Route to: product-owner
+  → PO completes spec → Dev implements → QA verifies
+```
+
+**Contradiction → PO**
+```
+Architect: "Spec requires offline AND real-time sync - these conflict"
+  → Error type: contradiction
+  → Route to: product-owner
+  → PO decides tradeoff → Architect adjusts → Dev implements
 ```
 
 ---
@@ -798,6 +1030,7 @@ Crée :
 └── skills/
     ├── craft/SKILL.md
     ├── heal/SKILL.md
+    ├── learn/SKILL.md
     ├── typescript-craft/SKILL.md
     ├── react-craft/SKILL.md
     ├── test-craft/SKILL.md
@@ -814,7 +1047,14 @@ project/
 │   ├── events.jsonl
 │   ├── learnings.jsonl
 │   ├── links.json
-│   └── context.json
+│   ├── context.json
+│   └── learnings/         # From /learn
+│       ├── tech-stack.json
+│       ├── code-patterns.json
+│       ├── test-patterns.json
+│       ├── spec-patterns.json
+│       ├── style-patterns.json
+│       └── summary.md
 ├── .claude/
 │   └── settings.json    # Hooks config
 ├── scripts/
@@ -830,11 +1070,21 @@ project/
 
 ## Utilisation
 
-### Deux commandes
+### Trois commandes
 
 ```bash
+/learn    # S'adapter au projet
 /craft    # Construire quelque chose de nouveau
 /heal     # Réparer ce qui est cassé
+```
+
+### `/learn` — S'adapter
+
+```bash
+/learn
+# → Analyse tech stack, architecture, tests, specs, style
+# → Sauvegarde dans .spectre/learnings/
+# → Les agents suivent VOS conventions
 ```
 
 ### `/craft` — Construire
@@ -845,7 +1095,7 @@ project/
 # → Objectif ? [ Build | Fix | Improve | Think ]
 # → Questions contextuelles...
 # → Décrivez votre besoin
-# → Les agents travaillent
+# → Les agents travaillent (avec vos conventions)
 ```
 
 ### `/heal` — Réparer
@@ -861,6 +1111,9 @@ project/
 ### Workflow typique
 
 ```bash
+# 0. Premier usage sur un projet existant
+/learn
+
 # 1. Nouveau projet ou feature
 /craft
 
@@ -869,6 +1122,7 @@ project/
 
 # 3. Les agents travaillent automatiquement
 #    Diagnose → Fix → Verify → Loop until healed
+#    (en suivant VOS conventions)
 ```
 
 ### Raccourcis
@@ -1016,19 +1270,35 @@ Dans `.claude/settings.json` :
 
 ## Résumé
 
-Spectre Agents = **Craft** + **Réactivité** + **Auto-apprentissage**
+Spectre Agents = **Craft** + **Réactivité Complète** + **Auto-apprentissage**
 
 ```
-┌────────────────────────────────────────────────────────────┐
-│                                                            │
-│   CRAFT           REACTIVE           LEARNING              │
-│                                                            │
-│   • Clean Arch    • Auto-correct     • Errors → Patterns   │
-│   • DDD           • Hooks routing    • Fixes → Learnings   │
-│   • SOLID         • Retry logic      • Confidence scores   │
-│   • TDD/BDD       • Shared state     • Cross-agent memory  │
-│                                                            │
-└────────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────┐
+│                                                                         │
+│   CRAFT              REACTIVE MESH              ADAPTIVE LEARNING       │
+│                                                                         │
+│   • Clean Arch       • 8 reactive links         • /learn your patterns │
+│   • DDD              • Smart error routing      • Code style detection │
+│   • SOLID            • Agent escalation         • Test conventions     │
+│   • TDD/BDD          • Bidirectional flow       • Spec format learning │
+│                                                                         │
+│   COMMANDS:                                                             │
+│                                                                         │
+│   /learn ───▶ Analyze project → Store patterns → Inject in agents      │
+│   /craft ───▶ Guided flow → Agent chain → Build with YOUR conventions  │
+│   /heal  ───▶ Diagnose → Route to expert → Fix → Verify → Loop         │
+│                                                                         │
+│   REACTIVE LINKS:                                                       │
+│                                                                         │
+│   QA ──────▶ Dev (test failure)                                        │
+│   QA ──────▶ Architect (design flaw)                                   │
+│   QA ──────▶ PO (unclear criteria)                                     │
+│   Dev ─────▶ Architect (design block)                                  │
+│   Dev ─────▶ PO (spec gap)                                             │
+│   Architect ▶ PO (contradiction)                                       │
+│   Architect ▶ Dev (code review)                                        │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
-**Le code est un artisanat. Les agents le perfectionnent ensemble.**
+**Le code est un artisanat. Les agents s'adaptent à VOTRE artisanat.**

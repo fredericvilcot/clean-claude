@@ -1,6 +1,6 @@
 ---
 name: reactive-loop
-description: "Start the Spectre reactive multi-agent loop. Agents collaborate automatically: QA finds errors → Dev fixes → QA verifies → repeat until success"
+description: "Start the Spectre reactive multi-agent loop. Agents collaborate with smart routing: test failures → Dev, design flaws → Architect, spec gaps → PO. Full mesh of reactive links."
 context: fork
 agent: orchestrator
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task
@@ -102,13 +102,31 @@ After each agent completes:
 
 ### Phase Transitions
 
-| Current Phase | On Success | On Error |
-|--------------|------------|----------|
-| define | → design | — |
-| design | → implement | — |
-| implement | → verify | — |
-| verify | → complete | → fix |
-| fix | → verify | → fix (retry) |
+| Current Phase | On Success | On Error Type | Route To |
+|--------------|------------|---------------|----------|
+| define | → design | — | — |
+| design | → implement | contradiction | → PO (arbitrate) |
+| design | → implement | spec_gap | → PO (complete) |
+| implement | → verify | blocked_by_design | → Architect |
+| implement | → verify | spec_gap | → PO |
+| verify | → complete | test_failure | → Dev (fix) |
+| verify | → complete | design_flaw | → Architect |
+| verify | → complete | unclear_criteria | → PO |
+| fix | → verify | — | → fix (retry) |
+
+### Error Type Detection
+
+| Error Type | Detection Pattern | Routed To |
+|------------|-------------------|-----------|
+| `test_failure` | FAIL, expect, assertion | Dev (owner) |
+| `type_error` | TS error, not assignable | Architect |
+| `design_flaw` | circular, race condition, coupling | Architect |
+| `spec_gap` | edge case, not covered, what if | PO |
+| `unclear_criteria` | ambiguous, not specified | PO |
+| `contradiction` | impossible, mutually exclusive | PO |
+| `blocked_by_design` | cannot implement, need decision | Architect |
+| `build_error` | compilation, module not found | Dev |
+| `lint_error` | eslint, prettier | Dev |
 
 ### Step 5: Monitor Progress
 
@@ -120,28 +138,95 @@ Keep the user informed:
 [SPECTRE] Status: Implementing feature...
 ```
 
-### Step 6: Handle Errors
+### Step 6: Handle Errors (Smart Routing)
 
-When QA reports test failures:
+When any agent reports an issue, route based on error type:
 
-1. Read error from `.spectre/errors.jsonl`
-2. Check retry count (max 3)
-3. Spawn frontend-dev with error context:
-
+#### 6a. Test Failures → Dev
 ```
-Use the frontend-dev agent to fix the following test failure:
+Use the <dev-agent> agent to fix the following test failure:
 
 Error: <ERROR_MESSAGE>
 File: <FILE_PATH>
-Line: <LINE_NUMBER>
-
-Stack trace:
-<STACK_TRACE>
-
-Previous learnings that might help:
-<RELEVANT_LEARNINGS>
+Ownership: <AGENT_WHO_WROTE_IT>
 
 Fix the error and ensure tests pass.
+```
+
+#### 6b. Design Flaws → Architect
+```
+Use the software-craftsman agent to fix this design issue:
+
+Problem: <DESIGN_ISSUE>
+Detection: <HOW_IT_WAS_FOUND>
+Files: <AFFECTED_FILES>
+
+Redesign and update technical spec.
+```
+
+#### 6c. Spec Gaps → Product Owner
+```
+Use the product-owner agent to complete the specification:
+
+Missing: <EDGE_CASE_OR_REQUIREMENT>
+Context: <WHERE_FOUND>
+Reported by: <AGENT>
+
+Update the spec with the missing criteria.
+```
+
+#### 6d. Unclear Criteria → Product Owner
+```
+Use the product-owner agent to clarify this acceptance criterion:
+
+Criterion: <AMBIGUOUS_CRITERION>
+Question: <WHAT_NEEDS_CLARIFICATION>
+Impact: <WHAT_CANT_BE_TESTED>
+
+Clarify and update the user story.
+```
+
+#### 6e. Contradictions → Product Owner
+```
+Use the product-owner agent to resolve this contradiction:
+
+Requirement A: <FIRST_REQUIREMENT>
+Requirement B: <CONFLICTING_REQUIREMENT>
+Analysis: <WHY_THEY_CONFLICT>
+
+Decide on the tradeoff and update the spec.
+```
+
+#### 6f. Design Blocks → Architect
+```
+Use the software-craftsman agent to adjust the design:
+
+Blocker: <WHAT_CANT_BE_IMPLEMENTED>
+Current Design: <DESIGN_DECISION>
+Suggested: <DEV_SUGGESTION>
+
+Adjust the design to unblock implementation.
+```
+
+#### Routing Logic
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    ERROR ROUTING LOGIC                          │
+│                                                                 │
+│  1. Parse error message                                         │
+│  2. Detect error type:                                          │
+│     - test_failure    → Check ownership → Route to owner dev    │
+│     - type_error      → Route to software-craftsman             │
+│     - design_flaw     → Route to software-craftsman             │
+│     - spec_gap        → Route to product-owner                  │
+│     - unclear_criteria→ Route to product-owner                  │
+│     - contradiction   → Route to product-owner                  │
+│     - blocked_by_design → Route to software-craftsman           │
+│  3. Spawn agent with error context                              │
+│  4. After fix, re-verify with qa-engineer                       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Step 7: Complete

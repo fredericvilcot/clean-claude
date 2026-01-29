@@ -1,6 +1,6 @@
 ---
 name: heal
-description: "Auto-repair: detects what's broken (code, tests, specs) and fixes it automatically. Just run /heal."
+description: "Auto-repair with smart routing: test failures → Dev, type errors → Architect, spec gaps → PO. Routes each problem to the right expert."
 context: conversation
 allowed-tools: Read, Bash, Task, AskUserQuestion, Skill
 ---
@@ -53,17 +53,59 @@ find . -name "*.spec.md" -o -name "*.story.md" -o -name "PRD*.md"
 cat .spectre/context.json
 ```
 
-### Step 2: Identify Problem Type
+### Step 2: Identify Problem Type & Route
 
-| Detection | Problem Type | Agent |
-|-----------|--------------|-------|
-| `FAIL`, `expect`, `assertion` | Test failure | `frontend-dev` / `backend-dev` |
-| `error TS`, `not assignable` | Type error | `software-craftsman` |
-| `Build failed`, `Module not found` | Build error | `software-craftsman` |
-| `eslint`, `prettier` | Lint error | Last active dev |
-| Spec vs code mismatch | Spec drift | `product-owner` + `software-craftsman` |
-| Missing acceptance criteria | Incomplete spec | `product-owner` |
-| Implementation gaps | Missing features | `software-craftsman` + dev |
+| Detection | Problem Type | Primary Agent | Fallback |
+|-----------|--------------|---------------|----------|
+| `FAIL`, `expect`, `assertion` | Test failure | Dev (owner) | stack dev |
+| `error TS`, `not assignable` | Type error | `software-craftsman` | — |
+| `Build failed`, `Module not found` | Build error | `software-craftsman` | dev |
+| `eslint`, `prettier` | Lint error | Last active dev | — |
+| Spec vs code mismatch | Spec drift | `product-owner` | — |
+| Missing acceptance criteria | Incomplete spec | `product-owner` | — |
+| Implementation gaps | Missing features | `software-craftsman` → dev | — |
+| `circular`, `race condition` | Design flaw | `software-craftsman` | — |
+| `ambiguous`, `not specified` | Unclear criteria | `product-owner` | — |
+| `contradiction`, `impossible` | Spec contradiction | `product-owner` | — |
+| `cannot implement`, `blocked` | Design block | `software-craftsman` | — |
+| `edge case`, `not covered` | Spec gap | `product-owner` | — |
+
+### Smart Routing Logic
+
+```
+┌─────────────────────────────────────────────────────────────────────┐
+│                         HEAL ROUTING                                 │
+│                                                                      │
+│  Error detected                                                      │
+│       │                                                              │
+│       ▼                                                              │
+│  ┌─────────────┐                                                     │
+│  │ Parse error │                                                     │
+│  │   message   │                                                     │
+│  └──────┬──────┘                                                     │
+│         │                                                            │
+│         ▼                                                            │
+│  ┌──────────────────────────────────────────────────────────────┐   │
+│  │                    ROUTE BY TYPE                              │   │
+│  │                                                               │   │
+│  │  test_failure ────────────────────────────────▶ Dev (owner)   │   │
+│  │  type_error ──────────────────────────────────▶ Architect     │   │
+│  │  design_flaw ─────────────────────────────────▶ Architect     │   │
+│  │  build_error ─────────────────────────────────▶ Architect/Dev │   │
+│  │  lint_error ──────────────────────────────────▶ Dev           │   │
+│  │  spec_drift ──────────────────────────────────▶ PO            │   │
+│  │  unclear_criteria ────────────────────────────▶ PO            │   │
+│  │  contradiction ───────────────────────────────▶ PO            │   │
+│  │  design_block ────────────────────────────────▶ Architect     │   │
+│  │  spec_gap ────────────────────────────────────▶ PO            │   │
+│  │                                                               │   │
+│  └──────────────────────────────────────────────────────────────┘   │
+│         │                                                            │
+│         ▼                                                            │
+│  Agent fixes → QA verifies → Loop if needed                          │
+│                                                                      │
+└─────────────────────────────────────────────────────────────────────┘
+```
 
 ### Step 3: Gather Context
 

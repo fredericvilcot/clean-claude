@@ -12,7 +12,7 @@ Start any Spectre agent with optional reactive connections to other agents.
 ## Syntax
 
 ```
-/agent <agent-name> [--link <agents>] [--stack <stack>] [--task <description>]
+/agent <agent-name> [--link <agents>] [--stack <stack>] [--task <description>] [--review]
 ```
 
 ### Arguments
@@ -23,6 +23,26 @@ Start any Spectre agent with optional reactive connections to other agents.
 | `--link <agents>` | Agents to link reactively (comma-separated) | `--link qa-engineer` |
 | `--stack <stack>` | Stack context | `--stack frontend` |
 | `--task <desc>` | Task description | `--task "Build login form"` |
+| `--review` | Enable code review loop (Architect → Dev) | `--review` |
+
+### Escalation Keywords
+
+Agents can escalate issues by using these keywords in their output:
+
+| Keyword | Escalates To | Description |
+|---------|--------------|-------------|
+| `BLOCKED:` | Architect | Design block, need decision |
+| `SPEC_GAP:` | PO | Missing requirement |
+| `UNCLEAR:` | PO | Ambiguous criteria |
+| `DESIGN_FLAW:` | Architect | Architectural issue found |
+| `CONTRADICTION:` | PO | Conflicting requirements |
+
+Example agent output:
+```
+BLOCKED: Cannot implement real-time sync without WebSocket infrastructure.
+Need architectural decision on connection strategy.
+```
+→ Automatically routes to software-craftsman
 
 ## Examples
 
@@ -59,39 +79,164 @@ Architect designs → Frontend implements → QA verifies → errors route back
 | `backend-dev` | API implementation | `qa-engineer`, `software-craftsman` |
 | `qa-engineer` | Testing, verification | `frontend-dev`, `backend-dev` |
 
-## Link Behaviors
+## Reactive Links — Full Matrix
 
-### frontend-dev → qa-engineer
+### Link Types
+
+| Link | Trigger | Action |
+|------|---------|--------|
+| **QA → Dev** | Test failure | Dev fixes code |
+| **QA → Architect** | Design flaw detected | Architect redesigns |
+| **QA → PO** | Unclear acceptance criteria | PO clarifies spec |
+| **Dev → Architect** | Blocked by design | Architect adjusts |
+| **Dev → PO** | Edge case not covered | PO completes spec |
+| **Architect → PO** | Contradiction/impossibility | PO arbitrates |
+| **Architect → Dev** | Code review feedback | Dev improves |
+| **Spec Drift** | Code ≠ Spec | PO or Dev aligns |
+
+---
+
+### 1. QA → Dev (Test Failures)
 ```
 ┌──────────────┐         ┌──────────────┐
-│  frontend-   │  done   │     qa-      │
-│     dev      │ ──────▶ │   engineer   │
-└──────────────┘         └──────┬───────┘
+│     qa-      │  test   │  frontend-   │
+│   engineer   │  fail   │     dev      │
+└──────────────┘ ──────▶ └──────────────┘
        ▲                        │
-       │         error          │
+       │         fixed          │
        └────────────────────────┘
 ```
+**Trigger:** `FAIL`, `expect`, `assertion error`
+**Route to:** Last dev who touched the file (ownership) or stack dev
 
-### software-craftsman → frontend-dev → qa-engineer
+---
+
+### 2. QA → Architect (Design Flaws)
 ```
 ┌──────────────┐         ┌──────────────┐         ┌──────────────┐
-│   software-  │  done   │  frontend-   │  done   │     qa-      │
-│   craftsman  │ ──────▶ │     dev      │ ──────▶ │   engineer   │
-└──────────────┘         └──────────────┘         └──────┬───────┘
-                                ▲                        │
-                                │         error          │
-                                └────────────────────────┘
+│     qa-      │ design  │   software-  │  new    │     dev      │
+│   engineer   │  flaw   │   craftsman  │ design  │              │
+└──────────────┘ ──────▶ └──────────────┘ ──────▶ └──────────────┘
+       ▲                                                 │
+       │                    re-verify                    │
+       └─────────────────────────────────────────────────┘
 ```
+**Trigger:** Race condition, circular dependency, architectural issue
+**Detection:** `circular`, `deadlock`, `race condition`, `coupling`
 
-### qa-engineer → frontend-dev (reverse for test-first)
+---
+
+### 3. QA → PO (Unclear Criteria)
 ```
-┌──────────────┐         ┌──────────────┐
-│     qa-      │  tests  │  frontend-   │
-│   engineer   │ ──────▶ │     dev      │
-└──────────────┘         └──────┬───────┘
-       ▲                        │
-       │         verify         │
-       └────────────────────────┘
+┌──────────────┐         ┌──────────────┐         ┌──────────────┐
+│     qa-      │ unclear │   product-   │ clarify │     qa-      │
+│   engineer   │ criteria│    owner     │   spec  │   engineer   │
+└──────────────┘ ──────▶ └──────────────┘ ──────▶ └──────────────┘
+```
+**Trigger:** `ambiguous`, `not specified`, `undefined behavior`
+**Detection:** QA reports unclear acceptance criteria
+
+---
+
+### 4. Dev → Architect (Design Block)
+```
+┌──────────────┐         ┌──────────────┐         ┌──────────────┐
+│  frontend-   │ blocked │   software-  │ adjust  │  frontend-   │
+│     dev      │   by    │   craftsman  │ design  │     dev      │
+└──────────────┘ design  └──────────────┘ ──────▶ └──────────────┘
+                 ──────▶
+```
+**Trigger:** `cannot implement`, `design issue`, `need architectural decision`
+**Detection:** Dev explicitly flags design problem
+
+---
+
+### 5. Dev → PO (Spec Gap)
+```
+┌──────────────┐         ┌──────────────┐         ┌──────────────┐
+│  frontend-   │  edge   │   product-   │ update  │  frontend-   │
+│     dev      │  case   │    owner     │   spec  │     dev      │
+└──────────────┘ ──────▶ └──────────────┘ ──────▶ └──────────────┘
+```
+**Trigger:** `edge case`, `not covered in spec`, `what if`, `missing requirement`
+**Detection:** Dev finds gap in specification
+
+---
+
+### 6. Architect → PO (Feasibility)
+```
+┌──────────────┐         ┌──────────────┐         ┌──────────────┐
+│   software-  │ contra- │   product-   │ decide  │   software-  │
+│   craftsman  │ diction │    owner     │ tradeoff│   craftsman  │
+└──────────────┘ ──────▶ └──────────────┘ ──────▶ └──────────────┘
+```
+**Trigger:** `contradiction`, `impossible`, `tradeoff needed`, `mutually exclusive`
+**Detection:** Architect identifies spec issues
+
+---
+
+### 7. Architect → Dev (Code Review)
+```
+┌──────────────┐         ┌──────────────┐         ┌──────────────┐
+│   software-  │ review  │  frontend-   │ improve │   software-  │
+│   craftsman  │ feedback│     dev      │   code  │   craftsman  │
+└──────────────┘ ──────▶ └──────────────┘ ──────▶ └──────────────┘
+       │                                                 │
+       └──────────────── approved ◀──────────────────────┘
+```
+**Trigger:** Post-implementation review
+**Mode:** Enable with `--review` flag
+
+---
+
+### 8. Spec Drift Detection (Bidirectional)
+```
+┌─────────────┐                           ┌─────────────┐
+│    Spec     │◀── drift detected ──────▶│    Code     │
+└──────┬──────┘                           └──────┬──────┘
+       │                                         │
+       ▼                                         ▼
+┌─────────────┐                           ┌─────────────┐
+│  Update     │    OR                     │  Update     │
+│  Spec       │                           │  Code       │
+│  (--sync)   │                           │  (--impl)   │
+└─────────────┘                           └─────────────┘
+```
+**Trigger:** `/heal spec` or automatic drift detection
+**Route:** PO updates spec OR Dev updates code
+
+---
+
+## Full Workflow with All Links
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        COMPLETE REACTIVE SYSTEM                          │
+│                                                                          │
+│  ┌───────────────┐                                                       │
+│  │ product-owner │◀──────────────────────────────────────────┐           │
+│  └───────┬───────┘                                           │           │
+│          │ spec                                              │           │
+│          ▼                                    contradiction  │           │
+│  ┌───────────────┐◀────────────────────────────────────┐     │           │
+│  │   software-   │                                     │     │           │
+│  │   craftsman   │─────── design flaw ─────────────────│─────│───┐       │
+│  └───────┬───────┘                                     │     │   │       │
+│          │ design                                      │     │   │       │
+│          ▼                              blocked by     │     │   │       │
+│  ┌───────────────┐                         design ─────┘     │   │       │
+│  │   frontend-   │                                           │   │       │
+│  │      dev      │────── spec gap ───────────────────────────┘   │       │
+│  └───────┬───────┘                                               │       │
+│          │ code                                                  │       │
+│          ▼                                                       │       │
+│  ┌───────────────┐                                               │       │
+│  │  qa-engineer  │───── test failure ──▶ Dev ◀───────────────────┘       │
+│  │               │───── design flaw ───▶ Architect                       │
+│  │               │───── unclear spec ──▶ PO                              │
+│  └───────────────┘                                                       │
+│                                                                          │
+└─────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## How It Works
