@@ -1,239 +1,368 @@
 ---
 name: guide
-description: "Interactive guided mode to help choose the right Spectre workflow, agent, or skill based on your needs"
+description: "Interactive guided mode to help you build the right thing. Express your need, Spectre configures the agents."
 context: conversation
-allowed-tools: Read, Bash, Task, AskUserQuestion
+allowed-tools: Read, Bash, Task, AskUserQuestion, Skill
 ---
 
-# Spectre Guide — Interactive Mode
+# Spectre Guide — Express Your Need
 
-Help users discover and use Spectre Agents through an interactive guided experience.
+Guide users through an intuitive flow to understand WHAT they want to build, then configure the right agent chain automatically.
 
-## When Invoked
+## Philosophy
 
-When the user runs `/guide`, start an interactive conversation to understand their needs and guide them to the right tool.
+**Don't ask technical questions. Ask about the USER'S need.**
 
-## Step 1: Understand the Goal
+Bad: "Which agent do you want to use?"
+Good: "What are you trying to build?"
 
-Ask the user what they want to accomplish:
+Bad: "Do you want QA verification?"
+Good: "How critical is this feature?"
+
+## The Flow
+
+### Step 1: What's the Situation?
+
+Start with a high-level question about context:
 
 ```
-Use AskUserQuestion with:
-
-Question: "What would you like to do?"
-Header: "Goal"
+Question: "What's your situation right now?"
+Header: "Context"
 Options:
-  1. "Build a new feature" - "Complete workflow from user story to tested code"
-  2. "Fix or improve code" - "Work on existing code with specific agents"
-  3. "Start a new project" - "Bootstrap a new application with craft principles"
-  4. "Learn about Spectre" - "Understand available agents and skills"
+  1. "I have an idea to build"
+     Description: "New feature, new component, new functionality"
+  2. "Something is broken"
+     Description: "Bug, failing tests, error to fix"
+  3. "I want to improve existing code"
+     Description: "Refactor, optimize, clean up, add tests"
+  4. "I need to think before coding"
+     Description: "Design, architecture, technical decision"
 ```
 
-## Step 2: Branch Based on Answer
+---
 
-### If "Build a new feature"
+### Step 2: Branch by Situation
 
-Ask about the scope:
+#### If "I have an idea to build"
+
+Ask about scope:
 
 ```
-Question: "How complete should the workflow be?"
-Header: "Workflow"
+Question: "How big is what you want to build?"
+Header: "Scope"
 Options:
-  1. "Full workflow (Recommended)" - "PO → Architect → Dev → QA with auto-correction"
-  2. "Just dev + testing" - "Implement and verify with reactive loop"
-  3. "Single agent" - "Use one specific agent for the task"
+  1. "A complete feature"
+     Description: "User-facing functionality with multiple components"
+  2. "A specific component or function"
+     Description: "One piece of the puzzle, focused scope"
+  3. "A quick addition"
+     Description: "Small change, minor enhancement"
 ```
 
-**Full workflow** → Suggest `/reactive-loop`
-**Just dev + testing** → Ask about stack, then suggest `/agent frontend-dev --link qa-engineer`
-**Single agent** → Go to agent selection (Step 3)
-
-### If "Fix or improve code"
-
-Ask what kind of work:
+Then ask about domain:
 
 ```
-Question: "What type of work?"
-Header: "Work type"
+Question: "What part of the app does it touch?"
+Header: "Domain"
 Options:
-  1. "Fix failing tests" - "Dev fixes code, QA verifies"
-  2. "Code review / refactor" - "Architecture and quality improvement"
-  3. "Add tests" - "Improve test coverage with TDD/BDD"
-  4. "Type safety / cleanup" - "TypeScript improvements"
+  1. "User interface"
+     Description: "Components, pages, forms, interactions"
+  2. "Backend / API"
+     Description: "Services, endpoints, data processing"
+  3. "Both frontend and backend"
+     Description: "Full-stack feature"
+  4. "Core logic / Architecture"
+     Description: "Business rules, domain model, structure"
 ```
 
-**Fix failing tests** → `/agent frontend-dev --link qa-engineer`
-**Code review** → `/agent software-craftsman` or use `software-craftsman` agent directly
-**Add tests** → `/test-craft` or `/agent qa-engineer`
-**Type safety** → `/typescript-craft`
-
-### If "Start a new project"
-
-Ask about stack:
+Then ask about quality needs:
 
 ```
-Question: "What type of project?"
-Header: "Stack"
+Question: "How critical is quality for this?"
+Header: "Quality"
 Options:
-  1. "React frontend (Recommended)" - "React + Vite + TypeScript + Vitest"
-  2. "Other frontend" - "General TypeScript/JavaScript"
-  3. "Backend API" - "Node.js / TypeScript backend"
+  1. "Very important — needs thorough testing"
+     Description: "User-facing, payment, auth, core business"
+  2. "Normal — standard quality"
+     Description: "Regular feature, should work correctly"
+  3. "Exploratory — just trying something"
+     Description: "Prototype, spike, proof of concept"
 ```
 
-**React frontend** → `/init-frontend` then `/setup-reactive`
-**Other** → Suggest manual setup with `/setup-reactive`
+**Mapping:**
 
-### If "Learn about Spectre"
+| Scope | Domain | Quality | Result |
+|-------|--------|---------|--------|
+| Complete feature | Any | Very important | `/reactive-loop` (full PO→Arch→Dev→QA) |
+| Complete feature | Any | Normal | `/agent software-craftsman --link <dev>,qa-engineer` |
+| Specific component | UI | Very/Normal | `/agent frontend-dev --link qa-engineer` |
+| Specific component | Backend | Very/Normal | `/agent backend-dev --link qa-engineer` |
+| Specific component | Both | Any | `/agent software-craftsman --link frontend-dev,backend-dev,qa-engineer` |
+| Specific component | Core | Any | `/agent software-craftsman --link qa-engineer` |
+| Quick addition | UI | Any | `/agent frontend-dev` (no loop, quick) |
+| Quick addition | Backend | Any | `/agent backend-dev` |
+| Any | Any | Exploratory | Agent alone, no QA link |
 
-Display a summary:
+---
+
+#### If "Something is broken"
+
+Ask what kind of problem:
+
+```
+Question: "What's happening?"
+Header: "Problem"
+Options:
+  1. "Tests are failing"
+     Description: "Red tests, need to make them green"
+  2. "There's an error in the app"
+     Description: "Runtime error, crash, unexpected behavior"
+  3. "Build is broken"
+     Description: "Compilation errors, type errors, can't start"
+  4. "Something doesn't look/work right"
+     Description: "UI issue, UX problem, visual bug"
+```
+
+Then ask about confidence:
+
+```
+Question: "Do you know what's causing it?"
+Header: "Diagnosis"
+Options:
+  1. "Yes, I know what to fix"
+     Description: "Just need help implementing the fix"
+  2. "I have a guess"
+     Description: "Need to verify and then fix"
+  3. "No idea"
+     Description: "Need investigation first"
+```
+
+**Mapping:**
+
+| Problem | Diagnosis | Result |
+|---------|-----------|--------|
+| Tests failing | Know/Guess | `/agent frontend-dev --link qa-engineer` (fix + verify) |
+| Tests failing | No idea | `/agent qa-engineer --link frontend-dev` (QA investigates first) |
+| Error in app | Any | `/agent frontend-dev --link qa-engineer` with error context |
+| Build broken | Any | `/agent software-craftsman` (type/architecture issues) |
+| UI issue | Any | `/agent frontend-dev --link qa-engineer` |
+
+---
+
+#### If "I want to improve existing code"
+
+Ask what kind of improvement:
+
+```
+Question: "What kind of improvement?"
+Header: "Improvement"
+Options:
+  1. "Add tests to existing code"
+     Description: "Improve coverage, add missing tests"
+  2. "Refactor for clarity"
+     Description: "Clean up, rename, restructure"
+  3. "Improve types and safety"
+     Description: "Better TypeScript, stricter types"
+  4. "Performance optimization"
+     Description: "Make it faster, more efficient"
+```
+
+**Mapping:**
+
+| Improvement | Result |
+|-------------|--------|
+| Add tests | `/agent qa-engineer` with target files |
+| Refactor | `/agent software-craftsman --link qa-engineer` |
+| Types/safety | Use `/typescript-craft` skill directly |
+| Performance | `/agent software-craftsman --link qa-engineer` |
+
+---
+
+#### If "I need to think before coding"
+
+Ask what needs thinking:
+
+```
+Question: "What do you need to figure out?"
+Header: "Decision"
+Options:
+  1. "How to structure this feature"
+     Description: "Architecture, components, data flow"
+  2. "Which approach to take"
+     Description: "Multiple options, need to choose"
+  3. "How to break down a big task"
+     Description: "Need a plan, steps, priorities"
+  4. "Best practices for this case"
+     Description: "Patterns, conventions, standards"
+```
+
+**Mapping:**
+
+| Decision | Result |
+|----------|--------|
+| Structure | `/agent software-craftsman` (design mode) |
+| Approach | `/agent software-craftsman` (analysis mode) |
+| Break down | `/reactive-loop` starting with product-owner |
+| Best practices | Use craft skills: `/typescript-craft`, `/react-craft`, `/test-craft` |
+
+---
+
+### Step 3: Get the Details
+
+After determining the right configuration, ask for specifics:
+
+```
+Question: "Describe what you want to do in a few words:"
+Header: "Task"
+Options:
+  1. (Let user type via "Other")
+```
+
+Or if context is clear, ask a more specific question:
+
+- For features: "What should this feature do?"
+- For bugs: "What's the error message or behavior?"
+- For refactoring: "Which files or components?"
+- For architecture: "What's the technical challenge?"
+
+---
+
+### Step 4: Confirm and Launch
+
+Show the user what will happen:
 
 ```markdown
-## Spectre Agents — Quick Reference
+## Here's what I understood:
 
-### Agents (specialized experts)
-| Agent | Role |
-|-------|------|
-| software-craftsman | Architecture, DDD, SOLID, code review |
-| product-owner | User stories, acceptance criteria |
-| frontend-dev | React, UI, accessibility |
-| qa-engineer | Testing, TDD/BDD |
+**Your need:** Build a login form with email/password validation
+**Approach:** Frontend implementation with QA verification
 
-### Key Skills
-| Skill | Use for |
-|-------|---------|
-| /reactive-loop | Full feature with auto-correction |
-| /agent <name> --link <agents> | Flexible agent + reactive links |
-| /typescript-craft | TypeScript best practices |
-| /react-craft | React component patterns |
-| /test-craft | TDD/BDD testing |
+## The agents that will work on this:
 
-### Quick Examples
-```bash
-# Full feature workflow
-/reactive-loop
+1. **frontend-dev** — Implements the UI
+   - React components
+   - Form handling
+   - Validation logic
 
-# Frontend dev with QA verification
-/agent frontend-dev --link qa-engineer
+2. **qa-engineer** — Verifies the work
+   - Tests the implementation
+   - If errors → sends back to frontend-dev
+   - Loops until all tests pass
 
-# Architect with dev and QA chain
-/agent arch --link front,qa --task "Build auth"
+## Starting the workflow...
+
+`/agent frontend-dev --link qa-engineer --task "Build login form with email/password validation"`
 ```
 
-Want me to help you get started with something specific?
-```
+Then actually execute the skill/command.
 
-## Step 3: Agent Selection (if needed)
+---
 
-If the user needs to select a specific agent:
+## Smart Shortcuts
 
-```
-Question: "Which agent should lead the work?"
-Header: "Agent"
-Options:
-  1. "Frontend Dev" - "React, UI components, accessibility"
-  2. "Software Craftsman" - "Architecture, design, code review"
-  3. "QA Engineer" - "Tests, verification, quality"
-  4. "Product Owner" - "User stories, requirements"
-```
+If the user provides context upfront, skip questions:
 
-## Step 4: Configure Links (if agent selected)
+| Input | Detected | Action |
+|-------|----------|--------|
+| `/guide login form` | Feature + UI | Ask only about quality, then launch |
+| `/guide fix tests` | Broken + Tests | Ask about diagnosis, then launch |
+| `/guide refactor auth` | Improve + Refactor | Confirm scope, then launch |
+| `/guide how to structure` | Think + Architecture | Launch architect directly |
 
-Ask about reactive links:
+---
 
-```
-Question: "Should other agents verify the work?"
-Header: "Links"
-Options:
-  1. "Yes, add QA verification (Recommended)" - "QA will test after, errors loop back"
-  2. "Yes, add architect review" - "Architect reviews design decisions"
-  3. "No links" - "Agent works alone"
-```
+## Configuration Translation Table
 
-## Step 5: Get Task Description
+### For Features
 
-If workflow involves a task:
+| Quality | Stack | Chain |
+|---------|-------|-------|
+| Critical | frontend | `product-owner → software-craftsman → frontend-dev → qa-engineer` |
+| Critical | backend | `product-owner → software-craftsman → backend-dev → qa-engineer` |
+| Critical | fullstack | `product-owner → software-craftsman → backend-dev → frontend-dev → qa-engineer` |
+| Normal | frontend | `software-craftsman → frontend-dev → qa-engineer` |
+| Normal | backend | `software-craftsman → backend-dev → qa-engineer` |
+| Exploratory | any | `<dev-agent>` alone |
 
-```
-Question: "Describe what you want to build or fix:"
-Header: "Task"
-(Free text via "Other" option)
-```
+### For Fixes
 
-## Step 6: Execute
+| Problem | Chain |
+|---------|-------|
+| Tests failing | `frontend-dev ↔ qa-engineer` (loop) |
+| Runtime error | `frontend-dev ↔ qa-engineer` (loop) |
+| Build/Type error | `software-craftsman → qa-engineer` |
+| Investigation needed | `qa-engineer → frontend-dev → qa-engineer` |
 
-Based on all gathered information, either:
+### For Improvements
 
-1. **Execute the skill directly** if it's a simple command
-2. **Show the command** and ask for confirmation
-3. **Provide guidance** on next steps
+| Type | Chain |
+|------|-------|
+| Add tests | `qa-engineer` |
+| Refactor | `software-craftsman ↔ qa-engineer` |
+| Types | `/typescript-craft` |
+| Performance | `software-craftsman → qa-engineer` |
 
-### Example Outputs
+---
 
-**For full workflow:**
-```
-Great! I'll start the reactive loop for your feature.
+## Example Flows
 
-Running: /reactive-loop
-
-This will guide you through:
-1. Product Owner → Define user story
-2. Software Craftsman → Design solution
-3. Frontend Dev → Implement
-4. QA Engineer → Verify (with auto-correction loop)
-```
-
-**For agent with links:**
-```
-Starting frontend-dev with QA verification.
-
-Running: /agent frontend-dev --link qa-engineer --task "Add form validation"
-
-The workflow:
-1. Frontend Dev implements the feature
-2. QA Engineer runs tests
-3. If errors → Frontend Dev fixes → QA re-verifies
-4. Loop until success (max 3 retries)
-```
-
-**For craft skill:**
-```
-I'll apply TypeScript craft principles to your code.
-
-Running: /typescript-craft
-
-This will analyze and improve:
-- Type safety and strictness
-- Algebraic types and Result patterns
-- Pure functions and immutability
-- Error handling
-```
-
-## Shortcut Detection
-
-If the user provides context in their initial message, skip unnecessary questions:
-
-- `/guide build login form` → Skip to "Build a new feature" flow with task pre-filled
-- `/guide fix tests` → Go directly to "Fix failing tests" suggestion
-- `/guide react` → Go to React project setup
-
-## Error Handling
-
-If `.spectre/` doesn't exist and user wants reactive features:
+### Example 1: "I want to add a dark mode toggle"
 
 ```
-The reactive system isn't set up in this project yet.
+Step 1: "I have an idea to build"
+Step 2: Scope → "A specific component"
+        Domain → "User interface"
+        Quality → "Normal"
+Step 3: Task → "Dark mode toggle in the header"
 
-Would you like me to set it up first? This will:
-- Create .spectre/ for shared state
-- Configure hooks for agent communication
-- Copy router scripts
-
-Run: /setup-reactive
+Result: /agent frontend-dev --link qa-engineer --task "Dark mode toggle in the header"
 ```
 
-## Tone
+### Example 2: "The checkout is broken"
 
-- Friendly and helpful
-- Concise explanations
-- Always show what will happen before executing
-- Offer to explain more if the user seems unsure
+```
+Step 1: "Something is broken"
+Step 2: Problem → "There's an error in the app"
+        Diagnosis → "I have a guess"
+Step 3: Details → "Payment fails on submit, console shows network error"
+
+Result: /agent frontend-dev --link qa-engineer --task "Fix payment submit - network error on checkout"
+```
+
+### Example 3: "I need to plan the authentication system"
+
+```
+Step 1: "I need to think before coding"
+Step 2: Decision → "How to structure this feature"
+Step 3: Details → "Full auth system with OAuth, email, session management"
+
+Result: /agent software-craftsman --task "Design authentication system architecture"
+        (Then suggest /reactive-loop for implementation)
+```
+
+---
+
+## Tone Guidelines
+
+- **Conversational**: "What are you trying to build?" not "Select input type"
+- **Supportive**: "Got it! Here's the plan..." not "Executing command..."
+- **Clear**: Always show what will happen before doing it
+- **Helpful**: If unsure, err on the side of more quality (add QA link)
+
+---
+
+## After Launch
+
+Once the agents start working, remind the user:
+
+```markdown
+The agents are now working. Here's what to expect:
+
+- **frontend-dev** is implementing your feature
+- When done, **qa-engineer** will automatically verify
+- If there are errors, they'll be fixed automatically (up to 3 attempts)
+- You'll see the final result when everything passes
+
+You can check progress anytime with:
+`cat .spectre/state.json | jq .`
+```
