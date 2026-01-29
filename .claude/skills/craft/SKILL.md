@@ -201,18 +201,18 @@ Options:
 
 ### Learning / Exploring
 
-| Area | Action |
-|------|--------|
-| Frontend/React | `/react-craft` |
-| Backend/API | Use `software-craftsman` for guidance |
-| Architecture | `/agent software-craftsman` |
-| Testing | `/test-craft` |
+| Area | Agent |
+|------|-------|
+| Frontend/React | `frontend-dev` (educational mode) |
+| Backend/API | `backend-dev` (educational mode) |
+| Architecture | `software-craftsman` (design mode) |
+| Testing | `qa-engineer` (educational mode) |
 
 **Characteristics:**
 - Educational mode
-- Single agent or skill
+- Single agent explains concepts
 - No pressure
-- Explanations prioritized
+- Pedagogical approach prioritized
 
 ---
 
@@ -336,9 +336,9 @@ Store context for the session:
 }
 ```
 
-On subsequent `/guide` calls, skip Step 1 and use stored context.
+On subsequent `/craft` calls, skip Step 1 and use stored context.
 
-To change: `/guide --reset` or answer "Other" to change context.
+To change: `/craft --reset` or answer "Other" to change context.
 
 ---
 
@@ -347,7 +347,7 @@ To change: `/guide --reset` or answer "Other" to change context.
 ### Product Team: Building from PRD
 
 ```
-User: /guide
+User: /craft
 
 Bot: "What's your work context?"
      [Product Team] [Startup] [Freelance] [Learning]
@@ -394,7 +394,7 @@ Starting software-craftsman...
 ### Startup: Quick Feature
 
 ```
-User: /guide
+User: /craft
 
 Bot: "What's your work context?"
 
@@ -428,7 +428,7 @@ Starting frontend-dev...
 ### Freelance: Direct Task
 
 ```
-User: /guide
+User: /craft
 
 User: [Freelance / Solo]
 
@@ -468,3 +468,65 @@ Starting...
 | Startup | Energetic, fast, pragmatic |
 | Freelance | Efficient, direct, no fluff |
 | Learning | Patient, educational, encouraging |
+
+---
+
+## Agent Invocation
+
+### How to Spawn Agents
+
+Use the **Task tool** with the appropriate `subagent_type`:
+
+```
+Task tool:
+  subagent_type: "software-craftsman"
+  prompt: "Design the technical architecture for: <task>"
+```
+
+### Available Agent Types
+
+| Agent | subagent_type | Use For |
+|-------|---------------|---------|
+| Product Owner | `product-owner` | User stories, specs, acceptance criteria |
+| Architect | `software-craftsman` | Architecture, design, code review |
+| Frontend Dev | `frontend-dev` | UI implementation, React, components |
+| Backend Dev | `backend-dev` | API implementation, services, data |
+| QA Engineer | `qa-engineer` | Tests, verification, quality |
+
+### Chaining Agents
+
+For pipelines like `Architect → Dev → QA`:
+
+1. Spawn first agent, wait for completion
+2. Pass output as context to next agent
+3. Continue chain until QA passes or max retries
+
+### Reactive Loop
+
+When QA finds errors:
+1. Parse error type (test failure, design flaw, spec gap)
+2. Route to appropriate agent based on error
+3. Re-run QA after fix
+4. Loop until success (max 3 retries)
+
+### Example: Startup Frontend Flow
+
+```
+# Step 1: Spawn frontend-dev
+Task(
+  subagent_type: "frontend-dev",
+  prompt: "Implement: <task>\n\nContext: Startup mode, fast iteration."
+)
+
+# Step 2: On completion, spawn qa-engineer
+Task(
+  subagent_type: "qa-engineer",
+  prompt: "Verify implementation:\n<what was built>\n\nAcceptance criteria:\n<criteria>"
+)
+
+# Step 3: If QA fails, loop back to frontend-dev with error context
+Task(
+  subagent_type: "frontend-dev",
+  prompt: "Fix this error:\n<error details>\n\nOriginal task: <task>"
+)
+```

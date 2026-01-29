@@ -520,3 +520,58 @@ After successful fix, record the pattern:
 - **Clear:** Show what's happening at each step
 - **Helpful:** If can't fix, suggest next steps
 - **Fast:** Minimize chatter, maximize action
+
+---
+
+## Agent Invocation
+
+### How to Spawn Agents
+
+Use the **Task tool** with the appropriate `subagent_type`:
+
+```
+Task tool:
+  subagent_type: "frontend-dev"
+  prompt: "Fix this error:\n<error details>\n\nFile: <file path>"
+```
+
+### Routing Table
+
+| Error Type | subagent_type | Prompt Template |
+|------------|---------------|-----------------|
+| Test failure | `frontend-dev` or `backend-dev` | "Fix failing test:\n<test output>" |
+| Type error | `software-craftsman` | "Fix TypeScript error:\n<tsc output>" |
+| Build error | `software-craftsman` | "Fix build error:\n<build output>" |
+| Design flaw | `software-craftsman` | "Redesign to fix:\n<issue description>" |
+| Spec gap | `product-owner` | "Complete spec for:\n<missing requirement>" |
+| Unclear criteria | `product-owner` | "Clarify:\n<ambiguous criterion>" |
+
+### Verification Flow
+
+After each fix attempt:
+
+```
+# 1. Agent fixes the issue
+Task(
+  subagent_type: "<appropriate-agent>",
+  prompt: "Fix: <error details>"
+)
+
+# 2. Verify with QA
+Task(
+  subagent_type: "qa-engineer",
+  prompt: "Verify fix for:\n<what was fixed>\n\nRun: <test command>"
+)
+
+# 3. If still failing, loop (max 3 times)
+```
+
+### Stack Detection
+
+Determine which dev agent to use:
+
+| File Pattern | Agent |
+|--------------|-------|
+| `*.tsx`, `*.jsx`, `components/*` | `frontend-dev` |
+| `*.ts` in `api/`, `services/`, `server/` | `backend-dev` |
+| Mixed or unclear | Check `.spectre/context.json` for stack |
