@@ -225,8 +225,8 @@ fi
 │       │                                                          │
 │       └─→ NON → Génère (étape 3)                                │
 │                                                                  │
-│  3. GÉNÉRATION VIA ARCHITECT                                    │
-│     ─────────────────────────                                    │
+│  3. GÉNÉRATION VIA ARCHITECT (CRAFT-ALIGNED)                    │
+│     ─────────────────────────────────────────                    │
 │     Task(                                                        │
 │       subagent_type: "architect",                               │
 │       prompt: """                                                │
@@ -238,11 +238,36 @@ fi
 │         - Zod                                                    │
 │         - Vitest + Testing Library                               │
 │                                                                  │
-│         Format attendu:                                          │
-│         ## Type System                                           │
-│         ## Error Handling                                        │
-│         ## State Management (React Query + Zustand patterns)     │
-│         ## Testing                                               │
+│         CONTRAINTES CRAFT OBLIGATOIRES:                          │
+│         ─────────────────────────────────                        │
+│         1. ARCHITECTURE HEXAGONALE                               │
+│            - Domain au centre (pure, pas de deps)                │
+│            - Ports = interfaces (ce dont le domain a besoin)     │
+│            - Adapters = implémentations (React Query, etc.)      │
+│            - Où placer chaque lib dans l'architecture?           │
+│                                                                  │
+│         2. SÉPARATION DES RESPONSABILITÉS                        │
+│            - React Query = adapter pour server state             │
+│            - Zustand = UI state seulement (pas business logic)   │
+│            - Zod = validation aux boundaries (pas dans domain)   │
+│            - Components = présentation pure                      │
+│                                                                  │
+│         3. ERROR HANDLING EXPLICITE                              │
+│            - Result<T, E> pour le domain                         │
+│            - Comment mapper avec React Query errors?             │
+│            - Error boundaries React pour l'UI                    │
+│                                                                  │
+│         4. TESTABILITÉ                                           │
+│            - Domain testable sans React                          │
+│            - MSW pour les adapters (pas mock des hooks)          │
+│            - Testing Library pour comportement UI                │
+│                                                                  │
+│         FORMAT ATTENDU:                                          │
+│         ## Architecture (où chaque lib se place)                 │
+│         ## Type System (strict, Result types)                    │
+│         ## State Management (server vs client vs domain)         │
+│         ## Error Handling (explicit, typed)                      │
+│         ## Testing Strategy                                      │
 │         ## Anti-patterns à éviter                                │
 │       """                                                        │
 │     )                                                            │
@@ -311,42 +336,162 @@ FULL_STACK="${LANGUAGE} + ${LIBS[*]}"
 
 **Invalidation automatique** : si le hash de package.json/go.mod change → régénère.
 
-#### Exemple de stack-defaults.md généré
+#### Exemple de stack-defaults.md généré (CRAFT-ALIGNED)
 
 ```markdown
 # Craft Defaults — TypeScript + React + React Query + Zustand
 
 Généré pour: TypeScript 5.3, React 18.2, React Query v5, Zustand, Zod, Vitest
 
+## Architecture — Où chaque lib se place
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                        INFRASTRUCTURE                            │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  UI (React Components)                                    │   │
+│  │  - Présentation pure, pas de logique métier              │   │
+│  │  - Zustand pour UI state (modals, sidebar, theme)        │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Adapters                                                 │   │
+│  │  - React Query = adapter pour server state               │   │
+│  │  - Zod = validation aux boundaries (API responses)       │   │
+│  │  - fetch/axios = HTTP adapter                            │   │
+│  └──────────────────────────────────────────────────────────┘   │
+├─────────────────────────────────────────────────────────────────┤
+│                        APPLICATION                               │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Use Cases (hooks métier)                                 │   │
+│  │  - useCreateOrder() orchestre domain + adapters          │   │
+│  │  - Retourne Result<T, E>, pas de throw                   │   │
+│  └──────────────────────────────────────────────────────────┘   │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Ports (interfaces)                                       │   │
+│  │  - OrderRepository, PaymentGateway                       │   │
+│  │  - Définies dans application, implémentées en infra      │   │
+│  └──────────────────────────────────────────────────────────┘   │
+├─────────────────────────────────────────────────────────────────┤
+│                          DOMAIN                                  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Entities, Value Objects, Domain Services                 │   │
+│  │  - AUCUNE dépendance externe (pas de React, pas de Zod)  │   │
+│  │  - Pure TypeScript, testable en isolation                │   │
+│  │  - Result<T, E> pour les erreurs                         │   │
+│  └──────────────────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────────────────┘
+```
+
 ## Type System
 - strict: true obligatoire
 - Pas de `any` — utiliser `unknown` + type guards
 - Props typées explicitement
-- Zod pour validation runtime + inférence de types
+- Domain types séparés des DTO/API types
+- Zod pour validation + inférence (aux boundaries seulement)
 
-## State Management
+## State Management — Séparation stricte
 
-### React Query (Server State)
-- Query keys en constantes typées
-- Mutations avec onMutate pour optimistic updates
-- Pas de `useEffect` pour fetch — toujours `useQuery`
-- Prefetch pour les routes prévisibles
+### Domain State
+- Vit dans les entités du domain
+- Calculé, pas stocké (derived state)
+- Pas de React ici
 
-### Zustand (Client State)
-- Un store par domaine, pas de store global géant
-- Selectors pour éviter les re-renders
-- Immer middleware si mutations complexes
-- Persist middleware pour le localStorage
+### Server State (React Query = ADAPTER)
+```typescript
+// ✅ React Query est un adapter, pas le domain
+// Le hook appelle un use case, pas directement l'API
+function useOrders() {
+  return useQuery({
+    queryKey: ['orders'],
+    queryFn: () => orderRepository.findAll(), // Via port/adapter
+  });
+}
+```
 
-## Error Handling
-- Zod pour validation aux boundaries
-- React Query error boundaries
-- Pas de try/catch silencieux
+### UI State (Zustand = UI seulement)
+```typescript
+// ✅ Zustand pour UI state uniquement
+const useUIStore = create<UIState>((set) => ({
+  sidebarOpen: false,
+  theme: 'light',
+  // ❌ PAS de business logic ici
+}));
+```
 
-## Testing
-- Vitest + Testing Library
-- MSW pour mocker les API (pas de mock manuel)
-- Test les comportements, pas l'implémentation
+## Error Handling — Explicit & Typed
+
+### Domain → Result<T, E>
+```typescript
+// Domain retourne des Result, jamais de throw
+function createOrder(items: OrderItem[]): Result<Order, OrderError> {
+  if (items.length === 0) {
+    return err(new EmptyOrderError());
+  }
+  return ok(Order.create(items));
+}
+```
+
+### React Query → Error Boundaries
+```typescript
+// Adapter mappe Result vers React Query
+const mutation = useMutation({
+  mutationFn: async (items) => {
+    const result = await createOrderUseCase.execute(items);
+    if (!result.ok) throw result.error; // React Query gère
+    return result.value;
+  },
+});
+```
+
+### UI → Error Boundaries React
+```tsx
+<ErrorBoundary fallback={<ErrorFallback />}>
+  <OrderForm />
+</ErrorBoundary>
+```
+
+## Testing Strategy
+
+### Domain (Vitest, pas de React)
+```typescript
+// ✅ Domain testable sans React
+describe('Order', () => {
+  it('should not allow empty order', () => {
+    const result = createOrder([]);
+    expect(result.ok).toBe(false);
+  });
+});
+```
+
+### Adapters (MSW pour API)
+```typescript
+// ✅ MSW pour mocker l'API, pas les hooks
+server.use(
+  http.get('/api/orders', () => HttpResponse.json(mockOrders))
+);
+```
+
+### UI (Testing Library pour comportement)
+```typescript
+// ✅ Test le comportement utilisateur
+test('user can submit order', async () => {
+  render(<OrderForm />);
+  await user.click(screen.getByRole('button', { name: /submit/i }));
+  expect(await screen.findByText(/order confirmed/i)).toBeVisible();
+});
+```
+
+## Anti-patterns à éviter
+
+| Anti-pattern | Problème | Solution craft |
+|--------------|----------|----------------|
+| Business logic dans Zustand | Mélange UI/domain | Domain séparé, Zustand = UI only |
+| `useEffect` pour fetch | Race conditions | React Query |
+| Zod dans le domain | Domain dépend d'infra | Zod aux boundaries seulement |
+| Mock des hooks React Query | Teste l'implémentation | MSW pour mock l'API |
+| `throw` dans le domain | Erreurs non typées | Result<T, E> |
+| Store global pour tout | Couplage fort | Server state vs UI state |
+```
 - Query client wrapper pour les tests
 
 ## Anti-patterns
