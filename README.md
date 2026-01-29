@@ -2,7 +2,7 @@
   <img src="https://img.shields.io/badge/SPECTRE-AGENTS-blueviolet?style=for-the-badge&logo=ghost&logoColor=white" alt="Spectre Agents"/>
 </p>
 
-<h1 align="center">👻 SPECTRE AGENTS</h1>
+<h1 align="center">SPECTRE AGENTS</h1>
 
 <p align="center">
   <strong>Stop prompting. Start crafting.</strong>
@@ -13,29 +13,34 @@
 </p>
 
 <p align="center">
-  <a href="#the-idea">The Idea</a> ·
+  <a href="#why-spectre">Why</a> ·
   <a href="#install">Install</a> ·
   <a href="#craft">Craft</a> ·
   <a href="#heal">Heal</a> ·
   <a href="#learn">Learn</a> ·
-  <a href="#the-team">The Team</a>
+  <a href="#the-team">Team</a>
 </p>
 
 ---
 
-## The Idea
+## Why Spectre?
 
-You've used AI coding tools. You know the drill:
+You've used AI coding tools. You know the pattern:
 
-*"Build me a login form"* → 200 lines of spaghetti → *"It doesn't work"* → 200 more lines → *"Now there are 2 bugs"* → You delete everything and write it yourself.
+> *"Build me a login form"*
+> → 200 lines of spaghetti
+> → *"It doesn't work"*
+> → 200 more lines
+> → *"Now there are 2 bugs"*
+> → You delete everything and write it yourself.
 
-**What if AI worked like a real engineering team instead?**
+**What if AI worked like a real engineering team?**
 
-With Spectre, when you ask for a login form:
+With Spectre:
 - The **Architect** designs the auth flow with proper security patterns
-- The **Developer** implements it with type-safe code and explicit error handling
+- The **Engineer** implements it with type-safe code and explicit error handling
 - The **QA Engineer** tests it, finds edge cases, catches bugs
-- When tests fail, the Developer fixes them automatically
+- When tests fail, the Engineer fixes them — automatically
 - You get production-ready code. Tested. Architected. Clean.
 
 That's the difference between *prompting* and *crafting*.
@@ -48,58 +53,105 @@ That's the difference between *prompting* and *crafting*.
 curl -fsSL https://raw.githubusercontent.com/fvilcot/spectre-agents/main/install.sh | bash
 ```
 
-Restart Claude Code. You're ready.
+Restart Claude Code. Three commands. Infinite possibilities.
+
+```
+/craft    →  Build with the right team
+/heal     →  Auto-fix everything
+/learn    →  Adapt to your patterns
+```
 
 ---
 
 ## Craft
 
-> `/craft` — Build features with the right team for your context.
+> Build features with the right team for your context.
+
+### Adapts to How You Work
 
 ```
 > /craft
 
 What's your work context?
 
-  🏢 Product Team   →  Full workflow with specs and reviews
+  🏢 Product Team   →  Full workflow: specs, reviews, compliance
   🚀 Startup        →  Fast iterations, still architected
   💼 Freelance      →  Direct and efficient
-  📚 Learning       →  One agent explains step by step
+  📚 Learning       →  Step-by-step explanations
 ```
 
-**Starting from scratch?** Spectre guides you through stack selection:
+Different contexts, different workflows. Product teams get specs and reviews. Startups get speed. Freelancers get efficiency. Learners get pedagogy.
+
+### Any Stack. Full Precision.
+
+**No static templates.** Spectre detects your *exact* stack and generates craft defaults on the fly.
 
 ```
 > /craft
 
-No project detected. What stack?
+🔍 Detecting stack...
 
-  ⚡ TypeScript + React    →  Vite, Vitest, TailwindCSS
-  🟢 TypeScript + Node     →  Express/Fastify, Zod
-  🐹 Go                    →  Standard lib or Gin/Echo
-  🦀 Rust                  →  Cargo, async runtime
-  🐍 Python                →  FastAPI/Django
+   package.json:
+   → TypeScript 5.3 (strict)
+   → React 18.2
+   → React Query v5
+   → Zustand
+   → Zod
+   → Vitest + Testing Library
+
+🧠 Generating craft defaults...
+
+   ✓ React Query patterns (query keys, mutations, optimistic updates)
+   ✓ Zustand patterns (slices, selectors, domain separation)
+   ✓ Zod validation at boundaries
+   ✓ Testing Library + MSW patterns
+   ✓ Anti-patterns to avoid
+
+📦 Cached in .spectre/stack-defaults.md
+```
+
+Add a library? Change a version? Spectre regenerates. Your agents always have patterns specific to YOUR stack.
+
+### From Scratch? Guided Setup.
+
+```
+> /craft
+
+🆕 No project detected. What stack?
+
+  ⚡ TypeScript + React
+  🟢 TypeScript + Node
+  🐹 Go
+  🦀 Rust
+  🐍 Python
+  📝 Other (describe)
 
 > TypeScript + React
 
-Setting up with craft defaults...
-  ✓ Strict TypeScript
-  ✓ Vitest + Testing Library
-  ✓ ESLint + Prettier
-  ✓ Path aliases configured
+Any preferences?
 
-Ready. What do you want to build?
+  [Full setup]           Vite + Vitest + TailwindCSS + strict TS
+  [With state management] + Zustand + React Query
+  [Minimal]              Just React + TypeScript
+
+> Full setup
+
+✅ Stack configured
+🧠 Generating craft defaults...
+📦 Ready to build
+
+What do you want to create?
 ```
 
-Describe what you need. Spectre assembles the team:
+### Assembles the Right Team
 
 ```
 > "User authentication with OAuth and magic links"
 
 Assembling: Architect → Frontend Engineer → QA Engineer
 
-🏗️ Architect designing auth flow...
-   ✓ OAuth2 + PKCE for security
+🏗️ Architect designing...
+   ✓ OAuth2 + PKCE flow
    ✓ Magic link with short-lived tokens
    ✓ Session management strategy
 
@@ -116,22 +168,23 @@ Assembling: Architect → Frontend Engineer → QA Engineer
 ✅ Ready to ship.
 ```
 
-The workflow adapts to your context. Product teams get full specs and reviews. Startups get fast iterations. Freelancers get straight to the point. Learners get explanations.
-
 ---
 
 ## Heal
 
-> `/heal` — Auto-fix everything. Tests, types, build, specs.
+> Auto-fix everything. Tests, types, build, specs.
 
 ```bash
 /heal           # Diagnose and fix whatever is broken
 /heal tests     # Fix failing tests
 /heal types     # Fix TypeScript errors
+/heal build     # Fix build errors
 /heal spec      # Sync spec with implementation
 ```
 
-Spectre doesn't just throw code at problems. It routes each issue to the right expert:
+### Smart Routing
+
+Spectre doesn't throw code at problems. It routes each issue to the right expert.
 
 ```
 > /heal
@@ -149,66 +202,56 @@ Spectre doesn't just throw code at problems. It routes each issue to the right e
    ✓ Fixed
 
 🧪 QA verifying...
-   ✓ All passing
+   ✓ All tests pass
+   ✓ Types clean
+   ✓ Build successful
 
 ✅ Healed.
 ```
 
-Test failures go to the dev who wrote the code. Type errors go to the Architect. Spec gaps go to the Product Owner. The right expert, every time.
+Test failures → Engineer who wrote the code
+Type errors → Architect
+Spec gaps → Product Owner
+Design flaws → Architect
+
+The right expert, every time.
 
 ---
 
 ## Learn
 
-> **Active by default.** Spectre auto-detects your stack and learns your patterns.
+> Active by default. Adapts agents to YOUR conventions.
 
-You don't need to run `/learn` — it happens automatically when you use `/craft` or `/heal`.
-
-```bash
-/learn                  # Re-learn entire project (refresh)
-/learn --only <path>    # Learn ONLY from this file/folder
-/learn --off            # Disable auto-learning
-/learn --on             # Re-enable (default)
-/learn --show           # Show current learnings
-```
-
-### Any Stack, Full Precision
-
-Spectre doesn't use static templates. It detects your **exact** stack and generates craft defaults on the fly.
-
-```
-package.json detected:
-  → React 18.2 + React Query v5 + Zustand + Zod + Vitest
-
-Generating craft defaults...
-  → React Query patterns (query keys, mutations, optimistic updates)
-  → Zustand patterns (slices, selectors, no global store)
-  → Zod validation patterns
-  → Testing Library + MSW patterns
-
-Cached in .spectre/stack-defaults.md
-```
-
-Dependencies change? Spectre regenerates. New library added? New patterns included.
+You don't need to run `/learn`. It happens automatically with `/craft` and `/heal`.
 
 ### Two-Phase Intelligence
 
-**Phase 1: Stack Detection** — Always runs. Even if your code is a mess, Spectre knows it's TypeScript vs Go.
+**Phase 1: Stack Detection** — Always runs.
+Even if your code needs work, Spectre knows your stack.
 
-**Phase 2: Pattern Learning** — Learns YOUR conventions. But stops on violations. Bad patterns don't propagate.
+**Phase 2: Pattern Learning** — Learns your conventions.
+But stops on violations. Bad patterns don't propagate.
 
 ```
-✅ Stack detected    →  Agents know WHAT you're using
-✅ Patterns learned  →  Agents know HOW you use it
-❌ Violations found  →  Agents use craft defaults instead
+🔍 Phase 1: Detecting stack...
+   ✅ TypeScript + React + Vite
+
+🔍 Phase 2: Learning patterns...
+   ✅ Feature folders architecture
+   ✅ Result types for errors
+   ✅ Colocated tests
+   ✅ Absolute imports with aliases
+
+📦 Patterns cached for agents
 ```
 
-**But it won't learn garbage.**
+### The Craft Guard
+
+**Spectre never learns garbage.**
 
 ```
 > /craft "Add user service"
 
-🔍 Auto-detecting stack... Node.js + TypeScript + React
 🔍 Learning patterns...
 
 🛑 CRAFT VIOLATIONS DETECTED
@@ -220,28 +263,49 @@ Dependencies change? Spectre regenerates. New library added? New patterns includ
 
 📋 Report: .spectre/violations-report.md
 
-❌ Pattern NOT learned. Fix violation first.
+   Stack detected: ✅ TypeScript + React
+   Patterns learned: ❌ Blocked (violations)
+   Agents will use: Craft defaults
+
+   [ 🔧 Fix violations ]  [ ⏭️ Continue anyway ]  [ 🛑 Stop ]
 ```
 
-The guard is always on. Every stack. No exceptions.
+Your agents still know your stack. They just won't copy bad patterns — they'll use craft defaults instead.
+
+### Manual Controls
+
+```bash
+/learn                  # Re-scan and refresh
+/learn --only <path>    # Learn from specific folder only
+/learn --off            # Disable auto-learning
+/learn --on             # Re-enable (default)
+/learn --show           # Show current learnings
+/learn --reset          # Clear all learnings
+```
 
 ---
 
 ## The Team
 
-Six specialists. Each with deep expertise. Working together.
+Six specialists. Deep expertise. Reactive collaboration.
 
-**👤 Product Owner** — Transforms vague ideas into clear specs. User stories with acceptance criteria. Edge cases you forgot to think about.
+**👤 Product Owner**
+Transforms vague ideas into clear specs. User stories with acceptance criteria. Edge cases you forgot.
 
-**🏗️ Architect** — Designs systems that scale. Clean Architecture. Domain-Driven Design. SOLID principles. Code review with teeth.
+**🏗️ Architect**
+Designs systems that scale. Clean Architecture. Domain-Driven Design. SOLID. Code review with teeth.
 
-**💻 Frontend Engineer** — Builds interfaces users love. Accessible. Performant. Type-safe. Components that compose well.
+**💻 Frontend Engineer**
+Builds interfaces users love. Accessible. Performant. Type-safe. Components that compose.
 
-**⚙️ Backend Engineer** — APIs that are secure and fast. Explicit error handling. Proper validation. No `any`, no shortcuts.
+**⚙️ Backend Engineer**
+APIs that are secure and fast. Explicit error handling. Proper validation. No `any`, no shortcuts.
 
-**🧪 QA Engineer** — Tests that prove it works. TDD/BDD. Meaningful coverage. Catches bugs before you do.
+**🧪 QA Engineer**
+Tests that prove it works. TDD/BDD. Meaningful coverage. Catches bugs before users do.
 
-**🎭 Orchestrator** — Coordinates the team. Routes problems to the right expert. Manages retries. Keeps the loop flowing.
+**🎭 Orchestrator**
+Coordinates the team. Routes problems to the right expert. Manages retries. Keeps the loop flowing.
 
 ---
 
@@ -249,10 +313,12 @@ Six specialists. Each with deep expertise. Working together.
 
 Agents don't just work in sequence. They react to each other.
 
-When QA finds a test failure → Dev fixes it → QA re-verifies.
-When QA finds a design flaw → Architect redesigns → Dev updates → QA re-verifies.
-When Dev is blocked by design → Architect adjusts → Dev continues.
-When Architect finds a spec contradiction → Product Owner arbitrates.
+```
+QA finds test failure    → Engineer fixes → QA re-verifies
+QA finds design flaw     → Architect redesigns → Engineer updates → QA re-verifies
+Engineer blocked         → Architect adjusts → Engineer continues
+Architect finds spec gap → Product Owner clarifies
+```
 
 Every problem goes to the expert who can solve it. Automatically.
 
@@ -283,19 +349,32 @@ Every problem goes to the expert who can solve it. Automatically.
 
 ---
 
+## What Makes Spectre Different
+
+| Traditional AI | Spectre |
+|----------------|---------|
+| One model, generic output | Specialized agents, expert output |
+| Static prompts | Dynamic stack detection |
+| Learns everything | Guards against anti-patterns |
+| Fix it yourself | Self-correcting loops |
+| Same for everyone | Adapts to your context |
+| Generic patterns | YOUR stack, YOUR libs, YOUR conventions |
+
+---
+
 ## Philosophy
 
-**Domain First** — Business logic lives at the center. Frameworks live at the edges. Your domain model is sacred.
+**Domain First** — Business logic at the center. Frameworks at the edges. Your domain model is sacred.
 
 **Type Safety** — Types are documentation that compiles. No `any`. No escape hatches. The compiler is your ally.
 
-**Explicit Over Implicit** — No magic. No surprises. `Result<T, E>` over thrown exceptions. Make the code tell its story.
+**Explicit Over Implicit** — No magic. No surprises. `Result<T, E>` over thrown exceptions. Code tells its story.
 
 **Test-Driven** — Tests are specifications that run. Write the test first. Let it drive the design.
 
-**Self-Correcting** — Agents catch their own mistakes. QA fails, Dev fixes, QA verifies. Humans step in only when needed.
+**Self-Correcting** — Agents catch their own mistakes. QA fails, Engineer fixes, QA verifies. Humans intervene only when needed.
 
-**Adaptive** — Learns your patterns. Guards your standards. Refuses to learn anti-patterns.
+**Adaptive** — Learns your patterns. Guards your standards. Evolves with your codebase.
 
 ---
 
@@ -310,5 +389,5 @@ BSD 3-Clause
 </p>
 
 <p align="center">
-  <strong>That's the Spectre way.</strong> 👻
+  <strong>That's the Spectre way.</strong>
 </p>
