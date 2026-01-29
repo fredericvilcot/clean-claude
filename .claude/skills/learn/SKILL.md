@@ -36,26 +36,28 @@ Analyze the project to learn its patterns. Agents then adapt their output to mat
 
 ## Craft Guard — Active on ALL Modes
 
-**Every /learn mode includes craft compliance checking.**
+**Every /learn mode includes craft compliance checking. STOP on violations.**
 
 | Mode | Guard Behavior | On Violation |
 |------|---------------|--------------|
-| `/learn` (manual) | **WARN** | Alert user, generate report, continue |
-| `/learn <file>` | **WARN** | Alert user, generate report, continue |
-| `/learn <folder>` | **WARN** | Alert user, generate report, continue |
-| `/learn --example` | **WARN** | Alert user, generate report, continue |
-| `/learn --auto` | **STOP** | Halt learning, generate report, ask user |
+| `/learn` (manual) | **STOP** | Halt, generate report, ask user |
+| `/learn <file>` | **STOP** | Halt, generate report, ask user |
+| `/learn <folder>` | **STOP** | Halt, generate report, ask user |
+| `/learn --example` | **STOP** | Halt, generate report, ask user |
+| `/learn --auto` | **STOP** | Halt, generate report, ask user |
 
-### Why Guard on Manual Mode?
+### Why STOP Everywhere?
 
-Even when you explicitly point to a file, Spectre checks it against craft principles:
+**We don't generate skills from garbage. Period.**
+
+Even when you explicitly point to a file, Spectre checks it against craft principles. If violations are found, learning STOPS completely:
 
 ```
 > /learn src/services/LegacyService.ts
 
 🔍 Analyzing src/services/LegacyService.ts...
 
-⚠️  CRAFT VIOLATIONS DETECTED (2)
+🛑 STOPPING — CRAFT VIOLATIONS DETECTED
 
   1. Line 45: throw new Error('User not found')
      → Violates: Explicit Error Handling
@@ -67,11 +69,15 @@ Even when you explicitly point to a file, Spectre checks it against craft princi
 
 📋 Report generated: .spectre/violations-report.md
 
-Patterns learned (craft-compliant only):
-  ✅ Dependency injection via constructor
-  ✅ Interface-based dependencies
+❌ NO PATTERNS LEARNED — Fix violations first.
 
-Continue learning, but violations were NOT learned.
+┌─────────────────────────────────────────────────────────┐
+│  What do you want to do?                                │
+│                                                         │
+│  [ 🔧 Fix it ]          Let me fix these violations     │
+│  [ ⏭️ Ignore once ]     Skip this file, continue scan   │
+│  [ 🛑 Stop ]            I'll review the report first    │
+└─────────────────────────────────────────────────────────┘
 ```
 
 ---

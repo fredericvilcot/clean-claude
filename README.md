@@ -218,27 +218,25 @@ Something broke? **Don't debug. Just heal.**
 /learn --violations          # 📋 Show violation report
 ```
 
-### 🛡️ Craft Guard — Active on ALL Modes
+### 🛡️ Craft Guard — STOP on ALL Modes
 
-| Mode | On Violation |
-|:-----|:-------------|
-| Manual (`/learn`, `/learn <file>`) | ⚠️ **WARN** — Alert, generate report, continue |
-| Auto (`/learn --auto`) | 🛑 **STOP** — Halt, generate report, ask user |
+**We don't generate skills from garbage. Ever.**
 
 ```
 > /learn src/services/
 
 🔍 Analyzing src/services/...
 
-  ✅ Dependency injection
-  ✅ Interface-based dependencies
+🛑 STOPPING — CRAFT VIOLATIONS DETECTED
 
-  ⚠️  VIOLATIONS DETECTED (2)
+  ❌ Line 45: throw Error → Use Result<T, E>
+  ❌ Line 12: any type → Define interface
 
-  📋 Report: .spectre/violations-report.md
+📋 Report: .spectre/violations-report.md
 
-Patterns learned (craft-compliant only).
-Violations were NOT learned.
+❌ NO PATTERNS LEARNED — Fix violations first.
+
+  [ 🔧 Fix it ]  [ ⏭️ Ignore file ]  [ 🛑 Stop ]
 ```
 
 ### 📋 Violation Report — Your Action Plan
