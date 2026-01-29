@@ -16,9 +16,9 @@ echo ""
 
 # Spectre agents list
 AGENTS=(
-    "software-craftsman"
+    "architect"
     "product-owner"
-    "frontend-dev"
+    "frontend-engineer"
     "qa-engineer"
     "orchestrator"
 )

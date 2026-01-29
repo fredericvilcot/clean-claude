@@ -14,7 +14,7 @@ INPUT=$(cat)
 AGENT_TYPE=$(echo "$INPUT" | jq -r '.agent_type // .subagent_type // "unknown"')
 
 # List of Spectre agents
-SPECTRE_AGENTS="qa-engineer|frontend-dev|backend-dev|software-craftsman|product-owner|orchestrator"
+SPECTRE_AGENTS="qa-engineer|frontend-engineer|backend-engineer|architect|product-owner|orchestrator"
 
 # Only process Spectre agents
 if echo "$AGENT_TYPE" | grep -qE "^($SPECTRE_AGENTS)$"; then

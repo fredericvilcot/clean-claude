@@ -73,7 +73,7 @@ HOOKS_CONFIG=$(cat << 'EOF'
 {
     "SubagentStop": [
         {
-            "matcher": "qa-engineer|frontend-dev|backend-dev|software-craftsman|product-owner",
+            "matcher": "qa-engineer|frontend-engineer|backend-engineer|architect|product-owner",
             "hooks": [
                 {
                     "type": "command",

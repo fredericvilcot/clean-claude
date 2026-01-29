@@ -126,49 +126,49 @@ resolve_agent_for_error() {
     case "$error_type" in
         "type_error")
             # Type errors often need architectural review
-            echo "software-craftsman"
+            echo "architect"
             ;;
         "test_failure")
             # Route to the appropriate dev based on stack
             if [[ "$stack" == "backend" ]]; then
-                echo "backend-dev"
+                echo "backend-engineer"
             else
-                echo "frontend-dev"
+                echo "frontend-engineer"
             fi
             ;;
         "build_error")
             # Build errors go to the dev who can fix config
             if [[ "$stack" == "backend" ]]; then
-                echo "backend-dev"
+                echo "backend-engineer"
             else
-                echo "frontend-dev"
+                echo "frontend-engineer"
             fi
             ;;
         "runtime_error")
             # Runtime errors go to the appropriate dev
             if [[ "$stack" == "backend" ]]; then
-                echo "backend-dev"
+                echo "backend-engineer"
             else
-                echo "frontend-dev"
+                echo "frontend-engineer"
             fi
             ;;
         "lint_error")
             # Lint errors are quick fixes for the last active dev
             local last_dev=$(get_state "agents.lastDev")
-            echo "${last_dev:-frontend-dev}"
+            echo "${last_dev:-frontend-engineer}"
             ;;
         "accessibility_error")
             # A11y is frontend specialty
-            echo "frontend-dev"
+            echo "frontend-engineer"
             ;;
         "design_issue")
             # Design issues need architect review
-            echo "software-craftsman"
+            echo "architect"
             ;;
         *)
             # Default to last active dev or frontend
             local last_dev=$(get_state "agents.lastDev")
-            echo "${last_dev:-frontend-dev}"
+            echo "${last_dev:-frontend-engineer}"
             ;;
     esac
 }
@@ -246,28 +246,28 @@ get_next_workflow_agent() {
     # Default workflow: PO → Architect → Dev → QA
     case "$current_agent" in
         "product-owner")
-            echo "software-craftsman"
+            echo "architect"
             ;;
-        "software-craftsman")
+        "architect")
             # Route to appropriate dev based on stack
             if [[ "$stack" == "backend" ]]; then
-                echo "backend-dev"
+                echo "backend-engineer"
             elif [[ "$stack" == "fullstack" ]]; then
                 # Fullstack: start with backend, then frontend
-                echo "backend-dev"
+                echo "backend-engineer"
             else
-                echo "frontend-dev"
+                echo "frontend-engineer"
             fi
             ;;
-        "backend-dev")
+        "backend-engineer")
             if [[ "$stack" == "fullstack" ]]; then
                 # Fullstack: backend done, now frontend
-                echo "frontend-dev"
+                echo "frontend-engineer"
             else
                 echo "qa-engineer"
             fi
             ;;
-        "frontend-dev")
+        "frontend-engineer")
             echo "qa-engineer"
             ;;
         "qa-engineer")
@@ -385,9 +385,9 @@ handle_agent_complete() {
         set_state "status" "\"success\""
     elif [[ "$next_agent" != "unknown" ]]; then
         local phase_map=(
-            ["software-craftsman"]="design"
-            ["frontend-dev"]="implement"
-            ["backend-dev"]="implement"
+            ["architect"]="design"
+            ["frontend-engineer"]="implement"
+            ["backend-engineer"]="implement"
             ["qa-engineer"]="verify"
         )
         local next_phase="${phase_map[$next_agent]:-implement}"
@@ -774,9 +774,9 @@ main() {
 
             # Expand shorthand names
             case "$primary" in
-                front) primary="frontend-dev" ;;
-                back) primary="backend-dev" ;;
-                arch) primary="software-craftsman" ;;
+                front) primary="frontend-engineer" ;;
+                back) primary="backend-engineer" ;;
+                arch) primary="architect" ;;
                 qa) primary="qa-engineer" ;;
                 po) primary="product-owner" ;;
             esac
@@ -809,7 +809,7 @@ main() {
             echo "Agent shorthand: front, back, arch, qa, po"
             echo ""
             echo "Examples:"
-            echo "  spectre-router.sh agent frontend-dev --link qa-engineer"
+            echo "  spectre-router.sh agent frontend-engineer --link qa-engineer"
             echo "  spectre-router.sh agent arch --link front,qa --task \"Build login\""
             exit 1
             ;;
