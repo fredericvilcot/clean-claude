@@ -27,7 +27,7 @@ Spectre Agents est une bibliothèque d'agents et skills pour Claude Code, orient
 │                         SPECTRE AGENTS                                  │
 │                                                                         │
 │                           ┌─────────────┐                               │
-│                           │   /guide    │  ← Point d'entrée             │
+│                           │   /build    │  ← Point d'entrée             │
 │                           └──────┬──────┘                               │
 │                                  │                                      │
 │                                  ▼                                      │
@@ -147,7 +147,7 @@ Détails d'exécution...
 
 | Skill | Description |
 |-------|-------------|
-| **/guide** | **Build** — mode guidé adapté au contexte |
+| **/build** | **Build** — mode guidé adapté au contexte |
 | **/heal** | **Fix** — auto-réparation (tests, build, types) |
 | **/typescript-craft** | Principes craft TypeScript |
 | **/react-craft** | Principes craft React |
@@ -159,7 +159,7 @@ Détails d'exécution...
 - **fork** : S'exécute dans un sous-agent isolé (nouveau contexte)
 - **conversation** : S'exécute dans la conversation principale
 
-#### Le skill `/guide` en détail
+#### Le skill `/build` en détail
 
 Mode interactif adapté au **contexte de travail** de l'utilisateur.
 
@@ -795,7 +795,7 @@ Crée :
 │   ├── qa-engineer.md
 │   └── orchestrator.md
 └── skills/
-    ├── guide/SKILL.md
+    ├── build/SKILL.md
     ├── heal/SKILL.md
     ├── typescript-craft/SKILL.md
     ├── react-craft/SKILL.md
@@ -832,14 +832,14 @@ project/
 ### Deux commandes
 
 ```bash
-/guide    # Construire quelque chose de nouveau
+/build    # Construire quelque chose de nouveau
 /heal     # Réparer ce qui est cassé
 ```
 
-### `/guide` — Construire
+### `/build` — Construire
 
 ```bash
-/guide
+/build
 # → Contexte ? [ Product Team | Startup | Freelance | Learning ]
 # → Objectif ? [ Build | Fix | Improve | Think ]
 # → Questions contextuelles...
@@ -861,7 +861,7 @@ project/
 
 ```bash
 # 1. Nouveau projet ou feature
-/guide
+/build
 
 # 2. Si quelque chose casse
 /heal
@@ -873,10 +873,10 @@ project/
 ### Raccourcis
 
 ```bash
-/guide add login form       # → flow build + UI
-/guide fix failing tests    # → flow fix + tests
-/guide refactor auth        # → flow improve
-/guide how to design auth   # → flow think
+/build add login form       # → flow build + UI
+/build fix failing tests    # → flow fix + tests
+/build refactor auth        # → flow improve
+/build how to design auth   # → flow think
 ```
 
 ### Monitoring

@@ -1,13 +1,13 @@
 ---
-name: guide
-description: "Interactive guided mode adapted to your work context. Express your need, Spectre configures the agents."
+name: build
+description: "Build something new. Adapts to your work context (Product Team, Startup, Freelance). Express your need, Spectre configures the agents."
 context: conversation
 allowed-tools: Read, Bash, Task, AskUserQuestion, Skill
 ---
 
-# Spectre Guide — Adapted to Your Context
+# Spectre Build — Adapted to Your Context
 
-Guide users based on HOW they work, not just WHAT they want to build.
+Build features based on HOW you work, not just WHAT you want to build.
 
 ## Philosophy
 
