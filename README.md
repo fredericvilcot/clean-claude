@@ -207,20 +207,42 @@ curl -fsSL https://raw.githubusercontent.com/fvilcot/spectre-agents/main/install
 
 ---
 
-## 🎨 CRAFT SKILLS
+## 💎 WHY SPECTRE?
 
-Apply craft principles to specific areas:
+<p align="center">
+  <strong>Because AI coding without craft is just fast garbage.</strong>
+</p>
 
-| Skill | What it does |
-|:------|:-------------|
-| `/typescript-craft` | Strict types, Result patterns, pure functions |
-| `/react-craft` | Component design, hooks, accessibility |
-| `/test-craft` | TDD/BDD, test pyramid, proper mocks |
-| `/init-frontend` | Bootstrap React + Vite + TS + Vitest |
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                                                                        │
+│   🤖 Other AI tools:                                                   │
+│                                                                        │
+│      You prompt → AI dumps code → You debug → You fix → You cry        │
+│                                                                        │
+│   👻 Spectre:                                                          │
+│                                                                        │
+│      You describe → Agents collaborate → Agents test →                 │
+│      Agents fix themselves → You ship                                  │
+│                                                                        │
+└────────────────────────────────────────────────────────────────────────┘
+```
+
+| Problem | Other tools | Spectre |
+|:--------|:------------|:--------|
+| ❌ **AI writes garbage** | You fix it manually | 🧪 QA agent catches & fixes |
+| ❌ **No architecture** | Spaghetti code | 🏗️ Architect designs first |
+| ❌ **No tests** | "I'll add them later" | 🧪 Tests are mandatory |
+| ❌ **Context lost** | Re-explain everything | 🧠 Agents share context |
+| ❌ **One-size-fits-all** | Same prompts for everyone | 🎯 Adapts to YOUR workflow |
+
+<p align="center">
+  <strong>🎯 Spectre doesn't just write code. It crafts software.</strong>
+</p>
 
 ---
 
-## 💎 PHILOSOPHY
+## 🏛️ PHILOSOPHY
 
 <p align="center">
   <strong>Code is a craft. Not a race.</strong>
@@ -232,6 +254,20 @@ Apply craft principles to specific areas:
 | 🔒 **Type Safety** | Types are documentation that compiles |
 | 👁️ **Explicit > Implicit** | No magic, no surprises |
 | 🧪 **Test-Driven** | Tests are specs that run |
+| 🔄 **Self-Correcting** | Agents fix their own mistakes |
+
+---
+
+## 🎨 CRAFT SKILLS
+
+Apply craft principles to specific areas:
+
+| Skill | What it does |
+|:------|:-------------|
+| `/typescript-craft` | Strict types, Result patterns, pure functions |
+| `/react-craft` | Component design, hooks, accessibility |
+| `/test-craft` | TDD/BDD, test pyramid, proper mocks |
+| `/init-frontend` | Bootstrap React + Vite + TS + Vitest |
 
 ---
 
