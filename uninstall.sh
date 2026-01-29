@@ -20,6 +20,7 @@ AGENTS=(
     "product-owner"
     "frontend-dev"
     "qa-engineer"
+    "orchestrator"
 )
 
 # Spectre skills list
@@ -29,6 +30,8 @@ SKILLS=(
     "test-craft"
     "init-frontend"
     "feature"
+    "reactive-loop"
+    "setup-reactive"
 )
 
 # Remove agents

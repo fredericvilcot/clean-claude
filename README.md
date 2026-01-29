@@ -38,6 +38,7 @@ After installation, **restart Claude Code** to load the new components.
 | **product-owner** | Product expert who transforms vague ideas into clear user stories with acceptance criteria. Prioritizes by value, defines MVP scope. |
 | **frontend-dev** | Frontend specialist building accessible, performant, maintainable UIs. Expert in React, state management, component testing. |
 | **qa-engineer** | Quality expert designing test strategies, writing tests at all levels (unit, integration, e2e), ensuring confidence in the codebase. |
+| **orchestrator** | Conductor of the reactive multi-agent system. Coordinates agents, manages feedback loops, handles errors and retries automatically. |
 
 ### Skills
 
@@ -48,6 +49,8 @@ After installation, **restart Claude Code** to load the new components.
 | **/test-craft** | TDD/BDD testing principles: test pyramid, behavior-driven tests, proper test doubles, maintainable test suites. |
 | **/init-frontend** | Bootstraps a new frontend project with craft setup: React + Vite + TypeScript + Vitest + clean architecture. |
 | **/feature** | Complete feature workflow: PO → Architect → Dev → QA. Creates user story, technical design, implementation, and QA verification. |
+| **/reactive-loop** | Start the reactive multi-agent loop. Agents auto-collaborate: QA finds errors → Dev fixes → QA verifies → repeat until success. |
+| **/setup-reactive** | Set up the Spectre Reactive System in your project (hooks, shared state, scripts). |
 
 ## Usage
 
@@ -77,6 +80,60 @@ curl -fsSL https://raw.githubusercontent.com/fvilcot/spectre-agents/main/uninsta
 # Or from cloned repo
 ./uninstall.sh
 ```
+
+## Reactive Multi-Agent System
+
+**What makes Spectre Agents different**: a self-correcting feedback loop where agents collaborate automatically.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    SPECTRE REACTIVE LOOP                    │
+│                                                             │
+│  ┌──────────┐    ┌──────────┐    ┌──────────┐    ┌───────┐ │
+│  │ Product  │ ─▶ │ Software │ ─▶ │ Frontend │ ─▶ │  QA   │ │
+│  │  Owner   │    │ Craftsman│    │   Dev    │    │Engineer│ │
+│  └──────────┘    └──────────┘    └──────────┘    └───┬───┘ │
+│                                        ▲              │     │
+│                                        │    error     │     │
+│                                        └──────────────┘     │
+│                                           fix & retry       │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### How It Works
+
+1. **QA runs tests** and finds an error
+2. **Hook triggers** and captures the error context
+3. **Dev agent spawns** automatically with error details
+4. **Dev fixes** the issue
+5. **QA re-verifies** automatically
+6. **Loop continues** until all tests pass (or max retries)
+
+### Shared Memory
+
+Agents communicate through `.spectre/`:
+- `state.json` — Current workflow state
+- `errors.jsonl` — Error history with resolutions
+- `learnings.jsonl` — Patterns learned from fixes
+
+### Setup in Your Project
+
+```bash
+/setup-reactive
+```
+
+Then start the loop:
+
+```bash
+/reactive-loop
+```
+
+### Key Features
+
+- **Auto-correction**: Errors trigger fixes without human intervention
+- **Learning**: Successful fixes become patterns for future errors
+- **Retry limits**: Maximum 3 retries before asking for help
+- **Full context**: Each agent receives relevant history and learnings
 
 ## Philosophy
 

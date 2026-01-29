@@ -46,6 +46,7 @@ The Markdown body contains the skill's specific instructions.
 - **product-owner**: Product expert who transforms vague ideas into clear user stories with acceptance criteria. Prioritizes by value, defines MVP scope.
 - **frontend-dev**: Frontend specialist building accessible, performant, maintainable UIs. Expert in React, state management, testing.
 - **qa-engineer**: Quality expert designing test strategies, writing tests at all levels, ensuring confidence in the codebase.
+- **orchestrator**: Conductor of the reactive multi-agent system. Coordinates agents, manages feedback loops, handles errors and retries.
 
 ### Skills
 - **typescript-craft**: Applies craft principles to TypeScript — strict typing, algebraic types, immutability, pure functions, Result types, layer separation.
@@ -53,6 +54,8 @@ The Markdown body contains the skill's specific instructions.
 - **test-craft**: TDD/BDD testing principles — test pyramid, behavior-driven tests, proper test doubles.
 - **init-frontend**: Bootstraps a new frontend project with craft setup (React + Vite + TypeScript + Vitest).
 - **feature**: Complete feature workflow orchestrating PO → Architect → Dev → QA with artifacts at each phase.
+- **reactive-loop**: Start the reactive multi-agent loop. Agents auto-collaborate: QA → error → Dev → fix → QA → verify.
+- **setup-reactive**: Set up the Spectre Reactive System in a project (hooks, shared state, scripts).
 
 ## Guiding Principles
 
