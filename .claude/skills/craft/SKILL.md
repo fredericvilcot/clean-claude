@@ -120,33 +120,65 @@ Header: "Feature"
 
 ## Step 4: Input Analysis (THE SMART PART)
 
-**Rule: PO ALWAYS intervenes unless user provides a REAL spec source.**
+**ABSOLUTE RULE: All agents work from a spec in MD format.**
 
-A "real spec" is NOT a text description. It's an actual artifact:
-- **File**: `.md`, `.yml`, `.yaml`, `.json` spec file
-- **URL**: Jira ticket, Linear issue, Notion page, GitHub issue
-- **Explicit format**: User story with Given/When/Then, acceptance criteria list
+The PO's job is to ensure a proper `.md` spec exists. Other agents (Architect, Dev, QA) CANNOT start without it.
 
-### Input Types & Routing
+### What counts as a valid spec?
 
-| Input | Is Real Spec? | Route |
-|-------|---------------|-------|
-| "a sexy counter" | ❌ No (just text) | **PO first** |
-| "Counter with +/-, localStorage, dark mode" | ❌ No (detailed but not formal) | **PO first** |
-| "See spec in docs/counter.md" | ✅ Yes (file) | Architect first |
-| "Jira ticket: PROJ-123" | ✅ Yes (external) | Architect first |
-| "Create Counter.tsx with useState..." | ❌ No (technical but no spec) | **PO first** (light) |
-| "Fix the counter reset bug" | N/A (bug fix) | Dev only |
-
-### Why PO Always?
-
-Even a "detailed description" is NOT a spec. A proper spec has:
+A valid spec file contains:
 - User story format (As a... I want... So that...)
-- Acceptance criteria (Given/When/Then)
+- Acceptance criteria (Given/When/Then or checkboxes)
 - Edge cases considered
 - Out of scope defined
 
-**The PO ensures this exists before any work starts.**
+### Input Types & Routing
+
+| Input | Has Valid Spec? | Route |
+|-------|-----------------|-------|
+| Spec file (`.md`, `.yml`) | ✅ YES | → Architect (reads file) |
+| "a sexy counter" | ❌ NO | → **PO creates spec.md** → Architect |
+| "Counter with +/-, localStorage, dark mode" | ❌ NO (detailed but informal) | → **PO creates spec.md** → Architect |
+| "Jira ticket: PROJ-123" | ❌ NO (external, not formatted) | → **PO fetches + creates spec.md** → Architect |
+| "Create Counter.tsx with useState..." | ❌ NO (technical, no spec) | → **PO creates spec.md** → Architect |
+| "Fix the counter reset bug" | N/A (bug fix) | → Dev only |
+
+### Why Always MD Spec?
+
+1. **Architect** needs clear requirements to design
+2. **Dev** needs acceptance criteria to implement
+3. **QA** needs test scenarios to verify
+4. **Everyone** needs a single source of truth
+
+The PO transforms ANY input into a proper spec.md that becomes the contract for all agents.
+
+### PO Output: Always .spectre/spec.md
+
+```markdown
+# Feature: [Feature Name]
+
+## User Story
+As a [user type], I want [feature]
+so that [benefit].
+
+## Acceptance Criteria
+- [ ] Given... When... Then...
+- [ ] Given... When... Then...
+
+## Edge Cases
+- What if...?
+- What about...?
+
+## Out of Scope
+- Not doing X in this iteration
+- Y will be handled separately
+
+## Technical Notes (optional)
+- Constraints mentioned by user
+- Performance requirements
+```
+
+This file is created by PO and used by ALL other agents.
 
 ### Detection Logic
 
@@ -521,23 +553,22 @@ Task(
 
 ## Context-Aware Routing Matrix
 
-**Rule: PO intervenes unless real spec file/URL is provided.**
+**Rule: All agents work from `.spectre/spec.md`. PO creates it if not provided.**
 
-| Context | Input Type | Pipeline |
-|---------|------------|----------|
-| **Product Team** | Text (any description) | PO → Architect → Dev ⇄ QA |
-| **Product Team** | Spec file (md/yml/json) | Architect → Dev ⇄ QA |
-| **Product Team** | External (Jira/Linear/etc) | Architect → Dev ⇄ QA |
-| **Product Team** | Bug fix | Dev → QA |
-| **Startup** | Text (any description) | PO (light) → Architect → Dev ⇄ QA |
-| **Startup** | Spec file/External | Architect → Dev ⇄ QA |
-| **Startup** | Bug fix | Dev → QA |
-| **Freelance** | Text | PO (minimal) → Dev ⇄ QA |
-| **Freelance** | Spec file/Bug fix | Dev → QA |
-| **Learning** | Any | Single agent (explains as it goes) |
+| Context | Input | PO Action | Pipeline |
+|---------|-------|-----------|----------|
+| **Product Team** | Text (any) | Creates full spec.md | PO → Architect → Dev ⇄ QA |
+| **Product Team** | Jira/Linear ticket | Fetches + creates spec.md | PO → Architect → Dev ⇄ QA |
+| **Product Team** | Spec file (.md/.yml) | Validates + copies | Architect → Dev ⇄ QA |
+| **Product Team** | Bug fix | — | Dev → QA |
+| **Startup** | Text (any) | Creates light spec.md | PO → Architect → Dev ⇄ QA |
+| **Startup** | Spec file (.md/.yml) | Validates + copies | Architect → Dev ⇄ QA |
+| **Startup** | Bug fix | — | Dev → QA |
+| **Freelance** | Text (any) | Creates minimal spec.md | PO → Dev ⇄ QA |
+| **Freelance** | Spec file/Bug fix | — | Dev → QA |
+| **Learning** | Any | Explains while creating | Single agent |
 
-**Key insight**: "Counter with +/-, localStorage, dark mode" is TEXT, not a spec.
-A spec has: user story format, acceptance criteria, edge cases.
+**The spec.md is the contract. No spec = no work.**
 
 ---
 
