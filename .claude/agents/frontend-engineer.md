@@ -239,14 +239,37 @@ const input = screen.getByClassName('email-input');
 
 > "The more your tests resemble the way your software is used, the more confidence they can give you."
 
+---
+
+## YOUR RESPONSIBILITY: Unit Tests (BDD)
+
+**You write unit tests. QA writes E2E/Integration tests.**
+
+| Who | What | Where |
+|-----|------|-------|
+| **You (Dev)** | Unit tests (BDD) | Colocated `*.test.ts` next to source |
+| **QA** | E2E (Playwright) or Integration | `e2e/` or `tests/integration/` |
+
+**ALWAYS write tests alongside your code. Tests are colocated.**
+
+```
+src/features/auth/
+├── LoginForm.tsx
+├── LoginForm.test.tsx      ← YOUR responsibility
+├── useAuth.ts
+└── useAuth.test.ts         ← YOUR responsibility
+```
+
+---
+
 **Testing Trophy**
 ```
         /\
-       /  \     E2E (few)
+       /  \     E2E (QA - Playwright)
       /────\
-     /      \   Integration (more)
+     /      \   Integration (QA)
     /────────\
-   /   Unit   \ (most, for utilities)
+   /   Unit   \ (YOU - colocated)
   /────────────\
    Static (TypeScript, ESLint)
 ```

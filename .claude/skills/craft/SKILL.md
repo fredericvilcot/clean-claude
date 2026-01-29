@@ -398,27 +398,70 @@ Task(
 
 ## Step 6: Dev + QA — ALWAYS RUN IN PARALLEL
 
+### Developer: Implementation + Unit Tests (BDD)
+
 ```
 Task(
   subagent_type: "frontend-engineer",  # or backend
   prompt: """
-    SPEC: .spectre/spec.md
+    SPEC: .spectre/specs/spec-latest.md
     DESIGN: .spectre/design.md
 
     Implement EXACTLY what design.md specifies.
     CRAFT: strict TS, Result<T,E>, domain isolated.
+
+    UNIT TESTS (BDD):
+    - Write colocated tests (*.test.ts next to source)
+    - Test domain logic, pure functions
+    - Given-When-Then format
   """
 )
+```
 
+### QA: E2E or Integration Tests
+
+**QA asks user FIRST:**
+```
+AskUserQuestion(
+  questions: [{
+    question: "What type of tests should I write?",
+    header: "Tests",
+    options: [
+      { label: "E2E (Playwright)", description: "Full browser tests covering all spec scenarios" },
+      { label: "Integration", description: "API/service boundary tests" }
+    ]
+  }]
+)
+```
+
+**Then:**
+```
 Task(
   subagent_type: "qa-engineer",
   prompt: """
-    SPEC: .spectre/spec.md
+    SPEC: .spectre/specs/spec-latest.md
     DESIGN: .spectre/design.md
+    TEST TYPE: <E2E or Integration>
 
-    Write tests from design.md.
-    Run as Dev completes.
-    Report failures to .spectre/failures.md.
+    ## Your Job
+    - NEVER write unit tests (that's Dev's job)
+    - Write <E2E/Integration> tests for ALL acceptance criteria
+
+    ## IF E2E (Playwright)
+    - Create e2e/ folder with Playwright config
+    - Use Page Object Model pattern
+    - Test ALL scenarios from spec:
+      - happy-path.spec.ts
+      - edge-cases.spec.ts
+      - error-cases.spec.ts
+
+    ## IF Integration
+    - Create tests/integration/ folder
+    - Test API endpoints and service boundaries
+
+    ## Output
+    - .spectre/test-coverage.md (100% spec coverage required)
+    - .spectre/failures.md (if any test fails)
   """
 )
 ```
@@ -445,7 +488,12 @@ Task(
    ✓ Objective clear
    ✓ 5 acceptance criteria
    ⚠️ Missing edge cases → adding
-   ✓ .spectre/spec.md ready
+   📋 spec-v2.md created
+
+"Accept PO's improvements?"
+> Accept v2
+
+   ✓ .spectre/specs/spec-latest.md ready
 
 🏗️ Architect: Designing...
    ✓ Hexagonal architecture
@@ -453,11 +501,22 @@ Task(
    ✓ Result<T, E> patterns
    ✓ .spectre/design.md ready
 
-💻 Dev + 🧪 QA: Building...
-   ✓ Domain layer
-   ✓ Application layer
-   ✓ UI components
-   ✓ 6/6 tests passing
+"What type of tests?"
+> E2E (Playwright)
+
+💻 Dev: Implementing...
+   ✓ Domain layer + unit tests (BDD)
+   ✓ Application layer + unit tests
+   ✓ UI components + unit tests
+
+🧪 QA: E2E Tests (Playwright)...
+   ✓ e2e/ folder created
+   ✓ Page Objects ready
+   ✓ happy-path.spec.ts (3 tests)
+   ✓ edge-cases.spec.ts (2 tests)
+   ✓ error-cases.spec.ts (2 tests)
+   ✓ 7/7 E2E tests passing
+   ✓ 100% spec coverage
 
 ✨ Done.
 ```
@@ -486,7 +545,12 @@ Task(
    ✓ Objective defined
    ✓ 7 acceptance criteria
    ✓ Edge cases covered
-   ✓ .spectre/spec.md ready
+   📋 spec-v1.md created
+
+"Review the spec. Ready to proceed?"
+> Approve
+
+   ✓ .spectre/specs/spec-latest.md ready
 
 🏗️ Architect: Designing...
    ✓ Auth module structure
@@ -494,11 +558,24 @@ Task(
    ✓ Security patterns
    ✓ .spectre/design.md ready
 
-💻 Dev + 🧪 QA: Building...
-   ✓ Implementing...
-   ✗ Test failed: OAuth callback
-   🔧 Fixing...
-   ✓ 8/8 tests passing
+"What type of tests?"
+> E2E (Playwright)
+
+💻 Dev: Implementing...
+   ✓ Domain layer + unit tests
+   ✓ Application layer + unit tests
+   ✓ UI components + unit tests
+
+🧪 QA: E2E Tests (Playwright)...
+   ✓ e2e/ folder created
+   ✗ Test failed: OAuth callback redirect
+
+   → Routing to Dev...
+   🔧 Dev: Fixing OAuth callback...
+
+   → QA re-runs...
+   ✓ 9/9 E2E tests passing
+   ✓ 100% spec coverage
 
 ✨ Done.
 ```
@@ -513,11 +590,20 @@ Task(
 | 2a | "Where is it?" | If has spec |
 | 2b | "What do you want?" | If no spec |
 | 3 | "What stack?" | Only if no project |
+| 4 | "Accept spec changes?" | After PO review |
+| 5 | "What type of tests?" | Before QA starts |
 
 | Agent | Runs | Output |
 |-------|------|--------|
-| PO | **ALWAYS** | `.spectre/spec.md` |
+| PO | **ALWAYS** | `.spectre/specs/spec-latest.md` |
 | Architect | **ALWAYS** | `.spectre/design.md` |
-| Dev + QA | **ALWAYS** | Implementation |
+| Dev | **ALWAYS** | Implementation + Unit tests (BDD) |
+| QA | **ALWAYS** | E2E (Playwright) or Integration tests |
+
+| Test Type | Responsibility | Location |
+|-----------|----------------|----------|
+| Unit (BDD) | **Developer** | Colocated `*.test.ts` |
+| E2E | **QA** | `e2e/` (Playwright) |
+| Integration | **QA** | `tests/integration/` |
 
 **Professional. Smart. Complete.**

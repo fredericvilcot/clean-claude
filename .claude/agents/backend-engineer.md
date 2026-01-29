@@ -342,8 +342,36 @@ function verifyToken(token: string): Result<TokenPayload, AuthError> {
 
 ### Testing Strategy
 
+---
+
+## YOUR RESPONSIBILITY: Unit Tests (BDD)
+
+**You write unit tests. QA writes E2E/Integration tests.**
+
+| Who | What | Where |
+|-----|------|-------|
+| **You (Dev)** | Unit tests (BDD) | Colocated `*.test.ts` next to source |
+| **QA** | E2E (Playwright) or Integration | `e2e/` or `tests/integration/` |
+
+**ALWAYS write tests alongside your code. Tests are colocated.**
+
+```
+src/features/user/
+├── domain/
+│   ├── User.ts
+│   └── User.test.ts              ← YOUR responsibility
+├── application/
+│   ├── CreateUser.ts
+│   └── CreateUser.test.ts        ← YOUR responsibility
+└── infrastructure/
+    ├── PostgresUserRepository.ts
+    └── PostgresUserRepository.test.ts  ← YOUR responsibility (with test DB)
+```
+
+---
+
 ```typescript
-// ✅ Unit test domain logic
+// ✅ Unit test domain logic (YOUR JOB)
 describe('Order', () => {
   it('should not allow submission of empty order', () => {
     const order = Order.create(customerId);
@@ -355,7 +383,7 @@ describe('Order', () => {
   });
 });
 
-// ✅ Integration test use cases
+// ✅ Use case tests (YOUR JOB)
 describe('CreateUser', () => {
   it('should create user and emit event', async () => {
     const repo = new InMemoryUserRepository();
@@ -369,15 +397,16 @@ describe('CreateUser', () => {
   });
 });
 
-// ✅ API test for HTTP layer
-describe('POST /users', () => {
-  it('returns 201 with created user', async () => {
-    const response = await request(app)
-      .post('/users')
-      .send({ email: 'test@example.com', name: 'Test' });
+// ✅ Repository tests (YOUR JOB)
+describe('PostgresUserRepository', () => {
+  it('persists and retrieves user', async () => {
+    const repo = new PostgresUserRepository(testDb);
+    const user = User.create({ email, name });
 
-    expect(response.status).toBe(201);
-    expect(response.body.data.email).toBe('test@example.com');
+    await repo.save(user);
+    const found = await repo.findById(user.id);
+
+    expect(found).toEqual(user);
   });
 });
 ```
