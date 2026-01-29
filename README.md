@@ -193,45 +193,47 @@ Architect ───▶ Engineer ───▶ QA
 
 ---
 
-### `/add-skill` — Fine-tuning mode
+### `/add-skill` — Skill Management
 
-Inject specific expertise into an agent, then trigger reactive re-implementation.
+**Craft foundation is ALWAYS active.** Add specialized expertise on top.
+
+```
+🏛️ CRAFT FOUNDATION (Always Active — Cannot be removed)
+   • SOLID • Clean Architecture • Hexagonal
+   • Explicit Errors • Type Safety • Immutability • TDD
+```
+
+Add, remove, or list skills:
 
 ```bash
-/add-skill architect DDD
+/add-skill architect DDD                  # Add DDD expertise
 /add-skill architect CQRS --scope src/orders
-/add-skill backend-engineer Event-Sourcing
-/add-skill frontend-engineer React-Patterns
+/add-skill --remove architect CQRS        # Remove a skill
+/add-skill --list                         # Show all active skills
+/add-skill --reset                        # Remove all added (keep foundation)
 ```
 
-**What happens:**
+**Craft Guard validates every skill:**
 
 ```
-🎯 Inject skill → architect learns DDD
+> /add-skill architect DDD
 
-🔍 Analyze codebase with new lens
-   → "OrderService is an anemic model"
-   → "Missing aggregate boundaries"
+✅ Validating against craft principles...
+   ✓ Aligns with SOLID (aggregates = single responsibility)
+   ✓ Aligns with Clean Architecture (domain at center)
+   ✓ Aligns with Hexagonal (bounded contexts as ports)
 
-📋 Propose refactoring plan
-   → Phase 1: Create Order Aggregate
-   → Phase 2: Move business logic to domain
-
-🚀 Reactive loop (if approved)
-   → Architect designs
-   → Engineers implement
-   → QA verifies
-   → Loop until green
+✅ APPROVED — DDD is craft-aligned
 ```
 
 **Available skills:**
 
 | Category | Skills |
 |----------|--------|
-| Architecture | `DDD`, `CQRS`, `Event-Sourcing`, `Hexagonal`, `Microservices` |
+| Architecture | `DDD`, `CQRS`, `Event-Sourcing`, `Hexagonal-Advanced`, `Modular-Monolith` |
 | Frontend | `React-Patterns`, `State-Machines`, `A11y-Expert`, `Performance` |
 | Backend | `API-Design`, `GraphQL`, `Message-Queues`, `Caching` |
-| Testing | `TDD`, `BDD`, `Contract-Testing`, `Property-Testing` |
+| Testing | `TDD-Advanced`, `BDD`, `Contract-Testing`, `Property-Testing` |
 
 ---
 
