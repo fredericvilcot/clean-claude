@@ -172,45 +172,78 @@ scripts/
 
 ##### spectre-router.sh
 
-Le cerveau du système réactif :
+Le cerveau du système réactif — **routage intelligent** basé sur le type d'erreur :
 
 ```bash
-./scripts/spectre-router.sh <action> [agent]
+./scripts/spectre-router.sh <action> [args]
 
 Actions:
-  agent-complete <agent>  # Appelé quand un agent termine
-  test-result            # Analyse les résultats de tests
-  error <agent>          # Enregistre une erreur
-  status                 # Affiche l'état actuel
+  agent-complete <agent>     # Appelé quand un agent termine
+  test-result                # Analyse les résultats de tests (stdin)
+  error <agent> [message]    # Enregistre une erreur
+  ownership <agent> <files>  # Track qui a modifié quels fichiers
+  status                     # Affiche l'état actuel
+  init <feature> [stack]     # Initialise un workflow (frontend|backend|fullstack)
 ```
 
-**Logique de routage** :
+**Détection des types d'erreur** :
+
+| Type | Pattern détecté | Agent routé |
+|------|-----------------|-------------|
+| `type_error` | TS errors, type mismatch | software-craftsman |
+| `test_failure` | FAIL, expect, assertion | frontend-dev / backend-dev |
+| `build_error` | compilation, module not found | dev du stack |
+| `runtime_error` | TypeError, undefined | dev du stack |
+| `lint_error` | eslint, prettier | dernier dev actif |
+| `accessibility_error` | a11y, aria, axe | frontend-dev |
+| `design_issue` | circular dependency | software-craftsman |
+
+**Logique de routage intelligente** :
+
 ```
-qa-engineer complete + error    → spawn frontend-dev
-qa-engineer complete + success  → workflow complete
-frontend-dev complete           → spawn qa-engineer (verify)
-software-craftsman complete     → spawn frontend-dev
-product-owner complete          → spawn software-craftsman
+1. Détection du type d'erreur
+         ↓
+2. Check ownership du fichier (.spectre/ownership.json)
+         ↓
+3. Si owner connu → route vers owner
+         ↓
+4. Sinon → route selon type d'erreur + stack
 ```
+
+**Support multi-stack** :
+
+| Stack | Workflow |
+|-------|----------|
+| `frontend` | PO → Architect → frontend-dev → QA |
+| `backend` | PO → Architect → backend-dev → QA |
+| `fullstack` | PO → Architect → backend-dev → frontend-dev → QA |
 
 ##### on-agent-stop.sh
 
-Hook déclenché par Claude Code quand un subagent termine :
+Hook SubagentStop — déclenché quand un agent termine :
 
 ```bash
-# Reçoit JSON sur stdin avec info de l'agent
-# Extrait le type d'agent
-# Appelle spectre-router.sh si c'est un agent Spectre
+# Agents Spectre écoutés :
+# qa-engineer | frontend-dev | backend-dev | software-craftsman | product-owner
+
+# Reçoit JSON avec agent_type
+# Route vers spectre-router.sh agent-complete
 ```
 
 ##### check-test-results.sh
 
-Hook déclenché après chaque commande Bash :
+Hook PostToolUse (Bash) — analyse les commandes :
 
 ```bash
-# Vérifie si c'était une commande de test (vitest, jest, etc.)
-# Parse la sortie pour détecter FAIL/ERROR
-# Enregistre dans .spectre/errors.jsonl si erreur
+# Commandes analysées :
+# - Tests: vitest, jest, playwright, cypress, mocha
+# - Build: npm run build, tsc, vite build
+# - Lint: eslint, prettier
+
+# Actions :
+# - Parse output pour détecter erreurs
+# - Track ownership sur git commit
+# - Route erreurs vers spectre-router.sh
 ```
 
 #### Configuration des Hooks
@@ -222,7 +255,7 @@ Dans `.claude/settings.json` du projet :
   "hooks": {
     "SubagentStop": [
       {
-        "matcher": "qa-engineer|frontend-dev|software-craftsman|product-owner",
+        "matcher": "qa-engineer|frontend-dev|backend-dev|software-craftsman|product-owner",
         "hooks": [
           {
             "type": "command",
@@ -306,6 +339,7 @@ Dans `.claude/settings.json` du projet :
 ├── errors.jsonl      # Log des erreurs (append-only)
 ├── events.jsonl      # Log des événements
 ├── learnings.jsonl   # Patterns appris
+├── ownership.json    # Qui a modifié quels fichiers
 ├── context.json      # Contexte de la feature courante
 └── trigger           # Fichier de déclenchement (transitoire)
 ```
@@ -316,12 +350,14 @@ Dans `.claude/settings.json` du projet :
 {
   "workflow": "feature",
   "feature": "user-login",
+  "stack": "frontend",
   "phase": "verify",
   "retryCount": 1,
   "maxRetries": 3,
   "agents": {
-    "lastActive": "frontend-dev",
-    "history": ["product-owner", "software-craftsman", "frontend-dev", "qa-engineer", "frontend-dev"]
+    "lastActive": "qa-engineer",
+    "lastDev": "frontend-dev",
+    "history": ["product-owner", "software-craftsman", "frontend-dev", "qa-engineer"]
   },
   "status": "in_progress"
 }
@@ -330,16 +366,28 @@ Dans `.claude/settings.json` du projet :
 #### errors.jsonl
 
 ```jsonl
-{"timestamp":"2024-01-15T10:30:00Z","type":"test_failure","message":"Button not found","resolved":false}
-{"timestamp":"2024-01-15T10:35:00Z","agent":"frontend-dev","fix":"Added data-testid","resolved":true}
+{"timestamp":"...","type":"test_failure","message":"Button not found","file":"src/Login.tsx","resolved":false}
+{"timestamp":"...","type":"type_error","message":"Property 'name' does not exist","file":"src/User.ts","resolved":true}
 ```
 
 #### learnings.jsonl
 
 ```jsonl
-{"pattern":"missing-testid","solution":"Add data-testid to interactive elements","confidence":0.9}
-{"pattern":"async-timing","solution":"Use waitFor instead of sleep","confidence":0.85}
+{"timestamp":"...","error_type":"test_failure","file_pattern":"*.tsx","fixed_by":"frontend-dev","solution":"Added data-testid","confidence":0.7}
+{"timestamp":"...","error_type":"type_error","file_pattern":"*.ts","fixed_by":"software-craftsman","solution":"Added type guard","confidence":0.85}
 ```
+
+#### ownership.json
+
+```json
+{
+  "src/components/Login.tsx": "frontend-dev",
+  "src/api/auth.ts": "backend-dev",
+  "src/types/user.ts": "software-craftsman"
+}
+```
+
+Le routeur utilise ownership pour router les erreurs vers l'agent qui a écrit le code.
 
 ### Phases du Workflow
 
