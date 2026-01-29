@@ -56,7 +56,9 @@ You can ADD specialized expertise on top of the craft foundation.
 
 ## Removing Skills
 
-You can REMOVE added skills (not the craft foundation).
+You can ONLY remove skills that were added with `/add-skill`.
+
+**Built-in craft principles are PROTECTED and cannot be removed.**
 
 ### Syntax
 
@@ -69,9 +71,36 @@ You can REMOVE added skills (not the craft foundation).
 ### Examples
 
 ```bash
-/add-skill --remove architect CQRS    # Remove CQRS from architect
+/add-skill --remove architect CQRS    # ✅ Remove CQRS (was added)
+/add-skill --remove architect SOLID   # ❌ REJECTED: Built-in, cannot remove
+/add-skill --remove architect TDD     # ❌ REJECTED: Built-in, cannot remove
 /add-skill --list                     # See what's active
 /add-skill --reset                    # Back to craft defaults only
+```
+
+### Protected Skills (Built-in)
+
+These skills are ALWAYS active and CANNOT be removed:
+
+| Skill | Why Protected |
+|-------|---------------|
+| `SOLID` | Foundation of OOP design |
+| `Clean-Architecture` | Core structural principle |
+| `Hexagonal` | Domain isolation principle |
+| `Explicit-Errors` | Craft error handling |
+| `Type-Safety` | Compiler as safety net |
+| `Immutability` | Predictable state |
+| `TDD` | Design through tests |
+
+```
+> /add-skill --remove architect SOLID
+
+❌ REJECTED
+
+SOLID is a BUILT-IN craft principle.
+Built-in skills are protected and cannot be removed.
+
+Only skills added with /add-skill can be removed.
 ```
 
 ---
@@ -343,7 +372,43 @@ type Command =
 // /add-skill --reset → { type: 'reset' }
 ```
 
-### Step 2: Validate Against Craft (for add)
+### Step 2: Check Built-in Protection (for remove)
+
+```typescript
+const BUILT_IN_SKILLS = [
+  'SOLID',
+  'Clean-Architecture',
+  'Hexagonal',
+  'Explicit-Errors',
+  'Type-Safety',
+  'Immutability',
+  'TDD'
+];
+
+function handleRemove(agent: string, skill: string): Result<void, ProtectedSkillError> {
+  // HARD BLOCK: Built-in skills cannot be removed
+  if (BUILT_IN_SKILLS.includes(skill)) {
+    return err(new ProtectedSkillError(
+      `${skill} is a BUILT-IN craft principle and cannot be removed.`
+    ));
+  }
+
+  // Check if skill was actually added
+  const addedSkills = readContext().addedSkills;
+  const found = addedSkills.find(s => s.name === skill && s.agent === agent);
+
+  if (!found) {
+    return err(new SkillNotFoundError(
+      `${skill} was not added to ${agent}. Nothing to remove.`
+    ));
+  }
+
+  // Safe to remove
+  return ok(removeSkill(agent, skill));
+}
+```
+
+### Step 3: Validate Against Craft (for add)
 
 ```
 Task(
