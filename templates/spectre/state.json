@@ -1,11 +1,13 @@
 {
   "workflow": null,
   "feature": null,
+  "stack": "frontend",
   "phase": "idle",
   "retryCount": 0,
   "maxRetries": 3,
   "agents": {
     "lastActive": null,
+    "lastDev": null,
     "history": []
   },
   "status": "ready"
