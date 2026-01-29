@@ -1,6 +1,7 @@
 ---
 name: add-skill
 description: "Add specialized craft skills to agents. Default craft principles always active. Everything MUST respect the craft philosophy."
+user-invocable: false
 context: conversation
 allowed-tools: Read, Write, Bash, Task, AskUserQuestion
 ---
