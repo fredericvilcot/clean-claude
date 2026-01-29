@@ -5,9 +5,47 @@ context: conversation
 allowed-tools: Read, Bash, Task, AskUserQuestion, Skill
 ---
 
-# Spectre Heal — Auto-Repair Mode
+# Spectre Heal — Re-enter the Reactive Loop
 
-Detects what's broken and fixes it automatically. Code, tests, or specs.
+**The fixing continues until everything is CRAFTED.**
+
+Use `/heal` to:
+- **Continue fixing** after `/craft` hit max retries
+- **Re-run agents** when something breaks later
+- **Fix specific issues** (tests, types, build, spec)
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│   /craft                                                         │
+│       │                                                          │
+│       ▼                                                          │
+│   PO → Architect → Dev ⇄ QA                                     │
+│                     │                                            │
+│              ┌──────┴──────┐                                    │
+│              │             │                                    │
+│           ALL GREEN    FAILURES                                  │
+│              │             │                                    │
+│              ▼             ▼                                    │
+│            DONE!     Auto-fix loop                              │
+│                           │                                      │
+│                    ┌──────┴──────┐                              │
+│                    │             │                              │
+│                 FIXED      MAX RETRIES                          │
+│                    │             │                              │
+│                    ▼             ▼                              │
+│                  DONE!     ⚠️ User notified                     │
+│                                  │                              │
+│                                  ▼                              │
+│                            /heal  ← RE-ENTER HERE               │
+│                                  │                              │
+│                                  ▼                              │
+│                         Continue fixing                          │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
 
 ## Pre-flight: Auto-Detect Stack
 
@@ -173,18 +211,20 @@ Use the qa-engineer agent to verify the fix:
 3. If passing → confirm the fix is complete
 ```
 
-### Step 6: Loop Until Healed
+### Step 6: Loop Until Healed (AUTONOMOUS)
+
+**SAME AS /craft: FIX AUTOMATICALLY, DO NOT ASK USER.**
 
 ```
 ┌─────────────┐         ┌─────────────┐
 │   Diagnose  │         │     Dev     │
-│   Problem   │ ──────▶ │    Fixes    │
+│   Problem   │ ──────▶ │    Fixes    │ ← AUTOMATIC
 └─────────────┘         └──────┬──────┘
                                │
                                ▼
                         ┌─────────────┐
                         │     QA      │
-                        │   Verifies  │
+                        │   Verifies  │ ← AUTOMATIC
                         └──────┬──────┘
                                │
                     ┌──────────┴──────────┐
@@ -194,8 +234,30 @@ Use the qa-engineer agent to verify the fix:
                     ▼                     ▼
               ┌──────────┐         ┌──────────┐
               │  Done!   │         │  Retry   │
-              │  Healed  │         │ (max 3)  │
+              │  Healed  │         │ (max 3)  │ ← AUTOMATIC
               └──────────┘         └──────────┘
+```
+
+### Key Behavior: Continue Where /craft Left Off
+
+1. **READ EXISTING CONTEXT**: Check `.spectre/failures.md` from previous `/craft` run
+2. **CONTINUE WHERE LEFT OFF**: Don't restart from scratch, use existing spec and design
+3. **AUTONOMOUS FIXING**: Dev/Architect fix without asking user
+4. **QA VERIFIES**: Re-run tests after each fix
+5. **LOOP UNTIL GREEN**: Keep fixing until all tests pass
+
+```
+# When /heal is invoked, it reads existing .spectre/ state:
+
+if exists(".spectre/failures.md"):
+    # Continue fixing from where /craft stopped
+    failures = read(".spectre/failures.md")
+    for failure in failures:
+        route_to_agent(failure)  # Dev or Architect
+    qa_verify()
+else:
+    # Fresh diagnosis
+    run_full_diagnostic()
 ```
 
 ---

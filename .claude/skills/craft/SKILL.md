@@ -396,11 +396,29 @@ Task(
 
 ---
 
-## Step 6: Dev + QA — ALWAYS RUN IN PARALLEL
+## Step 6: Dev + QA — PARALLEL + AUTONOMOUS FIXING LOOP
 
-### Developer: Implementation + Unit Tests (BDD)
+**THE LOOP NEVER STOPS UNTIL EVERYTHING IS GREEN.**
+
+### Ask Test Type First
 
 ```
+AskUserQuestion(
+  questions: [{
+    question: "What type of tests should QA write?",
+    header: "Tests",
+    options: [
+      { label: "E2E (Playwright)", description: "Full browser tests covering all spec scenarios" },
+      { label: "Integration", description: "API/service boundary tests" }
+    ]
+  }]
+)
+```
+
+### Launch Dev + QA in Parallel
+
+```
+# PARALLEL EXECUTION
 Task(
   subagent_type: "frontend-engineer",  # or backend
   prompt: """
@@ -414,28 +432,13 @@ Task(
     - Write colocated tests (*.test.ts next to source)
     - Test domain logic, pure functions
     - Given-When-Then format
+
+    OUTPUT:
+    - Implementation files
+    - .spectre/dev-status.md with list of files created
   """
 )
-```
 
-### QA: E2E or Integration Tests
-
-**QA asks user FIRST:**
-```
-AskUserQuestion(
-  questions: [{
-    question: "What type of tests should I write?",
-    header: "Tests",
-    options: [
-      { label: "E2E (Playwright)", description: "Full browser tests covering all spec scenarios" },
-      { label: "Integration", description: "API/service boundary tests" }
-    ]
-  }]
-)
-```
-
-**Then:**
-```
 Task(
   subagent_type: "qa-engineer",
   prompt: """
@@ -446,24 +449,147 @@ Task(
     ## Your Job
     - NEVER write unit tests (that's Dev's job)
     - Write <E2E/Integration> tests for ALL acceptance criteria
-
-    ## IF E2E (Playwright)
-    - Create e2e/ folder with Playwright config
-    - Use Page Object Model pattern
-    - Test ALL scenarios from spec:
-      - happy-path.spec.ts
-      - edge-cases.spec.ts
-      - error-cases.spec.ts
-
-    ## IF Integration
-    - Create tests/integration/ folder
-    - Test API endpoints and service boundaries
+    - Run tests and report results
 
     ## Output
     - .spectre/test-coverage.md (100% spec coverage required)
-    - .spectre/failures.md (if any test fails)
+    - .spectre/failures.md (if ANY test fails)
   """
 )
+```
+
+---
+
+## Step 7: AUTONOMOUS FIXING LOOP (CRITICAL)
+
+**IF THERE ARE FAILURES, FIX THEM AUTOMATICALLY. DO NOT ASK THE USER.**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    AUTONOMOUS FIXING LOOP                        │
+│                                                                  │
+│  Tests run                                                       │
+│       │                                                          │
+│       ▼                                                          │
+│  ┌─────────────────┐                                            │
+│  │ Read failures   │ ← .spectre/failures.md                     │
+│  │ from QA report  │                                            │
+│  └────────┬────────┘                                            │
+│           │                                                      │
+│      ┌────┴────┐                                                │
+│      │         │                                                │
+│   NO FAILURES  FAILURES FOUND                                    │
+│      │         │                                                │
+│      ▼         ▼                                                │
+│    DONE!    ┌─────────────────┐                                 │
+│             │ Classify errors │                                 │
+│             └────────┬────────┘                                 │
+│                      │                                           │
+│         ┌────────────┴────────────┐                             │
+│         │            │            │                             │
+│      test_fail    type_error   design_flaw                      │
+│         │            │            │                             │
+│         ▼            ▼            ▼                             │
+│       Dev         Architect    Architect                         │
+│       fixes       fixes        redesigns                         │
+│         │            │            │                             │
+│         └────────────┴────────────┘                             │
+│                      │                                           │
+│                      ▼                                           │
+│               ┌─────────────┐                                   │
+│               │  QA re-runs │ ← LOOP BACK                       │
+│               │   tests     │                                   │
+│               └──────┬──────┘                                   │
+│                      │                                           │
+│              ┌───────┴───────┐                                  │
+│              │               │                                  │
+│           PASS            FAIL                                   │
+│              │               │                                  │
+│              ▼               ▼                                   │
+│            DONE!     retry++ < 3?                               │
+│                              │                                   │
+│                      ┌───────┴───────┐                          │
+│                      │               │                          │
+│                     YES             NO                           │
+│                      │               │                          │
+│                      ▼               ▼                           │
+│                 LOOP BACK      Report to user                    │
+│                              (needs manual fix)                  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Implementation
+
+```python
+# PSEUDO-CODE - The orchestrator does this automatically
+
+retry_count = 0
+max_retries = 3
+
+while retry_count < max_retries:
+    # Read failures from QA
+    failures = read(".spectre/failures.md")
+
+    if not failures:
+        print("✅ ALL TESTS PASSING - CRAFT COMPLETE")
+        break
+
+    # Classify and route each failure
+    for failure in failures:
+        if failure.type == "test_failure":
+            # Dev fixes
+            Task(subagent_type="frontend-engineer", prompt=f"""
+                FIX THIS TEST FAILURE:
+                {failure.details}
+
+                File: {failure.file}
+                Error: {failure.error}
+
+                DO NOT ask the user. Just fix it.
+            """)
+
+        elif failure.type == "type_error":
+            # Architect fixes
+            Task(subagent_type="architect", prompt=f"""
+                FIX THIS TYPE ERROR:
+                {failure.details}
+
+                This may require updating .spectre/design.md
+            """)
+
+        elif failure.type == "design_flaw":
+            # Architect redesigns
+            Task(subagent_type="architect", prompt=f"""
+                DESIGN FLAW DETECTED:
+                {failure.details}
+
+                Update .spectre/design.md with corrected design.
+                Dev will re-implement based on new design.
+            """)
+
+    # QA re-runs all tests
+    Task(subagent_type="qa-engineer", prompt="""
+        RE-RUN ALL TESTS.
+        Update .spectre/failures.md with any remaining failures.
+    """)
+
+    retry_count += 1
+
+if retry_count >= max_retries:
+    print("⚠️ Max retries reached. Use /heal to continue fixing.")
+```
+
+### Key Rules
+
+1. **NEVER ask the user** during the fixing loop
+2. **Dev fixes test failures** automatically
+3. **Architect fixes type errors** and design flaws
+4. **QA re-runs tests** after each fix attempt
+5. **Loop until ALL tests pass** or max retries reached
+6. **If stuck**: User runs `/heal` to continue
+
+---
 ```
 
 ---
@@ -523,7 +649,7 @@ Task(
 
 ---
 
-## Example: Without Spec
+## Example: Without Spec (Autonomous Fixing Loop)
 
 ```
 > /craft
@@ -561,6 +687,10 @@ Task(
 "What type of tests?"
 > E2E (Playwright)
 
+═══════════════════════════════════════════════════════════════
+                    IMPLEMENTATION PHASE
+═══════════════════════════════════════════════════════════════
+
 💻 Dev: Implementing...
    ✓ Domain layer + unit tests
    ✓ Application layer + unit tests
@@ -568,16 +698,52 @@ Task(
 
 🧪 QA: E2E Tests (Playwright)...
    ✓ e2e/ folder created
-   ✗ Test failed: OAuth callback redirect
+   ✗ 2 tests failed → .spectre/failures.md
 
-   → Routing to Dev...
-   🔧 Dev: Fixing OAuth callback...
+═══════════════════════════════════════════════════════════════
+                 AUTONOMOUS FIXING LOOP (1/3)
+═══════════════════════════════════════════════════════════════
 
-   → QA re-runs...
+📋 Failures detected:
+   - oauth-callback.spec.ts: redirect URL mismatch
+   - login-form.spec.ts: missing error message
+
+🔧 Dev: Fixing OAuth callback... (auto)
+   ✓ Fixed redirect URL in AuthService
+
+🔧 Dev: Fixing login error message... (auto)
+   ✓ Added error display in LoginForm
+
+🧪 QA: Re-running tests...
+   ✗ 1 test still failing
+
+═══════════════════════════════════════════════════════════════
+                 AUTONOMOUS FIXING LOOP (2/3)
+═══════════════════════════════════════════════════════════════
+
+📋 Remaining failure:
+   - oauth-callback.spec.ts: type error in response
+
+🏗️ Architect: Fixing type error... (auto)
+   ✓ Updated OAuthResponse type in design.md
+
+🔧 Dev: Re-implementing with new type... (auto)
+   ✓ Applied type fix
+
+🧪 QA: Re-running tests...
    ✓ 9/9 E2E tests passing
    ✓ 100% spec coverage
 
-✨ Done.
+═══════════════════════════════════════════════════════════════
+
+✨ CRAFT COMPLETE — All tests green, all agents passed.
+
+📁 Output:
+   .spectre/specs/spec-latest.md  (functional spec)
+   .spectre/design.md             (technical design)
+   .spectre/test-coverage.md      (100% coverage)
+   src/features/auth/             (implementation)
+   e2e/tests/auth/                (E2E tests)
 ```
 
 ---
