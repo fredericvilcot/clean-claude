@@ -47,11 +47,11 @@ install_local() {
     done
 
     # Copy skills (entire directories)
-    for skill_dir in "$SCRIPT_DIR/.claude/skills"/*/; do
+    for skill_dir in "$SCRIPT_DIR/.claude/skills"/*; do
         [[ -d "$skill_dir" ]] || continue
         skill_name=$(basename "$skill_dir")
         rm -rf "$CLAUDE_DIR/skills/$skill_name"
-        cp -r "$skill_dir" "$CLAUDE_DIR/skills/"
+        cp -r "$skill_dir" "$CLAUDE_DIR/skills/$skill_name"
         success "Installed skill: $skill_name"
     done
 }
@@ -73,11 +73,11 @@ install_remote() {
     done
 
     # Copy skills
-    for skill_dir in "$tmp_dir/.claude/skills"/*/; do
+    for skill_dir in "$tmp_dir/.claude/skills"/*; do
         [[ -d "$skill_dir" ]] || continue
         skill_name=$(basename "$skill_dir")
         rm -rf "$CLAUDE_DIR/skills/$skill_name"
-        cp -r "$skill_dir" "$CLAUDE_DIR/skills/"
+        cp -r "$skill_dir" "$CLAUDE_DIR/skills/$skill_name"
         success "Installed skill: $skill_name"
     done
 }
