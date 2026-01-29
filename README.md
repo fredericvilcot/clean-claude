@@ -59,32 +59,31 @@ curl -fsSL https://raw.githubusercontent.com/fredericvilcot/spectre-agents/main/
 
 ## `/craft` — Your AI Dev Team
 
-Say what you want. Spectre assembles the right team.
+Say what you want. Spectre does the rest.
 
 ```
-> /craft "a beautiful counter with animations"
+> /craft "a pokemon list with search"
 
-👤 PO: Writing spec...
-   ✓ User story defined
-   ✓ 6 acceptance criteria
+🔍 Detected: TypeScript + React
 
-🏗️ Architect: Designing...
-   ✓ Clean architecture
-   ✓ File structure ready
+👤 PO → spec.md
+   ✓ User story
+   ✓ 4 acceptance criteria
 
-💻 Dev + 🧪 QA: Building...
-   ✓ Counter.tsx created
-   ✓ Tests written
-   ✗ Test failed: animation not smooth
-   🔧 Dev fixing...
-   ✓ All tests passing
+🏗️ Architect → design.md
+   ✓ 6 files planned
+   ✓ CRAFT patterns
 
-✨ Done. 8 files. 12 tests. Production-ready.
+💻 Dev + 🧪 QA (parallel)
+   ✓ Implementing...
+   ✗ Test failed: missing error state
+   🔧 Fixing...
+   ✓ 4/4 tests passing
+
+✨ Done.
 ```
 
-**No spec? PO writes it.**
-**No design? Architect creates it.**
-**Bug? Dev fixes it. Automatically.**
+**All agents. Always. No shortcuts.**
 
 ---
 

@@ -1,837 +1,346 @@
 ---
 name: craft
-description: "Craft something new. Smart flow adapts to your situation: existing project, from scratch, with inspiration. Reactive agents collaborate intelligently."
+description: "Craft something new. Smart adaptive flow. ALL agents ALWAYS intervene: PO → Architect → Dev+QA. No shortcuts, no unnecessary questions."
 context: conversation
-allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch
+allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 ---
 
-# Spectre Craft — Smart Reactive Flow
+# Spectre Craft — Smart Adaptive Flow
 
-Intelligent flow that adapts to your situation AND your input.
+**Two rules:**
+1. Ask only what's needed
+2. ALL agents ALWAYS run
 
 ---
 
-## The Smart Flow
+## The Flow
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                  │
-│  /craft                                                          │
-│      │                                                           │
-│      ▼                                                           │
-│  ┌─────────────────────────────────────┐                        │
-│  │  1. PROJECT DETECTION               │                        │
-│  │     Existing code? Stack?           │                        │
-│  └─────────────┬───────────────────────┘                        │
-│                │                                                 │
-│                ▼                                                 │
-│  ┌─────────────────────────────────────┐                        │
-│  │  2. WORK CONTEXT                    │                        │
-│  │     Product / Startup / Freelance   │                        │
-│  └─────────────┬───────────────────────┘                        │
-│                │                                                 │
-│                ▼                                                 │
-│  ┌─────────────────────────────────────┐                        │
-│  │  3. WHAT TO BUILD?                  │                        │
-│  │     User describes feature/idea     │                        │
-│  └─────────────┬───────────────────────┘                        │
-│                │                                                 │
-│                ▼                                                 │
-│  ┌─────────────────────────────────────┐                        │
-│  │  4. INPUT ANALYSIS ← NEW!           │                        │
-│  │     Detect input type & route       │                        │
-│  └─────────────┬───────────────────────┘                        │
-│                │                                                 │
-│       ┌────────┼────────┬──────────┐                            │
-│       │        │        │          │                            │
-│       ▼        ▼        ▼          ▼                            │
-│    ┌─────┐  ┌─────┐  ┌─────┐  ┌─────┐                          │
-│    │ Idea│  │Func │  │Tech │  │Bug/ │                          │
-│    │ raw │  │Spec │  │Spec │  │Fix  │                          │
-│    └──┬──┘  └──┬──┘  └──┬──┘  └──┬──┘                          │
-│       │        │        │        │                              │
-│       ▼        ▼        ▼        ▼                              │
-│    ┌─────┐  ┌─────┐  ┌─────┐  ┌─────┐                          │
-│    │ PO  │  │Archi│  │ Dev │  │ Dev │                          │
-│    │first│  │first│  │first│  │only │                          │
-│    └─────┘  └─────┘  └─────┘  └─────┘                          │
-│                                                                  │
-│                ▼                                                 │
-│  ┌─────────────────────────────────────┐                        │
-│  │  5. REACTIVE PARALLEL EXECUTION     │                        │
-│  │     Agents work & collaborate       │                        │
-│  └─────────────────────────────────────┘                        │
+│   /craft                                                         │
+│       │                                                          │
+│       ▼                                                          │
+│   ┌─────────────────────────────────────┐                       │
+│   │  AUTO-DETECT                        │                       │
+│   │  - Project exists? Stack?           │                       │
+│   │  - Patterns? (.spectre/learnings)   │                       │
+│   └─────────────────┬───────────────────┘                       │
+│                     │                                            │
+│            ┌────────┴────────┐                                  │
+│            │                 │                                  │
+│         PROJECT           EMPTY                                  │
+│            │                 │                                  │
+│            │                 ▼                                  │
+│            │        ┌───────────────┐                           │
+│            │        │ "What stack?" │                           │
+│            │        └───────┬───────┘                           │
+│            │                │                                   │
+│            └────────┬───────┘                                   │
+│                     │                                            │
+│                     ▼                                            │
+│         ┌───────────────────────┐                               │
+│         │ "What do you want?"   │                               │
+│         └───────────┬───────────┘                               │
+│                     │                                            │
+│                     ▼                                            │
+│   ══════════════════════════════════════════════════════════    │
+│   │  MANDATORY CHAIN (NO EXCEPTIONS)                        │   │
+│   ══════════════════════════════════════════════════════════    │
+│                     │                                            │
+│                     ▼                                            │
+│              ┌──────────┐                                       │
+│              │    PO    │ → .spectre/spec.md                    │
+│              └────┬─────┘                                       │
+│                   │                                              │
+│                   ▼                                              │
+│              ┌──────────┐                                       │
+│              │ Architect│ → .spectre/design.md                  │
+│              └────┬─────┘                                       │
+│                   │                                              │
+│                   ▼                                              │
+│              ┌──────────────────┐                               │
+│              │   Dev ⇄ QA       │                               │
+│              │   (parallel)     │                               │
+│              └──────────────────┘                               │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Step 1: Project Detection
+## Step 1: Auto-Detect (No Questions)
+
+Silently detect:
 
 ```bash
-# Check for existing project
-if [ -f "package.json" ] || [ -f "go.mod" ] || [ -f "Cargo.toml" ]; then
-  FROM_SCRATCH=false
-  # → Auto-detect stack, trigger /learn
-else
-  FROM_SCRATCH=true
-  # → Ask for stack
+# Project exists?
+if [ -f "package.json" ]; then
+  STACK="typescript"
+  # Read package.json for framework
+fi
+
+if [ -f "go.mod" ]; then
+  STACK="go"
+fi
+
+# Patterns learned?
+if [ -f ".spectre/learnings/patterns.json" ]; then
+  PATTERNS=$(cat .spectre/learnings/patterns.json)
 fi
 ```
 
-### If From Scratch → Ask Stack
+**No question if detectable.**
+
+---
+
+## Step 2: Ask Stack (Only If Empty Project)
 
 ```
+# ONLY if no project detected
 Question: "What stack?"
-Header: "Stack"
 Options:
-  1. "TypeScript + React" - Frontend with Vite
-  2. "TypeScript + Node" - Backend API
-  3. "Full-stack TypeScript" - React + Node
-  4. "Go" - Backend with Go
+  1. "TypeScript + React" - Frontend
+  2. "TypeScript + Node" - Backend
+  3. "Full-stack TypeScript" - Both
+  4. "Go" - Backend
 ```
+
+**Skip if project exists.**
 
 ---
 
-## Step 2: Work Context
-
-```
-Question: "What's your work context?"
-Header: "Context"
-Options:
-  1. "Product Team" - Full process: PO → Architect → Dev → QA
-  2. "Startup" - Fast: Architect → Dev → QA
-  3. "Freelance" - Efficient: Dev → QA
-  4. "Learning" - Educational: Single agent explains
-```
-
----
-
-## Step 3: What to Build
+## Step 3: Ask What to Build (Always)
 
 ```
 Question: "What do you want to build?"
-Header: "Feature"
-# Free text input - user describes their idea/feature/spec
+# Free text, examples:
+# - "a pokemon list with search"
+# - "user authentication"
+# - "fix the login bug"
+# - "refactor the auth module"
 ```
+
+**This is the ONLY required question.**
 
 ---
 
-## Step 4: Input Analysis (THE SMART PART)
+## Step 4: PO — ALWAYS RUNS
 
-**ABSOLUTE RULE: All agents work from a spec in MD format.**
-
-The PO's job is to ensure a proper `.md` spec exists. Other agents (Architect, Dev, QA) CANNOT start without it.
-
-### What counts as a valid spec?
-
-A valid spec file contains:
-- User story format (As a... I want... So that...)
-- Acceptance criteria (Given/When/Then or checkboxes)
-- Edge cases considered
-- Out of scope defined
-
-### Input Types & Routing
-
-| Input | Has Valid Spec? | Route |
-|-------|-----------------|-------|
-| Spec file (`.md`, `.yml`) | ✅ YES | → Architect (reads file) |
-| "a sexy counter" | ❌ NO | → **PO creates spec.md** → Architect |
-| "Counter with +/-, localStorage, dark mode" | ❌ NO (detailed but informal) | → **PO creates spec.md** → Architect |
-| "Jira ticket: PROJ-123" | ❌ NO (external, not formatted) | → **PO fetches + creates spec.md** → Architect |
-| "Create Counter.tsx with useState..." | ❌ NO (technical, no spec) | → **PO creates spec.md** → Architect |
-| "Fix the counter reset bug" | N/A (bug fix) | → Dev only |
-
-### Why Always MD Spec?
-
-1. **Architect** needs clear requirements to design
-2. **Dev** needs acceptance criteria to implement
-3. **QA** needs test scenarios to verify
-4. **Everyone** needs a single source of truth
-
-The PO transforms ANY input into a proper spec.md that becomes the contract for all agents.
-
-### PO Output: Always .spectre/spec.md
-
-```markdown
-# Feature: [Feature Name]
-
-## User Story
-As a [user type], I want [feature]
-so that [benefit].
-
-## Acceptance Criteria
-- [ ] Given... When... Then...
-- [ ] Given... When... Then...
-
-## Edge Cases
-- What if...?
-- What about...?
-
-## Out of Scope
-- Not doing X in this iteration
-- Y will be handled separately
-
-## Technical Notes (optional)
-- Constraints mentioned by user
-- Performance requirements
-```
-
-This file is created by PO and used by ALL other agents.
-
-### Detection Logic
-
-```
-ANALYZE the user's input:
-
-# Check for REAL spec source
-IF input references a file (*.md, *.yml, *.yaml, *.json):
-  → READ the file
-  → IF file contains proper spec format:
-    → INPUT_TYPE = "spec_file"
-    → NEEDS_PO = false
-    → "Spec file provided. Architect can design."
-
-ELSE IF input contains URL (jira, linear, notion, github issue):
-  → FETCH the URL content
-  → INPUT_TYPE = "external_spec"
-  → NEEDS_PO = false
-  → "External spec source. Architect can design."
-
-ELSE IF input is clearly a bug fix (references existing file + problem):
-  → INPUT_TYPE = "bug_fix"
-  → NEEDS_PO = false
-  → NEEDS_ARCHITECT = false
-  → "Bug fix. Dev handles directly."
-
-ELSE:
-  # ANY other text input = PO first
-  → INPUT_TYPE = "needs_spec"
-  → NEEDS_PO = true
-  → "No formal spec. PO will create one first."
-```
-
-### Inform the User
-
-```
-Based on your input, here's the plan:
-
-📝 Input type: Raw idea
-🎯 Flow: PO → Architect → Dev ⇄ QA
-
-The Product Owner will first create a proper spec from your idea,
-then the Architect will design the technical solution.
-
-[Start] [I have more details to add]
-```
-
----
-
-## Step 5: Smart Routing by Input Type
-
-### Route A: Raw Idea → PO First
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  USER INPUT: "a sexy counter"                                    │
-│                                                                  │
-│       ┌──────────┐                                              │
-│       │    PO    │ ← Creates functional spec                    │
-│       │  (spec)  │                                              │
-│       └────┬─────┘                                              │
-│            │ user story + acceptance criteria                   │
-│            ▼                                                     │
-│       ┌──────────┐                                              │
-│       │ Architect│ ← Creates technical design                   │
-│       │ (design) │                                              │
-│       └────┬─────┘                                              │
-│            │ architecture + file structure                      │
-│            ▼                                                     │
-│       ┌─────────────────────────┐                               │
-│       │      PARALLEL           │                               │
-│       │  ┌──────┐  ┌──────┐    │                               │
-│       │  │ Dev  │  │  QA  │    │                               │
-│       │  │impl  │⇄│tests │    │                               │
-│       │  └──────┘  └──────┘    │                               │
-│       └─────────────────────────┘                               │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-**PO Output:**
-```markdown
-## User Story
-As a user, I want a visually appealing counter
-so that I can track a value with delight.
-
-## Acceptance Criteria
-- [ ] Counter displays current value (starts at 0)
-- [ ] Increment button (+1) with satisfying animation
-- [ ] Decrement button (-1) with animation
-- [ ] Reset button
-- [ ] Value persists across page refresh
-- [ ] Dark/light mode toggle
-- [ ] Micro-interactions on hover/click
-- [ ] Accessible (keyboard nav, screen reader)
-
-## Edge Cases
-- Negative values allowed? → Ask user or default to yes
-- Max value? → No limit unless specified
-```
-
-### Route B: Real Spec File/URL → Architect First
-
-Only when a REAL spec source is provided (file, Jira, etc.):
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  USER INPUT: "See spec in docs/counter-spec.md"                 │
-│         or: "Jira ticket PROJ-123"                              │
-│         or: "GitHub issue #45"                                  │
-│                                                                  │
-│       ┌──────────┐                                              │
-│       │ Architect│ ← Reads spec, designs technical solution     │
-│       │ (design) │                                              │
-│       └────┬─────┘                                              │
-│            │                                                     │
-│            ▼                                                     │
-│       ┌─────────────────────────┐                               │
-│       │      PARALLEL           │                               │
-│       │  ┌──────┐  ┌──────┐    │                               │
-│       │  │ Dev  │  │  QA  │    │                               │
-│       │  │impl  │⇄│tests │    │                               │
-│       │  └──────┘  └──────┘    │                               │
-│       └─────────────────────────┘                               │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Route C: Detailed Text Description → STILL PO First!
-
-Even detailed descriptions need PO to formalize:
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  USER INPUT: "Counter with +/-, localStorage, dark mode"        │
-│                                                                  │
-│  ⚠️ This is NOT a spec! It's a detailed idea.                   │
-│     PO will formalize it with proper acceptance criteria.       │
-│                                                                  │
-│       ┌──────────┐                                              │
-│       │    PO    │ ← Formalizes into spec (light)               │
-│       │  (spec)  │                                              │
-│       └────┬─────┘                                              │
-│            │                                                     │
-│            ▼                                                     │
-│       ┌──────────┐                                              │
-│       │ Architect│                                              │
-│       │ (design) │                                              │
-│       └────┬─────┘                                              │
-│            │                                                     │
-│            ▼                                                     │
-│       ┌─────────────────────────┐                               │
-│       │      PARALLEL           │                               │
-│       │  ┌──────┐  ┌──────┐    │                               │
-│       │  │ Dev  │  │  QA  │    │                               │
-│       │  │impl  │⇄│tests │    │                               │
-│       │  └──────┘  └──────┘    │                               │
-│       └─────────────────────────┘                               │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### Route D: Bug Fix → Dev Only
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│  USER INPUT: "Fix the counter not persisting on refresh"        │
-│                                                                  │
-│       ┌──────┐      ┌──────┐                                    │
-│       │ Dev  │ ───▶ │  QA  │                                    │
-│       │ fix  │      │verify│                                    │
-│       └──────┘      └──────┘                                    │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
----
-
-## Parallel Execution: Dev ⇄ QA
-
-The magic: **Dev and QA work in parallel**, not sequentially.
-
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                   PARALLEL REACTIVE LOOP                         │
-│                                                                  │
-│   ┌──────────────────────────────────────────────────────────┐  │
-│   │                                                          │  │
-│   │    Dev implements          QA writes tests              │  │
-│   │         │                        │                       │  │
-│   │         │   ← shares context →   │                       │  │
-│   │         │                        │                       │  │
-│   │         ▼                        ▼                       │  │
-│   │    Code ready              Tests ready                   │  │
-│   │         │                        │                       │  │
-│   │         └────────┬───────────────┘                       │  │
-│   │                  │                                       │  │
-│   │                  ▼                                       │  │
-│   │            QA runs tests                                 │  │
-│   │                  │                                       │  │
-│   │         ┌───────┴───────┐                               │  │
-│   │         │               │                               │  │
-│   │        PASS            FAIL                              │  │
-│   │         │               │                               │  │
-│   │         ▼               ▼                               │  │
-│   │       Done         Dev fixes                            │  │
-│   │                        │                                │  │
-│   │                        └──────▶ QA re-runs              │  │
-│   │                                                          │  │
-│   └──────────────────────────────────────────────────────────┘  │
-│                                                                  │
-└─────────────────────────────────────────────────────────────────┘
-```
-
-### How Parallel Works
-
-1. **Architect** outputs design with:
-   - File structure
-   - Component specs
-   - Acceptance criteria (for QA)
-
-2. **Dev starts** implementing from the design
-
-3. **QA starts** writing tests from acceptance criteria
-   - Doesn't wait for Dev to finish
-   - Writes test shells based on expected behavior
-
-4. **When Dev completes a component**, QA runs its tests
-
-5. **If tests fail**, Dev gets immediate feedback and fixes
-
-6. **Loop continues** until all tests pass
-
----
-
-## Agent Prompts
-
-### PO Prompt (Raw Idea → Spec)
+Creates or validates `.spectre/spec.md`.
 
 ```
 Task(
   subagent_type: "product-owner",
   prompt: """
-    USER'S IDEA: <raw idea>
-    STACK: <detected or chosen stack>
+    USER WANTS: <user input>
+    STACK: <detected or chosen>
+    EXISTING PATTERNS: <from .spectre/learnings if any>
 
     ## Your Job
+    Create a clear, actionable spec.
 
-    Transform this raw idea into a proper functional specification.
+    ## Output: .spectre/spec.md
 
-    ## Output Format
+    ```markdown
+    # Spec: [Feature Name]
 
-    ### User Story
-    As a [user type], I want [feature]
-    so that [benefit].
+    ## User Story
+    As a [user], I want [what]
+    so that [why].
 
-    ### Acceptance Criteria
-    - [ ] Criterion 1 (specific, testable)
-    - [ ] Criterion 2
-    - [ ] ...
+    ## Acceptance Criteria
+    - [ ] [Criterion 1 - specific, testable]
+    - [ ] [Criterion 2]
+    - [ ] [Criterion 3]
 
-    ### Edge Cases
-    - What happens if...?
-    - What about...?
+    ## Edge Cases
+    - [Edge case 1]
+    - [Edge case 2]
 
-    ### Out of Scope (for this iteration)
-    - Things to explicitly NOT do now
+    ## Out of Scope
+    - [What we're NOT doing]
+    ```
 
-    ### Questions for User (if any)
-    - Clarifications needed before proceeding
-
-    ## Rules
-    - Be specific and testable
-    - Think about edge cases
-    - Consider accessibility
-    - Keep scope reasonable for first iteration
+    Keep it concise. Focus on WHAT, not HOW.
+    Write to .spectre/spec.md.
   """
 )
 ```
 
-### Architect Prompt (Spec → Design)
+---
 
-**ABSOLUTE RULE: Architect outputs `.spectre/design.md`. Dev and QA implement it TO THE LETTER.**
+## Step 5: Architect — ALWAYS RUNS
+
+Creates `.spectre/design.md`.
 
 ```
 Task(
   subagent_type: "architect",
   prompt: """
-    ## CONTEXT
-
-    FUNCTIONAL SPEC: .spectre/spec.md
+    SPEC: Read .spectre/spec.md
     STACK: <stack>
-    CRAFT PRINCIPLES: Result<T,E>, strict TypeScript, hexagonal
+    PATTERNS: <from .spectre/learnings if any>
 
     ## Your Job
+    Design the technical solution. CRAFT principles mandatory.
 
-    Create the technical design document that Dev and QA will implement EXACTLY.
+    ## CRAFT Rules
+    - Strict TypeScript (no `any`)
+    - Result<T, E> for errors (no throw)
+    - Domain at center (hexagonal)
+    - Tests colocated
 
-    ## OUTPUT: .spectre/design.md
-
-    You MUST write to `.spectre/design.md` with this structure:
+    ## Output: .spectre/design.md
 
     ```markdown
-    # Technical Design: [Feature Name]
+    # Design: [Feature Name]
 
-    ## Overview
-    Brief description of the technical approach.
+    ## Architecture
+    [Brief approach]
 
-    ## Architecture Decision
-    Why this approach? What alternatives were considered?
-
-    ## File Structure
-    EXACT files to create (Dev will create THESE files, no more, no less):
+    ## Files to Create
 
     ```
-    src/features/<feature>/
+    src/features/<name>/
     ├── domain/
-    │   ├── <Entity>.ts           # Description
-    │   └── <ValueObject>.ts      # Description
+    │   └── [Entity].ts
     ├── application/
-    │   └── use<UseCase>.ts       # Description
+    │   └── use[UseCase].ts
     ├── infrastructure/
-    │   └── <Adapter>.ts          # Description
+    │   └── [Adapter].ts
     └── ui/
-        ├── <Component>.tsx       # Description
-        └── <Component>.test.tsx  # Description
+        ├── [Component].tsx
+        └── [Component].test.tsx
     ```
 
-    ## Implementation Details
+    ## Implementation Notes
 
-    ### File: src/features/<feature>/domain/<Entity>.ts
+    ### [File path]
     - Purpose: ...
     - Exports: ...
-    - Key types: ...
-    - Craft patterns: Result<T, E>, no throw
+    - Pattern: Result<T, E>
 
-    ### File: src/features/<feature>/application/use<UseCase>.ts
-    - Purpose: ...
-    - Dependencies: ...
-    - Returns: Result<T, E>
-
-    (etc. for each file)
-
-    ## Test Specifications (for QA)
-    EXACT tests to write:
-
-    - [ ] `<Component>.test.tsx`: "should render initial state"
-    - [ ] `<Component>.test.tsx`: "should handle increment"
-    - [ ] `use<UseCase>.test.ts`: "should return Ok on success"
-    - [ ] `use<UseCase>.test.ts`: "should return Err on failure"
-
-    ## Craft Checklist
-    - [ ] No `any` types
-    - [ ] All errors as Result<T, E>
-    - [ ] Domain isolated from framework
-    - [ ] Tests colocated
-    - [ ] Strict TypeScript
+    ## Tests (for QA)
+    - [ ] "[test description]"
+    - [ ] "[test description]"
     ```
 
-    ## IMPORTANT
-
-    Dev and QA will implement THIS DOCUMENT exactly.
-    - Dev creates the EXACT files listed
-    - Dev uses the EXACT patterns specified
-    - QA writes the EXACT tests listed
-    - No deviation without coming back to you
-
-    The design.md IS the implementation contract.
+    Write to .spectre/design.md.
+    Dev and QA will implement this EXACTLY.
   """
 )
 ```
 
-### Architect Output: .spectre/design.md
+---
 
-This file becomes the IMPLEMENTATION CONTRACT:
-
-```markdown
-# Technical Design: Counter
-
-## Overview
-A delightful counter with persistence and theme support.
-
-## Architecture Decision
-Feature-folder structure with hexagonal architecture.
-Domain logic isolated, React only in ui/ layer.
-
-## File Structure
+## Step 6: Dev + QA — ALWAYS RUN IN PARALLEL
 
 ```
-src/features/counter/
-├── domain/
-│   ├── Counter.ts              # Value object with increment/decrement
-│   └── CounterError.ts         # Typed errors
-├── application/
-│   └── useCounter.ts           # Hook returning Result<Counter, CounterError>
-├── infrastructure/
-│   └── CounterStorage.ts       # localStorage adapter
-└── ui/
-    ├── Counter.tsx             # Main component
-    ├── Counter.test.tsx        # Tests
-    └── CounterButton.tsx       # Animated button
-```
+# Ensure .spectre exists
+mkdir -p .spectre
 
-## Implementation Details
-
-### File: src/features/counter/domain/Counter.ts
-```typescript
-// EXACT code structure Dev must follow
-export type Counter = {
-  readonly value: number;
-};
-
-export const Counter = {
-  create: (value: number = 0): Counter => ({ value }),
-  increment: (c: Counter): Counter => ({ value: c.value + 1 }),
-  decrement: (c: Counter): Counter => ({ value: c.value - 1 }),
-  reset: (): Counter => ({ value: 0 }),
-};
-```
-
-### File: src/features/counter/application/useCounter.ts
-```typescript
-// Hook signature Dev must implement
-export function useCounter(): {
-  counter: Counter;
-  increment: () => Result<Counter, CounterError>;
-  decrement: () => Result<Counter, CounterError>;
-  reset: () => void;
-}
-```
-
-## Test Specifications (for QA)
-
-- [ ] `Counter.test.ts`: "Counter.create returns Counter with value 0"
-- [ ] `Counter.test.ts`: "Counter.increment increases value by 1"
-- [ ] `Counter.test.ts`: "Counter.decrement decreases value by 1"
-- [ ] `useCounter.test.ts`: "returns Ok on successful increment"
-- [ ] `Counter.test.tsx`: "renders current value"
-- [ ] `Counter.test.tsx`: "calls increment on + button click"
-
-## Craft Checklist
-- [ ] No `any` types
-- [ ] Result<T, E> for operations that can fail
-- [ ] Domain has no React imports
-- [ ] Tests colocated with components
-```
-
-**Dev and QA implement THIS DOCUMENT. No improvisation.**
-
-### Implementation Phases (from design.md)
-    1. Phase 1: ...
-    2. Phase 2: ...
-  """
-)
-```
-
-### Parallel Dev + QA Spawn
-
-```
-# Launch BOTH in parallel
+# Launch both
 Task(
-  subagent_type: "frontend-engineer",
-  run_in_background: true,
+  subagent_type: "frontend-engineer",  # or backend based on stack
   prompt: """
-    ARCHITECT DESIGN: <design>
+    SPEC: .spectre/spec.md
+    DESIGN: .spectre/design.md
 
-    Implement the feature following the design.
-    Write to .spectre/dev-progress.md as you complete each file.
+    Implement EXACTLY what design.md specifies.
+    - Create the exact files listed
+    - Use the exact patterns specified
+    - No improvisation
+
+    CRAFT: strict TS, Result<T,E>, domain isolated.
   """
 )
 
 Task(
   subagent_type: "qa-engineer",
-  run_in_background: true,
   prompt: """
-    ACCEPTANCE CRITERIA: <from PO or architect>
-    TEST SPECS: <from architect>
+    SPEC: .spectre/spec.md
+    DESIGN: .spectre/design.md
 
-    Write tests for this feature.
-    - Unit tests for domain logic
-    - Integration tests for use cases
-    - Component tests for UI
-
-    Watch .spectre/dev-progress.md for completed files.
-    Run tests as files become available.
-    Write failures to .spectre/test-failures.md
+    Write the tests specified in design.md.
+    Run them as Dev completes files.
+    Report failures to .spectre/failures.md.
   """
 )
-
-# Orchestrator monitors both and routes failures
 ```
 
 ---
 
-## Context-Aware Routing Matrix
+## Reactive Loop
 
-**Rule: All agents work from `.spectre/spec.md`. PO creates it if not provided.**
+```
+Dev completes file
+       │
+       ▼
+QA runs tests
+       │
+   ┌───┴───┐
+   │       │
+  PASS    FAIL
+   │       │
+   ▼       ▼
+ Done    Dev fixes → QA re-runs
+```
 
-| Context | Input | PO Action | Pipeline |
-|---------|-------|-----------|----------|
-| **Product Team** | Text (any) | Creates full spec.md | PO → Architect → Dev ⇄ QA |
-| **Product Team** | Jira/Linear ticket | Fetches + creates spec.md | PO → Architect → Dev ⇄ QA |
-| **Product Team** | Spec file (.md/.yml) | Validates + copies | Architect → Dev ⇄ QA |
-| **Product Team** | Bug fix | — | Dev → QA |
-| **Startup** | Text (any) | Creates light spec.md | PO → Architect → Dev ⇄ QA |
-| **Startup** | Spec file (.md/.yml) | Validates + copies | Architect → Dev ⇄ QA |
-| **Startup** | Bug fix | — | Dev → QA |
-| **Freelance** | Text (any) | Creates minimal spec.md | PO → Dev ⇄ QA |
-| **Freelance** | Spec file/Bug fix | — | Dev → QA |
-| **Learning** | Any | Explains while creating | Single agent |
-
-**The spec.md is the contract. No spec = no work.**
+Max 3 retries, then escalate.
 
 ---
 
-## Example: Full Flow
+## Summary
+
+| Question | When Asked |
+|----------|------------|
+| "What stack?" | Only if empty project |
+| "What do you want?" | Always |
+
+| Agent | Runs | Output |
+|-------|------|--------|
+| PO | **ALWAYS** | `.spectre/spec.md` |
+| Architect | **ALWAYS** | `.spectre/design.md` |
+| Dev + QA | **ALWAYS** | Implementation + Tests |
+
+**Smart. Minimal. Complete.**
+
+---
+
+## Example
 
 ```
-User: /craft
+> /craft
 
-🔍 No existing project detected.
-
-"What stack?"
-[ TypeScript + React ]
-
-"What's your work context?"
-[ Startup ]
+🔍 Detected: TypeScript + React (from package.json)
+📐 Patterns: Feature folders, Result types (from .spectre/learnings)
 
 "What do you want to build?"
+> a pokemon list with search
 
-User: a sexy counter
+═══════════════════════════════════════════════════════════════
 
-📝 Analyzing your input...
+👤 PO → .spectre/spec.md
+   ✓ User story
+   ✓ 4 acceptance criteria
+   ✓ Edge cases defined
 
-   Input type: Raw idea (informal, no specifics)
-   Recommended flow: PO → Architect → Dev ⇄ QA
+🏗️ Architect → .spectre/design.md
+   ✓ 6 files planned
+   ✓ 4 tests specified
+   ✓ CRAFT patterns applied
 
-   The Product Owner will create a proper spec first.
+💻 Dev + 🧪 QA (parallel)
+   ✓ Pokemon.ts
+   ✓ usePokemonList.ts
+   ✓ PokemonList.tsx
+   🧪 Running tests...
+   ✓ 4/4 passing
 
-[ Start ] [ Add more details ]
+═══════════════════════════════════════════════════════════════
 
-User: [ Start ]
-
-👤 Product Owner creating spec...
-
-   ## User Story
-   As a user, I want a visually appealing counter
-   so that I can track values with delight.
-
-   ## Acceptance Criteria
-   - [ ] Display current value (default: 0)
-   - [ ] Increment (+1) with micro-animation
-   - [ ] Decrement (-1) with micro-animation
-   - [ ] Reset to 0
-   - [ ] Persist in localStorage
-   - [ ] Dark/light theme toggle
-   - [ ] Keyboard accessible (arrows, enter)
-   - [ ] Smooth transitions
-
-   ## Edge Cases
-   - Allow negative values
-   - No max limit
-
-[ Approve spec ] [ Modify ]
-
-User: [ Approve spec ]
-
-🏗️ Architect designing...
-
-   ## Architecture
-
-   src/features/counter/
-   ├── domain/
-   │   └── Counter.ts         # Value + operations
-   ├── application/
-   │   └── useCounter.ts      # Hook with localStorage
-   ├── infrastructure/
-   │   └── CounterStorage.ts  # localStorage adapter
-   └── ui/
-       ├── Counter.tsx        # Main component
-       ├── Counter.test.tsx   # Tests
-       └── CounterButton.tsx  # Animated button
-
-   ## For QA - Test Scenarios
-   - renders with initial value 0
-   - increments on + click
-   - decrements on - click
-   - resets to 0
-   - persists to localStorage
-   - loads from localStorage on mount
-   - supports keyboard navigation
-
-[ Approve design ] [ Modify ]
-
-User: [ Approve design ]
-
-🚀 Starting parallel execution...
-
-   ┌─────────────────────────────────────────┐
-   │  💻 Dev implementing...                  │
-   │  🧪 QA writing tests...                  │
-   └─────────────────────────────────────────┘
-
-   Dev: ✓ Created Counter.ts (domain)
-   QA:  ✓ Writing domain tests...
-
-   Dev: ✓ Created useCounter.ts
-   QA:  ✓ Writing hook tests...
-
-   Dev: ✓ Created Counter.tsx
-   QA:  🧪 Running tests...
-
-   QA:  ❌ FAIL: "should persist to localStorage"
-        Expected localStorage.setItem to be called
-
-   Dev: 🔧 Fixing... added localStorage sync
-
-   QA:  🧪 Re-running...
-   QA:  ✓ All tests passing (12/12)
-
-✨ Feature complete!
-
-   Files: 6 created
-   Tests: 12 passing
-   Coverage: 94%
+✨ Done!
 ```
 
----
-
-## State Storage
-
-```json
-// .spectre/state.json
-{
-  "workflow": "craft",
-  "inputType": "raw_idea",
-  "context": "startup",
-  "phase": "parallel_execution",
-  "agents": {
-    "po": { "status": "complete", "output": "spec.md" },
-    "architect": { "status": "complete", "output": "design.md" },
-    "dev": { "status": "in_progress", "files": ["Counter.ts", "useCounter.ts"] },
-    "qa": { "status": "in_progress", "tests": 12, "passing": 10, "failing": 2 }
-  }
-}
-```
-
----
-
-## Tone
-
-- **Smart**: Detects input type, routes intelligently
-- **Parallel**: Dev and QA work together, not sequentially
-- **Reactive**: Failures route instantly to the right agent
-- **Transparent**: User sees what's happening at each step
-- **Adaptive**: Different flows for different contexts
+**One question. Full chain. Craft code.**
