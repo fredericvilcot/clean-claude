@@ -201,17 +201,93 @@ fi
 
 ---
 
-### Agent Knowledge by Stack
+### Agent Knowledge by Stack — Dynamic Injection
 
-Agents adapt to detected stack with **craft defaults**:
+Agents receive stack-specific craft guidelines **dynamically injected** at spawn time.
 
-| Stack | Architect Defaults | Engineer Defaults |
-|-------|-------------------|-------------------|
-| **TS + React** | Hooks, composition, explicit props | Testing Library, a11y, strict types |
-| **TS + Node** | Ports/adapters, DI, Result types | Zod validation, explicit errors |
-| **Go** | Interfaces, error returns, small packages | Table tests, standard lib |
-| **Rust** | Traits, Result/Option, ownership | Cargo test, no unwrap |
-| **Python** | Type hints, protocols, dataclasses | pytest, explicit returns |
+#### Supported Stacks (Native)
+
+| Stack | File | Key Patterns |
+|-------|------|--------------|
+| **TypeScript + React** | `stacks/typescript-react.md` | Strict types, hooks, Testing Library, a11y |
+| **TypeScript + Node** | `stacks/typescript-node.md` | Result types, Zod, hexagonal, Pino |
+| **Go** | `stacks/go.md` | Error returns, small interfaces, table tests |
+| **Rust** | `stacks/rust.md` | Result/Option, thiserror, traits, no unwrap |
+| **Python** | `stacks/python.md` | Type hints, dataclasses, protocols, pytest |
+
+#### Injection Flow — Stack Defaults + Project Learnings
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│  1. Stack detected → "typescript-react"                         │
+│                                                                  │
+│  2. Load CRAFT DEFAULTS (always):                               │
+│     → Read .claude/skills/craft/stacks/typescript-react.md      │
+│                                                                  │
+│  3. Load PROJECT LEARNINGS (if clean, auto-learning on):        │
+│     → Read .spectre/learnings/patterns.json                     │
+│     → Read .spectre/learnings/examples.json                     │
+│                                                                  │
+│  4. Spawn agent with FULL context:                              │
+│                                                                  │
+│     Task(                                                        │
+│       subagent_type: "frontend-engineer",                       │
+│       prompt: """                                                │
+│         ## Stack Context                                         │
+│         Tu travailles sur un projet TypeScript + React.          │
+│                                                                  │
+│         ## Craft Defaults (Stack)                                │
+│         <contenu de typescript-react.md>                        │
+│                                                                  │
+│         ## Project Patterns (Learned)                            │
+│         <contenu de .spectre/learnings/patterns.json>           │
+│                                                                  │
+│         ## Reference Examples                                    │
+│         <contenu de .spectre/learnings/examples.json>           │
+│                                                                  │
+│         ## Task                                                  │
+│         <la tâche demandée>                                     │
+│       """                                                        │
+│     )                                                            │
+│                                                                  │
+│  5. Agent = Universal + Stack defaults + Project patterns       │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### What Gets Injected
+
+| Source | Condition | Content |
+|--------|-----------|---------|
+| **Stack defaults** | Always | Craft principles for the detected stack |
+| **Project patterns** | Learning ON + No violations | Naming, imports, architecture conventions |
+| **Reference examples** | Learning ON + No violations | Best files as templates |
+
+#### Continuous Learning
+
+Each time `/craft` or `/heal` runs:
+1. Check if `.spectre/learnings/` exists and is up-to-date
+2. If new patterns detected → update learnings
+3. Inject fresh learnings into next agent spawn
+
+Agents stay in sync with your evolving codebase.
+
+#### Why This Matters
+
+| Sans injection | Avec injection |
+|----------------|----------------|
+| Agent devine les conventions | Agent suit des guidelines précises |
+| Patterns incohérents | Patterns uniformes |
+| Code "générique" | Code idiomatique au stack |
+| Risque d'anti-patterns | Anti-patterns documentés et évités |
+
+#### Adding New Stacks
+
+Pour supporter un nouveau stack :
+1. Créer `.claude/skills/craft/stacks/<stack-name>.md`
+2. Suivre le format des fichiers existants
+3. Documenter : type system, error handling, architecture, testing, anti-patterns
 
 ---
 
@@ -227,6 +303,34 @@ Agents adapt to detected stack with **craft defaults**:
 ---
 
 ## The Flow
+
+### SMART ROUTING: From Scratch vs Existing Project
+
+**CRITICAL:** Adapt the flow based on project state.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     FLOW ROUTING                                 │
+│                                                                  │
+│  FROM SCRATCH (no code detected):                               │
+│  ─────────────────────────────────                               │
+│  1. Stack selection ✓ (already done in Phase 1)                 │
+│  2. Work context (Product Team/Startup/etc.)                    │
+│  3. SKIP "What do you want to do?" → assume BUILD               │
+│  4. Go directly to domain questions                              │
+│  5. Ask what to build → GO                                       │
+│                                                                  │
+│  EXISTING PROJECT (code detected):                               │
+│  ─────────────────────────────────                               │
+│  1. Auto-detect stack ✓ (already done in Phase 1)               │
+│  2. Work context (Product Team/Startup/etc.)                    │
+│  3. "What do you want to do?" → Build/Fix/Improve/Think         │
+│  4. Continue based on choice                                     │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+---
 
 ### Step 1: What's Your Work Context?
 
@@ -248,20 +352,34 @@ Options:
 
 ---
 
-### Step 2: What Do You Want to Do?
+### Step 2: What Do You Want to Do? (EXISTING PROJECTS ONLY)
+
+**⚠️ SKIP THIS STEP IF `fromScratch === true`**
+
+From scratch = nothing to fix, nothing to improve. Go directly to building.
 
 ```
-Question: "What do you want to do?"
-Header: "Goal"
-Options:
-  1. "Build something new"
-     Description: "New feature, component, or functionality"
-  2. "Fix something"
-     Description: "Bug, error, failing tests"
-  3. "Improve existing code"
-     Description: "Refactor, add tests, clean up"
-  4. "Think / Design"
-     Description: "Architecture, planning, decisions"
+# ONLY for existing projects:
+if (fromScratch === false) {
+  Question: "What do you want to do?"
+  Header: "Goal"
+  Options:
+    1. "Build something new"
+       Description: "New feature, component, or functionality"
+    2. "Fix something"
+       Description: "Bug, error, failing tests"
+    3. "Improve existing code"
+       Description: "Refactor, add tests, clean up"
+    4. "Think / Design"
+       Description: "Architecture, planning, decisions"
+}
+
+# For from-scratch projects:
+if (fromScratch === true) {
+  # SKIP this question
+  # Assume goal = "Build something new"
+  # Go directly to Step 3
+}
 ```
 
 ---
@@ -552,17 +670,70 @@ To change: `/craft --reset` or answer "Other" to change context.
 
 ## Example Conversations
 
-### Product Team: Building from PRD
+### FROM SCRATCH: New Project (Smart Flow)
 
 ```
 User: /craft
 
-Bot: "What's your work context?"
+Bot: 🔍 No project detected.
+     "What stack are you building with?"
+     [TypeScript + React] [TypeScript + Node] [Go] [Rust] [Python]
+
+User: [TypeScript + React]
+
+Bot: "Any preferences?"
+     [Full setup] [Minimal] [With state management]
+
+User: [Full setup]
+
+Bot: ✅ Stack configured: TypeScript + React + Vite + Vitest + TailwindCSS
+
+     "What's your work context?"
+     [Product Team] [Startup] [Freelance] [Learning]
+
+User: [Startup / Small Team]
+
+Bot: "What part of the system?"                    ← SKIPPED "What do you want to do?"
+     [Frontend] [Backend] [Full-stack]               (from scratch = obviously BUILD)
+
+User: [Frontend]
+
+Bot: "What are you building?"
+
+User: "User authentication with social login"
+
+Bot:
+## New Project: User Authentication
+
+**Stack:** TypeScript + React (Vite, Vitest, TailwindCSS)
+**Context:** Startup / Fast iteration
+
+### Agents:
+
+architect → frontend-engineer → qa-engineer
+
+Setting up project structure and starting architect...
+```
+
+**Key insight:** From scratch, we SKIP "Build/Fix/Improve?" — there's nothing to fix or improve yet.
+
+---
+
+### EXISTING PROJECT: Product Team Building from PRD
+
+```
+User: /craft
+
+Bot: 🔍 Detected: TypeScript + React + Vite
+     🔍 Learning patterns...
+     ✅ Patterns learned (no violations)
+
+     "What's your work context?"
      [Product Team] [Startup] [Freelance] [Learning]
 
 User: [Product Team / Enterprise]
 
-Bot: "What do you want to do?"
+Bot: "What do you want to do?"                     ← SHOWN because existing project
      [Build something new] [Fix] [Improve] [Think]
 
 User: [Build something new]
@@ -599,12 +770,17 @@ Bot:
 Starting architect...
 ```
 
-### Startup: Quick Feature
+---
+
+### EXISTING PROJECT: Startup Quick Feature
 
 ```
 User: /craft
 
-Bot: "What's your work context?"
+Bot: 🔍 Detected: TypeScript + React
+     ✅ Stack + patterns loaded
+
+     "What's your work context?"
 
 User: [Startup / Small Team]
 
@@ -633,10 +809,46 @@ frontend-engineer → qa-engineer
 Starting frontend-engineer...
 ```
 
-### Freelance: Direct Task
+### EXISTING PROJECT: Freelance Fix & Ship
 
 ```
 User: /craft
+
+Bot: 🔍 Detected: TypeScript + Node
+     ✅ Stack loaded
+
+     "What's your work context?"
+
+User: [Freelance / Solo]
+
+Bot: "What do you want to do?"                     ← SHOWN because existing project
+     [Build something new] [Fix] [Improve] [Think]
+
+User: [Fix something]
+
+Bot: "Describe the problem:"
+
+User: "API returns 500 on invalid email format"
+
+Bot:
+## Fix: API 500 Error
+
+backend-engineer → qa-engineer (verify)
+
+Starting backend-engineer...
+```
+
+---
+
+### EXISTING PROJECT: Freelance Build with Tests
+
+```
+User: /craft
+
+Bot: 🔍 Detected: TypeScript + React
+     ✅ Stack loaded
+
+     "What's your work context?"
 
 User: [Freelance / Solo]
 

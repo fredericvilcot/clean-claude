@@ -503,7 +503,7 @@ Remaining issue:
 Suggestions:
   1. Check the test expectations
   2. Review the error handling logic
-  3. Run `/guide fix tests` for guided debugging
+  3. Run `/craft` and choose "Fix something" for guided debugging
 ```
 
 ---

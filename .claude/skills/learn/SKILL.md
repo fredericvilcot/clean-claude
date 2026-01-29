@@ -289,11 +289,69 @@ Craft principles are universal. Implementation adapts to your stack:
 .spectre/
 ├── context.json          # Stack + settings
 ├── learnings/
-│   ├── patterns.json     # Learned patterns
-│   └── examples.json     # Reference files
+│   ├── patterns.json     # Learned patterns → INJECTED into agents
+│   └── examples.json     # Reference files → INJECTED into agents
 ├── violations-report.md  # Current violations
 └── state.json            # Workflow state
 ```
+
+### patterns.json — What Agents Receive
+
+```json
+{
+  "architecture": {
+    "style": "feature-folders",
+    "layers": ["domain", "application", "infrastructure"]
+  },
+  "naming": {
+    "files": "kebab-case",
+    "components": "PascalCase",
+    "functions": "camelCase",
+    "constants": "SCREAMING_SNAKE"
+  },
+  "imports": {
+    "style": "absolute",
+    "aliases": ["@/", "~/"],
+    "barrelExports": true
+  },
+  "testing": {
+    "location": "colocated",
+    "framework": "vitest",
+    "pattern": "*.test.ts"
+  },
+  "errorHandling": {
+    "style": "result-type",
+    "customErrors": true
+  }
+}
+```
+
+### examples.json — Reference Files
+
+```json
+{
+  "bestFiles": [
+    {
+      "path": "src/features/auth/AuthService.ts",
+      "reason": "Clean Result types, proper DI",
+      "patterns": ["result-type", "dependency-injection"]
+    },
+    {
+      "path": "src/components/Button/Button.tsx",
+      "reason": "Well-typed props, accessible",
+      "patterns": ["typed-props", "a11y"]
+    }
+  ]
+}
+```
+
+### Continuous Injection
+
+Every time an agent is spawned via `/craft` or `/heal`:
+1. Read `.spectre/learnings/patterns.json`
+2. Read `.spectre/learnings/examples.json`
+3. Inject into agent prompt alongside stack craft defaults
+4. Agent applies YOUR conventions, not generic ones
 
 ---
 

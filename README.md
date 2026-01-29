@@ -172,7 +172,31 @@ You don't need to run `/learn` — it happens automatically when you use `/craft
 /learn --show           # Show current learnings
 ```
 
-**Works with any stack.** TypeScript, Go, Rust, Python, Java — Spectre detects it and adapts.
+### Natively Supported Stacks
+
+Each stack has dedicated craft defaults — type patterns, error handling, architecture, testing practices — all injected dynamically into agents.
+
+| Stack | Auto-Detected By | Craft Defaults |
+|-------|------------------|----------------|
+| **TypeScript + React** | `package.json` + React | Strict types, hooks, Testing Library, a11y |
+| **TypeScript + Node** | `package.json` + tsconfig | Result types, Zod, hexagonal, Pino |
+| **Go** | `go.mod` | Error returns, small interfaces, table tests |
+| **Rust** | `Cargo.toml` | Result/Option, thiserror, traits |
+| **Python** | `pyproject.toml` | Type hints, dataclasses, protocols, pytest |
+
+Not listed? Spectre still works — agents apply universal craft principles. Want dedicated support? Add a stack file in `.claude/skills/craft/stacks/`.
+
+### Two-Phase Intelligence
+
+**Phase 1: Stack Detection** — Always runs. Even if your code is a mess, Spectre knows it's TypeScript vs Go.
+
+**Phase 2: Pattern Learning** — Learns YOUR conventions. But stops on violations. Bad patterns don't propagate.
+
+```
+✅ Stack detected    →  Agents know WHAT you're using
+✅ Patterns learned  →  Agents know HOW you use it
+❌ Violations found  →  Agents use craft defaults instead
+```
 
 **But it won't learn garbage.**
 
