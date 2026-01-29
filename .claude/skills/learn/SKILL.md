@@ -1,6 +1,6 @@
 ---
 name: learn
-description: "Learn project patterns. Manual: /learn, /learn <file>. Auto: /learn --auto (stops on craft violations). Generates custom skills from your codebase."
+description: "Learn project patterns. Manual: /learn, /learn <file>. Auto: /learn --auto (stops on craft violations). Craft guard on ALL modes. Generates violation report as action plan."
 context: conversation
 allowed-tools: Read, Bash, Glob, Grep, Write, Task, AskUserQuestion
 ---
@@ -8,6 +8,8 @@ allowed-tools: Read, Bash, Glob, Grep, Write, Task, AskUserQuestion
 # Spectre Learn — Adaptive Intelligence
 
 Analyze the project to learn its patterns. Agents then adapt their output to match YOUR conventions.
+
+**CRAFT GUARD ENABLED ON ALL MODES** — Spectre will never learn anti-patterns.
 
 ## Usage
 
@@ -29,6 +31,171 @@ Analyze the project to learn its patterns. Agents then adapt their output to mat
 /learn --from <file>          # Use this file as the reference standard
 /learn --example <file>       # "This is how I want it done"
 ```
+
+---
+
+## Craft Guard — Active on ALL Modes
+
+**Every /learn mode includes craft compliance checking.**
+
+| Mode | Guard Behavior | On Violation |
+|------|---------------|--------------|
+| `/learn` (manual) | **WARN** | Alert user, generate report, continue |
+| `/learn <file>` | **WARN** | Alert user, generate report, continue |
+| `/learn <folder>` | **WARN** | Alert user, generate report, continue |
+| `/learn --example` | **WARN** | Alert user, generate report, continue |
+| `/learn --auto` | **STOP** | Halt learning, generate report, ask user |
+
+### Why Guard on Manual Mode?
+
+Even when you explicitly point to a file, Spectre checks it against craft principles:
+
+```
+> /learn src/services/LegacyService.ts
+
+🔍 Analyzing src/services/LegacyService.ts...
+
+⚠️  CRAFT VIOLATIONS DETECTED (2)
+
+  1. Line 45: throw new Error('User not found')
+     → Violates: Explicit Error Handling
+     → Craft approach: Use Result<User, NotFoundError>
+
+  2. Line 12: any
+     → Violates: Type Safety
+     → Craft approach: Define proper interface
+
+📋 Report generated: .spectre/violations-report.md
+
+Patterns learned (craft-compliant only):
+  ✅ Dependency injection via constructor
+  ✅ Interface-based dependencies
+
+Continue learning, but violations were NOT learned.
+```
+
+---
+
+## Violations Report — Your Action Plan
+
+When violations are detected, Spectre generates a detailed markdown report:
+
+```bash
+cat .spectre/violations-report.md
+```
+
+### Report Format
+
+```markdown
+# Craft Violations Report
+
+> Generated: 2024-01-15T10:30:00Z
+> Source: /learn src/services/
+
+## Summary
+
+| Severity | Count |
+|----------|-------|
+| 🔴 Critical | 1 |
+| 🟠 Warning | 3 |
+| 🟡 Info | 2 |
+
+---
+
+## Action Plan
+
+### 🔴 Critical — Fix Immediately
+
+#### 1. God Class Detected
+
+| Field | Value |
+|-------|-------|
+| **File** | `src/services/PaymentService.ts` |
+| **Issue** | Class has 847 lines and 23 methods |
+| **Violates** | Single Responsibility Principle (SOLID) |
+| **Craft Approach** | Split into focused services: PaymentProcessor, PaymentValidator, PaymentNotifier |
+| **Priority** | 🔴 P0 — Blocking, fix before learning |
+
+---
+
+### 🟠 Warning — Should Fix
+
+#### 2. Thrown Exception in Business Logic
+
+| Field | Value |
+|-------|-------|
+| **File** | `src/services/UserService.ts:45` |
+| **Issue** | `throw new Error('User not found')` |
+| **Violates** | Explicit Error Handling |
+| **Craft Approach** | Return `Result<User, NotFoundError>` instead |
+| **Priority** | 🟠 P1 — Important, improves reliability |
+
+#### 3. `any` Type Usage
+
+| Field | Value |
+|-------|-------|
+| **File** | `src/utils/helpers.ts:12` |
+| **Issue** | `function parse(data: any)` |
+| **Violates** | Type Safety |
+| **Craft Approach** | Define interface `ParsedData` or use `unknown` with type guard |
+| **Priority** | 🟠 P1 — Important, improves safety |
+
+---
+
+### 🟡 Info — Consider Improving
+
+#### 4. Missing JSDoc on Public API
+
+| Field | Value |
+|-------|-------|
+| **File** | `src/api/client.ts:78` |
+| **Issue** | Public method `fetchUser()` has no documentation |
+| **Violates** | Explicitness (documentation) |
+| **Craft Approach** | Add JSDoc with @param and @returns |
+| **Priority** | 🟡 P2 — Nice to have |
+
+---
+
+## Quick Fixes
+
+Run these commands to address violations:
+
+\`\`\`bash
+# Fix all auto-fixable violations
+/heal
+
+# Fix type issues specifically
+/heal types
+
+# Let the architect redesign the God class
+/agent software-craftsman --task "Refactor PaymentService into focused services"
+\`\`\`
+
+---
+
+## Learned Patterns (Craft-Compliant)
+
+Despite violations, these patterns WERE learned:
+
+- ✅ Dependency injection via constructor
+- ✅ Interface-based dependencies
+- ✅ Barrel exports in index.ts
+- ✅ Co-located test files
+
+---
+
+*This report is your action plan. Fix violations to improve code quality.*
+*Re-run `/learn` after fixes to update learnings.*
+```
+
+### Accessing the Report
+
+```bash
+/learn --violations      # Show violations summary
+cat .spectre/violations-report.md  # Full report
+```
+
+The report persists until the next `/learn` run.
 
 ---
 

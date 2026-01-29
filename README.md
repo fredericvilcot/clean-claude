@@ -214,28 +214,50 @@ Something broke? **Don't debug. Just heal.**
 /learn <file>                # 📄 Learn from specific file
 /learn <folder>              # 📁 Learn from specific folder
 /learn --example <file>      # 🌟 "THIS is my gold standard"
-/learn --auto                # 🤖 Intelligent scan with craft guard
+/learn --auto                # 🤖 Intelligent scan (STOPS on violations)
+/learn --violations          # 📋 Show violation report
 ```
 
+### 🛡️ Craft Guard — Active on ALL Modes
+
+| Mode | On Violation |
+|:-----|:-------------|
+| Manual (`/learn`, `/learn <file>`) | ⚠️ **WARN** — Alert, generate report, continue |
+| Auto (`/learn --auto`) | 🛑 **STOP** — Halt, generate report, ask user |
+
 ```
-> /learn --auto
+> /learn src/services/
 
-🤖 Scanning codebase...
+🔍 Analyzing src/services/...
 
-  ✅ Architecture: Hexagonal
-  ✅ Error handling: Result<T, E>
-  ✅ Testing: Vitest + co-located
+  ✅ Dependency injection
+  ✅ Interface-based dependencies
 
-  🛑 STOPPING — Craft violation detected!
+  ⚠️  VIOLATIONS DETECTED (2)
 
-  📁 File: src/services/PaymentService.ts
-  ⚠️  Issue: God class (847 lines)
-  🚫 Violates: Single Responsibility
+  📋 Report: .spectre/violations-report.md
 
-  [ 🔧 Fix it ]  [ ⏭️ Ignore ]  [ 🛑 Stop ]
+Patterns learned (craft-compliant only).
+Violations were NOT learned.
 ```
 
-> **⚠️ Auto-learn will NEVER learn anti-patterns.** It stops and asks you first.
+### 📋 Violation Report — Your Action Plan
+
+When violations are detected, a detailed report is generated:
+
+```markdown
+# .spectre/violations-report.md
+
+## Action Plan
+
+| Priority | File | Issue | Craft Approach |
+|:---------|:-----|:------|:---------------|
+| 🔴 P0 | PaymentService.ts | God class | Split into focused services |
+| 🟠 P1 | UserService.ts:45 | throw Error | Use Result<T, E> |
+| 🟠 P1 | helpers.ts:12 | any type | Define interface |
+```
+
+> **⚠️ Spectre will NEVER learn anti-patterns.** Guards are always active.
 
 ---
 
