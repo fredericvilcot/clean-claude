@@ -159,6 +159,90 @@ Détails d'exécution...
 - **fork** : S'exécute dans un sous-agent isolé (nouveau contexte)
 - **conversation** : S'exécute dans la conversation principale
 
+#### Le skill `/guide` en détail
+
+Mode interactif qui traduit le besoin utilisateur en configuration d'agents.
+
+**Philosophie** : Poser des questions sur le BESOIN, pas sur les options techniques.
+
+##### Flow interactif
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  Étape 1: "What's your situation?"                              │
+│                                                                 │
+│  [ I want to build something ]    [ Something isn't working ]   │
+│  [ I want to improve code ]       [ I need to think first ]     │
+└─────────────────────────────────────────────────────────────────┘
+                         │
+        ┌────────────────┼────────────────┬────────────────┐
+        ▼                ▼                ▼                ▼
+     BUILD             FIX            IMPROVE           THINK
+        │                │                │                │
+        ▼                ▼                ▼                ▼
+┌───────────────┐ ┌───────────────┐ ┌───────────────┐ ┌───────────────┐
+│ Starting from?│ │ What problem? │ │ What improve? │ │ What to think?│
+│               │ │               │ │               │ │               │
+│ • User need   │ │ • Tests fail  │ │ • Add tests   │ │ • Structure   │
+│ • Know what   │ │ • Error/crash │ │ • Refactor    │ │ • Approach    │
+│ • Just code   │ │ • Build broke │ │ • Types       │ │ • Break down  │
+└───────────────┘ │ • Visual bug  │ │ • Performance │ │ • Best practic│
+                  └───────────────┘ └───────────────┘ └───────────────┘
+```
+
+##### Tables de mapping
+
+**Build → Agents**
+
+| Starting Point | Domain | Tested | Configuration |
+|----------------|--------|--------|---------------|
+| User need/idea | UI | Yes | `/reactive-loop` (PO → Arch → front → QA) |
+| User need/idea | Backend | Yes | `/reactive-loop` (PO → Arch → back → QA) |
+| User need/idea | Both | Yes | `/reactive-loop` (PO → Arch → back → front → QA) |
+| Know what to build | UI | Yes | `/agent software-craftsman --link frontend-dev,qa-engineer` |
+| Know what to build | Backend | Yes | `/agent software-craftsman --link backend-dev,qa-engineer` |
+| Know what to build | Any | No | `/agent software-craftsman` |
+| Just code it | UI | Yes | `/agent frontend-dev --link qa-engineer` |
+| Just code it | Backend | Yes | `/agent backend-dev --link qa-engineer` |
+| Just code it | Any | No | `/agent <dev>` seul |
+
+**Fix → Agents**
+
+| Problem | Diagnosis | Configuration |
+|---------|-----------|---------------|
+| Tests failing | Know/Guess | `/agent frontend-dev --link qa-engineer` |
+| Tests failing | No clue | `/agent qa-engineer --link frontend-dev` |
+| Error in app | Any | `/agent frontend-dev --link qa-engineer` |
+| Build broken | Any | `/agent software-craftsman --link qa-engineer` |
+| Visual bug | Any | `/agent frontend-dev --link qa-engineer` |
+
+**Improve → Agents**
+
+| Improvement | Configuration |
+|-------------|---------------|
+| Add tests | `/agent qa-engineer` |
+| Refactor | `/agent software-craftsman --link qa-engineer` |
+| Types/safety | `/typescript-craft` |
+| Performance | `/agent software-craftsman --link qa-engineer` |
+
+**Think → Agents**
+
+| Thinking | Configuration |
+|----------|---------------|
+| Structure feature | `/agent software-craftsman` |
+| Which approach | `/agent software-craftsman` |
+| Break down task | `/agent product-owner` |
+| Best practices | `/typescript-craft`, `/react-craft`, `/test-craft` |
+
+##### Raccourcis intelligents
+
+| Input | Détection | Action |
+|-------|-----------|--------|
+| `/guide add login form` | "add" + "form" = build UI | Demande starting point + testing |
+| `/guide fix failing tests` | "fix" + "tests" = broken | Demande diagnosis |
+| `/guide refactor auth module` | "refactor" = improve | Confirme et lance |
+| `/guide how to design auth` | "how to" + "design" = think | Lance architect |
+
 ---
 
 ### Scripts & Hooks

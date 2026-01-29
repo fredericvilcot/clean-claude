@@ -144,6 +144,92 @@ Invoke with `/skill-name` in Claude Code.
 | `/agent` | **Start any agent with optional reactive links** |
 | `/setup-reactive` | Configure your project for the reactive system |
 
+---
+
+## The `/guide` Skill — Interactive Guided Mode
+
+**Don't know where to start?** Just run `/guide` and answer a few questions. Spectre figures out the right agents for you.
+
+### The Flow
+
+```
+/guide
+   │
+   ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  "What's your situation?"                                       │
+│                                                                 │
+│  [ I want to build something ]    [ Something isn't working ]   │
+│  [ I want to improve code ]       [ I need to think first ]     │
+└─────────────────────────────────────────────────────────────────┘
+                    │
+                    ▼ (if "build")
+┌─────────────────────────────────────────────────────────────────┐
+│  "Where are you starting from?"                                 │
+│                                                                 │
+│  [ A user need or idea ]     → Full workflow with PO            │
+│  [ I know what to build ]    → Architect designs first          │
+│  [ Just need to code it ]    → Dev implements directly          │
+└─────────────────────────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  "What part of the app?"                                        │
+│                                                                 │
+│  [ User interface ]    [ Backend / API ]    [ Both ]            │
+└─────────────────────────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  "Should this be tested before shipping?"                       │
+│                                                                 │
+│  [ Yes, with automated tests ]    [ No, just a prototype ]      │
+└─────────────────────────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  "Describe what you want to build:"                             │
+│                                                                 │
+│  > "Password reset via email"                                   │
+└─────────────────────────────────────────────────────────────────┘
+                    │
+                    ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  ## Got it! Here's the plan:                                    │
+│                                                                 │
+│  product-owner → software-craftsman → frontend-dev → qa         │
+│                                             ↑            │      │
+│                                             └── error ───┘      │
+│                                                                 │
+│  Launching: /reactive-loop                                      │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### How Your Answers Map to Agents
+
+| Starting Point | Domain | Testing | Agents Chain |
+|----------------|--------|---------|--------------|
+| User need/idea | UI | Yes | `PO → Architect → frontend-dev → QA` |
+| User need/idea | Backend | Yes | `PO → Architect → backend-dev → QA` |
+| Know what to build | UI | Yes | `Architect → frontend-dev → QA` |
+| Know what to build | Backend | Yes | `Architect → backend-dev → QA` |
+| Just code it | UI | Yes | `frontend-dev ↔ QA` (loop) |
+| Just code it | Backend | Yes | `backend-dev ↔ QA` (loop) |
+| Any | Any | No | Single agent, no QA |
+
+### Smart Shortcuts
+
+Skip questions by providing context upfront:
+
+```bash
+/guide add login form       # Detected: build + UI
+/guide fix failing tests    # Detected: broken + tests
+/guide refactor auth        # Detected: improve + refactor
+/guide how to design auth   # Detected: think + architecture
+```
+
+---
+
 ### The `/agent` Skill — Flexible Agent Linking
 
 Start any agent and optionally connect it to others for reactive collaboration.

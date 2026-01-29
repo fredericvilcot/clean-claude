@@ -85,6 +85,36 @@ spectre-agents/
 | `/agent` | **Start any agent with optional reactive links** |
 | `/setup-reactive` | Configure reactive system in your project |
 
+## The `/guide` Flow
+
+Interactive mode that translates your need into the right agent configuration:
+
+```
+/guide
+   │
+   ├─→ "What's your situation?"
+   │      [ Build ] [ Fix ] [ Improve ] [ Think ]
+   │
+   ├─→ "Where are you starting from?" (if Build)
+   │      [ User need ] [ Know what to build ] [ Just code it ]
+   │
+   ├─→ "What part of the app?"
+   │      [ UI ] [ Backend ] [ Both ]
+   │
+   ├─→ "Should this be tested?"
+   │      [ Yes ] [ No (prototype) ]
+   │
+   └─→ "Describe what you want to build"
+          → Launches the right agent chain
+```
+
+**Mapping:**
+| Starting Point | Result |
+|----------------|--------|
+| User need + UI + Tested | `PO → Architect → frontend-dev → QA` |
+| Know what to build + UI + Tested | `Architect → frontend-dev → QA` |
+| Just code it + UI + Tested | `frontend-dev ↔ QA` |
+
 ## Reactive System
 
 ### Setup
