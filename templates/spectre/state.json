@@ -1,0 +1,12 @@
+{
+  "workflow": null,
+  "feature": null,
+  "phase": "idle",
+  "retryCount": 0,
+  "maxRetries": 3,
+  "agents": {
+    "lastActive": null,
+    "history": []
+  },
+  "status": "ready"
+}

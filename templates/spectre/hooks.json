@@ -1,0 +1,26 @@
+{
+  "hooks": {
+    "SubagentStop": [
+      {
+        "matcher": "qa-engineer|frontend-dev|software-craftsman|product-owner",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/spectre/on-agent-stop.sh"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "./scripts/spectre/check-test-results.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
