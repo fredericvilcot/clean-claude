@@ -35,6 +35,9 @@ After installation, **restart Claude Code** to load the new components.
 | Agent | Description |
 |-------|-------------|
 | **software-craftsman** | Software architect expert in Clean Architecture, DDD, Hexagonal, SOLID, TDD/BDD. Analyzes, designs, and reviews code with a pedagogical approach. |
+| **product-owner** | Product expert who transforms vague ideas into clear user stories with acceptance criteria. Prioritizes by value, defines MVP scope. |
+| **frontend-dev** | Frontend specialist building accessible, performant, maintainable UIs. Expert in React, state management, component testing. |
+| **qa-engineer** | Quality expert designing test strategies, writing tests at all levels (unit, integration, e2e), ensuring confidence in the codebase. |
 
 ### Skills
 

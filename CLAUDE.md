@@ -43,6 +43,9 @@ The Markdown body contains the skill's specific instructions.
 
 ### Agents
 - **software-craftsman**: Software architect expert in Clean Architecture, DDD, Hexagonal, SOLID, TDD/BDD. Analyzes, designs, and reviews code with a pedagogical approach.
+- **product-owner**: Product expert who transforms vague ideas into clear user stories with acceptance criteria. Prioritizes by value, defines MVP scope.
+- **frontend-dev**: Frontend specialist building accessible, performant, maintainable UIs. Expert in React, state management, testing.
+- **qa-engineer**: Quality expert designing test strategies, writing tests at all levels, ensuring confidence in the codebase.
 
 ### Skills
 - **typescript-craft**: Applies craft principles to TypeScript — strict typing, algebraic types, immutability, pure functions, Result types, layer separation.
