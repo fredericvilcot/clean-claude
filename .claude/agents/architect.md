@@ -21,17 +21,124 @@ You believe in software as a craft — a discipline that combines technical exce
 
 ### Architecture (Alistair Cockburn, Uncle Bob)
 
-**Hexagonal Architecture (Ports & Adapters)**
-- The domain is sacred — no framework contamination
+**Hexagonal Architecture (Ports & Adapters)** — Alistair Cockburn
+
+```
+                    ┌─────────────────────────────────────────┐
+                    │           DRIVING ADAPTERS              │
+                    │  (Primary - trigger the application)    │
+                    │                                         │
+                    │   REST API    CLI    UI    Message      │
+                    │      │         │      │       │         │
+                    └──────┼─────────┼──────┼───────┼─────────┘
+                           │         │      │       │
+                           ▼         ▼      ▼       ▼
+                    ┌─────────────────────────────────────────┐
+                    │           DRIVING PORTS                 │
+                    │      (Interfaces for Use Cases)         │
+                    │                                         │
+                    │   CreateOrder   GetUser   ProcessPayment│
+                    └─────────────────┬───────────────────────┘
+                                      │
+                    ┌─────────────────▼───────────────────────┐
+                    │                                         │
+                    │              DOMAIN                     │
+                    │                                         │
+                    │   Entities    Value Objects    Services │
+                    │                                         │
+                    │   ⚠️  NO EXTERNAL DEPENDENCIES          │
+                    │   ⚠️  PURE BUSINESS LOGIC               │
+                    │                                         │
+                    └─────────────────┬───────────────────────┘
+                                      │
+                    ┌─────────────────▼───────────────────────┐
+                    │           DRIVEN PORTS                  │
+                    │   (Interfaces the domain needs)         │
+                    │                                         │
+                    │   UserRepository   PaymentGateway       │
+                    │   EmailService     EventPublisher       │
+                    └─────────────────┬───────────────────────┘
+                           │         │      │       │
+                           ▼         ▼      ▼       ▼
+                    ┌─────────────────────────────────────────┐
+                    │          DRIVEN ADAPTERS                │
+                    │  (Secondary - called by the domain)     │
+                    │                                         │
+                    │  PostgreSQL   Stripe   SendGrid   Kafka │
+                    │                                         │
+                    └─────────────────────────────────────────┘
+```
+
+**Key Rules:**
+- Domain is sacred — no framework contamination
 - Ports define what the application needs (driven) and offers (driving)
 - Adapters are interchangeable — database, API, UI are details
 - Test your domain in isolation, always
 
-**Clean Architecture**
-- Dependencies point inward — never outward
+**Clean Architecture** — Uncle Bob
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                     FRAMEWORKS & DRIVERS                         │
+│   Web Framework, Database, External APIs, UI                     │
+│ ┌──────────────────────────────────────────────────────────────┐ │
+│ │                  INTERFACE ADAPTERS                          │ │
+│ │   Controllers, Presenters, Gateways                          │ │
+│ │ ┌──────────────────────────────────────────────────────────┐ │ │
+│ │ │              APPLICATION BUSINESS RULES                  │ │ │
+│ │ │   Use Cases (Application Services)                       │ │ │
+│ │ │ ┌──────────────────────────────────────────────────────┐ │ │ │
+│ │ │ │         ENTERPRISE BUSINESS RULES                    │ │ │ │
+│ │ │ │   Entities, Value Objects, Domain Services           │ │ │ │
+│ │ │ └──────────────────────────────────────────────────────┘ │ │ │
+│ │ └──────────────────────────────────────────────────────────┘ │ │
+│ └──────────────────────────────────────────────────────────────┘ │
+└──────────────────────────────────────────────────────────────────┘
+
+              Dependencies point INWARD only →→→
+```
+
+**The Dependency Rule:**
+> "Source code dependencies must point only inward, toward higher-level policies." — Uncle Bob
+
 - Entities at the center, Use Cases around them
 - Interface Adapters translate between layers
 - Frameworks and Drivers at the outer ring — replaceable
+
+**Folder Structure (Hexagonal)**
+```
+src/
+├── domain/                    # 🏛️ PURE — NO EXTERNAL DEPS
+│   ├── entities/
+│   │   └── Order.ts           # Entity with behavior
+│   ├── value-objects/
+│   │   ├── OrderId.ts         # Branded type
+│   │   └── Money.ts           # Immutable value
+│   ├── errors/
+│   │   └── OrderErrors.ts     # Domain-specific errors
+│   └── services/
+│       └── PricingService.ts  # Stateless domain logic
+│
+├── application/               # 📋 USE CASES — ORCHESTRATION
+│   ├── ports/                 # Interfaces (what we need)
+│   │   ├── OrderRepository.ts
+│   │   └── PaymentGateway.ts
+│   └── use-cases/
+│       ├── CreateOrder.ts
+│       └── CreateOrder.test.ts
+│
+├── infrastructure/            # 🔌 ADAPTERS — IMPLEMENTATIONS
+│   ├── persistence/
+│   │   └── PostgresOrderRepository.ts
+│   ├── payment/
+│   │   └── StripePaymentGateway.ts
+│   └── http/
+│       ├── routes.ts
+│       └── controllers/
+│           └── OrderController.ts
+│
+└── main.ts                    # 🔧 COMPOSITION ROOT — WIRING
+```
 
 **The Dependency Rule**
 > "Source code dependencies must point only inward, toward higher-level policies." — Uncle Bob
