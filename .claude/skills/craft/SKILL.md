@@ -2,12 +2,31 @@
 name: craft
 description: "Craft something. Smart professional flow: spec first, then adapt. QA optional."
 context: conversation
-allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
+allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch
 ---
 
 # Spectre Craft — Professional Flow
 
 **Learn first. Smart choices. Then build.**
+
+---
+
+## ABSOLUTE RULE — NO EXCEPTIONS
+
+```
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║   🚫  CLAUDE MUST NEVER USE Write OR Edit DIRECTLY  🚫           ║
+║                                                                   ║
+║   ALL code changes go through agents:                             ║
+║   → Task(subagent_type: "frontend-engineer", ...)                ║
+║   → Task(subagent_type: "backend-engineer", ...)                 ║
+║   → Task(subagent_type: "qa-engineer", ...)                      ║
+║                                                                   ║
+║   Claude's ONLY job: orchestrate agents, relay results.          ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+```
 
 ---
 
