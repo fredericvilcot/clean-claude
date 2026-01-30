@@ -214,43 +214,56 @@ The agents debug themselves.
 
 ---
 
-## 🧠 Adaptive — Learns YOUR Codebase
+## 🧠 Adaptive — Real-Time CRAFT Guardian
 
 <table>
 <tr>
 <td width="300">
 
-**Not generic. Personal.**
+**Always watching. Always learning.**
 
-Spectre scans your code and learns:
+The Learning Agent monitors your code **in real-time**:
 
-- 📁 Your folder structure
-- 📝 Your naming conventions
-- 🎨 Your patterns
-- ⚠️ Your anti-patterns (to avoid)
+- 👁️ Watches every code change
+- 🔴 Detects CRAFT violations instantly
+- 🏗️ Triggers Architect immediately
+- 💬 Prompts you for approval
 
-Then **enforces them everywhere**.
+**Auto-learning is ON by default.**
 
 </td>
 <td>
 
 ```
-> /learn
+Code saved...
 
-📦 Stack: TypeScript + React + Vitest
-📐 Pattern: Feature folders
-📐 Pattern: Result<T, E> for errors
-📐 Pattern: Colocated tests
+⚠️ CRAFT VIOLATION DETECTED
 
-⚠️ Violation: 5x 'any' found
-⚠️ Violation: 2x throw in domain
+File: src/api/client.ts:45
+Issue: `any` type found
 
-🏗️ Architect → Refactoring plan...
+🏗️ Architect suggests:
+Replace `data: any` with `ApiResponse<T>`
+
+[ 💜 Fix now ]  [ ⏭️ Later ]
 ```
 
 </td>
 </tr>
 </table>
+
+### What Gets Watched
+
+| 🔴 Critical | 🟠 Warning | 🟡 Smells |
+|-------------|------------|-----------|
+| `any` types | God class (>300 lines) | Feature Envy |
+| `throw` in domain | Long methods (>20 lines) | Data Clumps |
+| Framework in domain | Long params (>4) | Primitive Obsession |
+| No tests for business | Poor naming | Shotgun Surgery |
+| Dependency Rule violation | Missing strict mode | |
+| Hidden coupling | | |
+
+**+ All SOLID principles monitored.**
 
 ---
 
@@ -320,25 +333,28 @@ Something broken? Spectre relaunches agents to fix it.
 
 ---
 
-## `/learn` — Adapts to YOU
+## `/learn` — Real-Time Guardian
 
-Spectre learns your codebase:
+**Auto-learning is ON by default.** The Learning Agent watches your code continuously.
 
-- Your folder structure
-- Your naming conventions
-- Your patterns
+```bash
+/learn              # Force re-scan now
+/learn --off        # Disable auto-learning (not recommended)
+/learn --from <x>   # Learn from external source (repo, folder, URL)
+```
 
-Then enforces them. Everywhere.
+When violations are detected:
 
 ```
-> /learn
+⚠️ CRAFT violation in src/services/auth.ts
 
-📦 Detected: TypeScript + React + Vitest
-📐 Patterns: Feature folders, Result types
-⚠️ Found: 5x 'any' types
+🏗️ Architect proposes fix:
+   Replace `throw new Error` with `Result<User, AuthError>`
 
-🏗️ Architect proposes refactoring plan...
+[ 💜 Approve & Fix ]  [ ⏭️ Later ]
 ```
+
+**Violation → Architect → User approval → Dev fixes → QA verifies**
 
 ---
 
