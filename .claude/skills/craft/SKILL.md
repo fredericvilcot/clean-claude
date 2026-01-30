@@ -1,13 +1,13 @@
 ---
 name: craft
-description: "Craft something. Smart professional flow: spec first, then adapt. ALL agents ALWAYS run."
+description: "Craft something. Smart professional flow: spec first, then adapt. QA optional."
 context: conversation
 allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 ---
 
 # Spectre Craft — Professional Flow
 
-**Spec first. Always ask. All agents run.**
+**Spec first. Always ask. QA optional.**
 
 ---
 
@@ -32,16 +32,16 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 │   │ Q1: "What do you   │  │ Q1: Stack?     │                   │
 │   │ want to do?"       │  └───────┬────────┘                   │
 │   │                    │          │                             │
-│   │ • 💜 Crafter       │          ▼                             │
-│   │   l'existant       │  ┌────────────────┐                   │
+│   │ • 💜 Craft the     │          ▼                             │
+│   │   existing         │  ┌────────────────┐                   │
 │   │ • ✨ New feature   │  │ Q2: Spec?      │                   │
 │   │ • 🐛 Bug fix       │  └───────┬────────┘                   │
 │   └────────┬───────────┘          │                             │
 │            │                      │                             │
 │   ┌────────┴────────┐             │                             │
 │   │                 │             │                             │
-│  CRAFTER         OTHER            │                             │
-│ L'EXISTANT         │              │                             │
+│  CRAFT THE       OTHER            │                             │
+│  EXISTING          │              │                             │
 │   │                │              │                             │
 │   │                ▼              │                             │
 │   │         ┌──────────────┐      │                             │
@@ -69,6 +69,11 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 │                       │                                          │
 │                       ▼                                          │
 │                ┌──────────┐                                     │
+│                │ Learning │ → Stack detection + skill injection │
+│                └────┬─────┘                                     │
+│                     │                                            │
+│                     ▼                                            │
+│                ┌──────────┐                                     │
 │                │ Architect│ → design-vN.md                      │
 │                └────┬─────┘   (CRAFT patterns)                  │
 │                     │                                            │
@@ -78,9 +83,23 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 │                └────┬─────┘                                     │
 │                     │                                            │
 │                     ▼                                            │
-│                ┌──────────┐                                     │
-│                │    QA    │ → Regression tests                  │
-│                └──────────┘   (ensure nothing broke)            │
+│              Q: "Want QA?"                                       │
+│                     │                                            │
+│            ┌────────┴────────┐                                  │
+│            │                 │                                  │
+│           YES               NO                                   │
+│            │                 │                                  │
+│            ▼                 ▼                                  │
+│      ┌──────────┐         DONE                                  │
+│      │    QA    │ (optional)                                    │
+│      └────┬─────┘                                               │
+│           │                                                      │
+│           ▼                                                      │
+│     Q: "Same repo?"                                              │
+│           │                                                      │
+│      ┌────┴────┐                                                │
+│      │         │                                                │
+│     YES       NO → Push to different repo                       │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -899,11 +918,49 @@ Task(
 
 ---
 
-## Step 6: Dev + QA — PARALLEL + AUTONOMOUS FIXING LOOP
+## Step 6: Dev + QA — AUTONOMOUS FIXING LOOP
 
 **THE LOOP NEVER STOPS UNTIL EVERYTHING IS GREEN.**
 
-### Ask Test Type First
+### Step 6.1: Ask if QA is Wanted (Optional)
+
+```
+AskUserQuestion(
+  questions: [{
+    question: "🧪 Do you want QA tests (E2E/Integration)?",
+    header: "QA",
+    options: [
+      { label: "✅ Yes, with QA", description: "E2E or Integration tests (Recommended)" },
+      { label: "⏭️ No, skip QA", description: "Only Dev with unit tests" }
+    ]
+  }]
+)
+```
+
+### If "Skip QA" → Dev Only
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    DEV ONLY (NO QA)                              │
+│                                                                  │
+│   Dev implements + Unit tests (BDD colocated)                    │
+│        │                                                         │
+│        ▼                                                         │
+│   Unit tests pass?                                               │
+│        │                                                         │
+│   ┌────┴────┐                                                   │
+│   │         │                                                   │
+│  YES       NO                                                    │
+│   │         │                                                   │
+│   ▼         ▼                                                   │
+│  DONE    Dev fixes (loop)                                        │
+│                                                                  │
+│   ⚠️ No E2E/Integration coverage                                 │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### If "Yes, with QA" → Ask Test Type
 
 ```
 AskUserQuestion(
@@ -918,7 +975,94 @@ AskUserQuestion(
 )
 ```
 
-### Launch Dev + QA in Parallel
+### Step 6.2: Ask Test Repository (Optional)
+
+```
+AskUserQuestion(
+  questions: [{
+    question: "📁 Where should QA tests be stored?",
+    header: "Repo",
+    options: [
+      { label: "📦 Same repo", description: "Tests in current project (Recommended)" },
+      { label: "🔗 Different repo", description: "Push tests to a separate repository" }
+    ]
+  }]
+)
+```
+
+### If "Different repo" → Ask for Remote
+
+```
+AskUserQuestion(
+  questions: [{
+    question: "🔗 What's the test repository URL?",
+    header: "Remote",
+    options: [
+      { label: "📝 I'll provide it", description: "Enter git remote URL" }
+    ]
+  }]
+)
+
+# User provides: git@github.com:org/project-tests.git
+# OR: https://github.com/org/project-tests.git
+```
+
+### Test Repository Configuration
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                 TEST REPOSITORY OPTIONS                          │
+│                                                                  │
+│   Option A: Same Repo (default)                                  │
+│   ─────────────────────────────                                  │
+│   project/                                                       │
+│   ├── src/                                                       │
+│   ├── e2e/              ← Tests here                            │
+│   └── tests/integration/ ← Tests here                           │
+│                                                                  │
+│   Option B: Different Repo                                       │
+│   ────────────────────────                                       │
+│   project/              project-tests/                           │
+│   ├── src/              ├── e2e/                                │
+│   └── ...               ├── integration/                        │
+│                         └── playwright.config.ts                │
+│                                                                  │
+│   QA will:                                                       │
+│   1. Clone test repo to .spectre/test-repo/                     │
+│   2. Write tests there                                           │
+│   3. Commit and push to test remote                              │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### QA with Remote Test Repo
+
+```
+Task(
+  subagent_type: "qa-engineer",
+  prompt: """
+    MODE: E2E/Integration tests
+    TEST REPO: <remote URL>
+
+    ## Setup
+    1. Clone test repo: git clone <remote> .spectre/test-repo/
+    2. Create branch: git checkout -b feat/<feature-name>
+    3. Write tests in .spectre/test-repo/
+
+    ## After Tests Written
+    1. Commit tests
+    2. Push to remote: git push -u origin feat/<feature-name>
+    3. Report: "Tests pushed to <remote> on branch feat/<feature>"
+
+    ## Running Tests
+    Tests point to main project via config:
+    - baseURL in playwright.config.ts
+    - API_URL in integration setup
+  """
+)
+```
+
+### Launch Dev + QA
 
 ```
 # PARALLEL EXECUTION
@@ -1303,19 +1447,31 @@ if retry_count >= max_retries:
 
 | Step | Question | When |
 |------|----------|------|
-| 1 | "Do you have a spec?" | **ALWAYS** |
+| Step | Question | When |
+|------|----------|------|
+| 1 | "Do you have a spec?" | ALWAYS (if not "Craft the existing") |
 | 2a | "Where is it?" | If has spec |
 | 2b | "What do you want?" | If no spec |
 | 3 | "What stack?" | Only if no project |
 | 4 | "Accept spec changes?" | After PO review |
-| 5 | "What type of tests?" | Before QA starts |
+| 5 | "Want QA tests?" | After Dev (OPTIONAL) |
+| 5b | "Same repo or different?" | If QA enabled |
 
 | Agent | Runs | Output |
 |-------|------|--------|
-| PO | **ALWAYS** | `.spectre/specs/functional/spec-vN.md` |
+| PO | If not "Craft the existing" | `.spectre/specs/functional/spec-vN.md` |
+| Learning | **ALWAYS** | `.spectre/context.json`, `stack-skills.json` |
 | Architect | **ALWAYS** | `.spectre/specs/design/design-vN.md` |
 | Dev | **ALWAYS** | Implementation + Unit tests (BDD) |
-| QA | **ALWAYS** | E2E (Playwright) or Integration tests |
+| QA | **OPTIONAL** | E2E or Integration tests |
+
+### QA Options
+
+| Option | Description |
+|--------|-------------|
+| Skip QA | Dev only with unit tests |
+| QA in same repo | Tests in `e2e/` or `tests/integration/` |
+| QA in different repo | Clone, write, push to separate repo |
 
 ### Folder Structure
 
@@ -1328,6 +1484,11 @@ if retry_count >= max_retries:
 └── design/               # Architect's versioned designs
     ├── design-v1.md      # version: 1.0.0, based_on: spec-v2.md
     └── ...
+
+# If QA in different repo:
+.spectre/test-repo/       # Cloned test repository
+├── e2e/
+└── integration/
 ```
 
 ### Golden Rules
@@ -1336,11 +1497,12 @@ if retry_count >= max_retries:
 2. **NEVER MODIFY ORIGINALS** — Always create new version
 3. **HISTORY IS SACRED** — Every version preserved forever
 4. **FRONTMATTER REQUIRED** — version, status, parent, based_on
+5. **QA IS OPTIONAL** — User decides if E2E/Integration needed
 
 | Test Type | Responsibility | Location |
 |-----------|----------------|----------|
 | Unit (BDD) | **Developer** | Colocated `*.test.ts` |
-| E2E | **QA** | `e2e/` (Playwright) |
-| Integration | **QA** | `tests/integration/` |
+| E2E | **QA** (optional) | `e2e/` or separate repo |
+| Integration | **QA** (optional) | `tests/integration/` or separate repo |
 
-**Professional. Smart. Complete.**
+**Professional. Smart. Flexible.**
