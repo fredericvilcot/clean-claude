@@ -202,16 +202,20 @@ ls .spectre/specs/functional/spec-v*.md 2>/dev/null | sort -V | tail -1
 Task(
   subagent_type: "product-owner",
   prompt: """
-    USER PROVIDED SPEC:
-    <spec content>
+    USER PROVIDED SPEC (raw input):
+    <spec content — ANY format: paste, file, Jira, vague idea...>
 
     EXISTING SPECS (if any):
     <list of spec-vN.md files>
 
-    ## Your Job
+    ## MANDATORY STEP 1: Transform to Standard Format
+
+    BEFORE anything else, transform user input into standard format:
+
     1. Create .spectre/specs/functional/ folder
     2. Find latest version N (or 0 if none)
-    3. Save as spec-v(N+1).md with frontmatter:
+    3. TRANSFORM user input into spec-v(N+1).md:
+
        ---
        version: "(N+1).0.0"
        status: draft
@@ -221,17 +225,42 @@ Task(
        feature: <slug>
        ---
 
-    4. REVIEW against CRAFT checklist
-    5. If NOT compliant → Create spec-v(N+2).md (NEVER modify previous)
+       # Spec: [Title]
+
+       > One-line summary
+
+       ## Problem
+       [Extract from user input or ask]
+
+       ## User Story
+       As a [persona], I want [goal], So that [benefit].
+
+       ## Acceptance Criteria
+       ### Happy Path
+       - [ ] Given... When... Then...
+       ### Edge Cases
+       - [ ] Given... When... Then...
+       ### Error Cases
+       - [ ] Given... When... Then...
+
+       ## Business Rules
+       ## Out of Scope
+       ## Changelog
+
+    ## MANDATORY STEP 2: Review for CRAFT Compliance
+
+    Check the TRANSFORMED spec against CRAFT checklist.
+    If NOT compliant → Create spec-v(N+2).md with improvements.
 
     ## IMMUTABILITY RULE
     - NEVER modify any existing spec-vN.md
     - Always create NEW version file
-    - Changelog tracks what changed
 
     ## Output
-    - .spectre/specs/functional/spec-vN.md (latest approved)
+    - .spectre/specs/functional/spec-vN.md (STANDARDIZED, with frontmatter)
     - User validates before Architect starts
+
+    NO RAW USER INPUT GOES TO ARCHITECT. EVER.
   """
 )
 ```

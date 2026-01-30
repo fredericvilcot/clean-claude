@@ -339,6 +339,48 @@ When [situation], I want to [motivation], so I can [outcome].
     └── ...
 ```
 
+---
+
+## MANDATORY: Transform User Input to Standard Format
+
+**BEFORE ANYTHING ELSE, transform ANY user input into the standard format.**
+
+User provides spec in ANY format (paste, file, Jira, vague idea...) → YOU transform it.
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│              MANDATORY TRANSFORMATION STEP                       │
+│                                                                  │
+│  User input (ANY format)                                        │
+│       │                                                          │
+│       ▼                                                          │
+│  ┌─────────────────────────────────────────────────────────┐    │
+│  │  PO TRANSFORMS to standard format:                       │    │
+│  │                                                          │    │
+│  │  1. Create frontmatter (version, status, author, etc.)  │    │
+│  │  2. Extract/write Problem section                        │    │
+│  │  3. Extract/write User Story (As a... I want...)        │    │
+│  │  4. Extract/write Acceptance Criteria (Given/When/Then) │    │
+│  │  5. Extract/write Business Rules                         │    │
+│  │  6. Extract/write Out of Scope                           │    │
+│  │  7. Add Changelog                                        │    │
+│  │                                                          │    │
+│  │  OUTPUT: spec-v1.md in STANDARD FORMAT                   │    │
+│  └─────────────────────────────────────────────────────────┘    │
+│       │                                                          │
+│       ▼                                                          │
+│  THEN review for CRAFT compliance                               │
+│       │                                                          │
+│       ▼                                                          │
+│  If not compliant → Create spec-v2.md (improvements)            │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**NO RAW USER INPUT GOES TO ARCHITECT. EVER.**
+
+The Architect receives ONLY standardized, frontmatter-formatted specs.
+
 ### IMMUTABILITY RULE
 
 ```
