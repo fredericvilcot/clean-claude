@@ -82,11 +82,11 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 ```
 AskUserQuestion(
   questions: [{
-    question: "Do you have a spec or requirements document?",
+    question: "📋 Do you have a spec or requirements?",
     header: "Spec",
     options: [
-      { label: "Yes, I have a spec", description: "File, Jira ticket, URL, or document" },
-      { label: "No, just an idea", description: "I'll describe what I want" }
+      { label: "✅ Yes, I have one", description: "File, Jira, Notion, or I'll paste it" },
+      { label: "💡 No, just an idea", description: "Let's build the spec together" }
     ]
   }]
 )
@@ -99,12 +99,12 @@ AskUserQuestion(
 ```
 AskUserQuestion(
   questions: [{
-    question: "Where is your spec?",
+    question: "📍 Where's the spec?",
     header: "Source",
     options: [
-      { label: "Local file", description: "Path to .md, .yml, or .json file" },
-      { label: "Jira / Linear / GitHub", description: "Ticket URL or ID" },
-      { label: "Paste it", description: "I'll paste the content" }
+      { label: "📁 Local file", description: "I'll give you the path" },
+      { label: "🔗 URL / Ticket", description: "Jira, Linear, GitHub, Notion..." },
+      { label: "📝 Paste it", description: "I'll copy-paste it here" }
     ]
   }]
 )
@@ -122,13 +122,12 @@ Then:
 ```
 AskUserQuestion(
   questions: [{
-    question: "What do you want to build?",
+    question: "🎯 What are we building?",
     header: "Goal",
     options: [
-      { label: "New feature", description: "Build something new" },
-      { label: "Fix a bug", description: "Something is broken" },
-      { label: "Refactor", description: "Improve existing code" },
-      { label: "Other", description: "Something else" }
+      { label: "✨ New feature", description: "Let's create something awesome" },
+      { label: "🐛 Bug fix", description: "Something needs fixing" },
+      { label: "♻️ Refactor", description: "Make existing code better" }
     ]
   }]
 )
@@ -161,13 +160,13 @@ If `ASK_STACK`:
 ```
 AskUserQuestion(
   questions: [{
-    question: "What stack are you using?",
+    question: "🔮 What's your stack?",
     header: "Stack",
     options: [
-      { label: "TypeScript + React", description: "Frontend application" },
-      { label: "TypeScript + Node", description: "Backend API" },
-      { label: "Full-stack TypeScript", description: "Frontend + Backend" },
-      { label: "Go", description: "Backend service" }
+      { label: "⚛️ React + TypeScript", description: "Frontend app" },
+      { label: "🟢 Node + TypeScript", description: "Backend API" },
+      { label: "🔥 Full-stack TS", description: "React + Node monorepo" },
+      { label: "🐹 Go", description: "Backend service" }
     ]
   }]
 )
@@ -287,12 +286,12 @@ Task(
 ```
 AskUserQuestion(
   questions: [{
-    question: "PO found issues. Review the diff and approve?",
-    header: "Diff",
+    question: "🔮 PO improved your spec. Accept changes?",
+    header: "Review",
     options: [
-      { label: "Approve changes", description: "Create spec-v2 and proceed to Architect" },
-      { label: "Reject, keep v1", description: "Use my original spec (may cause issues)" },
-      { label: "Discuss", description: "I have questions about specific changes" }
+      { label: "💜 Accept v2", description: "Looks good, let's roll" },
+      { label: "🚫 Keep v1", description: "Use my original (may cause issues)" },
+      { label: "💬 Discuss", description: "I have questions" }
     ]
   }]
 )
@@ -369,11 +368,11 @@ Task(
 ```
 AskUserQuestion(
   questions: [{
-    question: "Review the spec. Ready to proceed?",
+    question: "🔮 Spec ready. Ship it?",
     header: "Validate",
     options: [
-      { label: "Approve", description: "Spec is good, proceed to Architect" },
-      { label: "Changes needed", description: "I want to modify something" }
+      { label: "💜 Let's go!", description: "Proceed to Architect" },
+      { label: "✏️ Needs tweaks", description: "I want to adjust something" }
     ]
   }]
 )
@@ -484,11 +483,11 @@ Task(
 ```
 AskUserQuestion(
   questions: [{
-    question: "What type of tests should QA write?",
+    question: "🧪 What tests should QA write?",
     header: "Tests",
     options: [
-      { label: "E2E (Playwright)", description: "Full browser tests covering all spec scenarios" },
-      { label: "Integration", description: "API/service boundary tests" }
+      { label: "🎭 E2E (Playwright)", description: "Full browser tests — sees what users see" },
+      { label: "🔌 Integration", description: "API boundaries — fast & focused" }
     ]
   }]
 )
@@ -678,52 +677,79 @@ if retry_count >= max_retries:
 ```
 > /craft
 
-"Do you have a spec?"
-> Yes, I have a spec
+🔮 SPECTRE CRAFT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-"Where is your spec?"
-> Local file
+📋 Do you have a spec or requirements?
+   ▸ ✅ Yes, I have one
+   ▹ 💡 No, just an idea
 
-"File path?"
-> docs/user-auth-spec.md
+> Yes
 
-═══════════════════════════════════════════════════════════════
+📍 Where's the spec?
+   ▸ 📁 Local file
+   ▹ 🔗 URL / Ticket
+   ▹ 📝 Paste it
 
-👤 PO: Validating spec...
+> Local file → docs/user-auth-spec.md
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    💜 PO PHASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+👤 Product Owner analyzing...
    ✓ Objective clear
-   ✓ 5 acceptance criteria
+   ✓ 5 acceptance criteria found
    ⚠️ Missing edge cases → adding
-   📋 spec-v2.md created
+   📋 spec-v2.md drafted
 
-"Accept PO's improvements?"
+🔮 PO improved your spec. Accept changes?
+   ▸ 💜 Accept v2
+   ▹ 🚫 Keep v1
+   ▹ 💬 Discuss
+
 > Accept v2
 
    ✓ .spectre/specs/functional/spec-v2.md approved
 
-🏗️ Architect: Designing...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                 💜 ARCHITECT PHASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏗️ Architect designing...
    ✓ Hexagonal architecture
    ✓ 8 files planned
    ✓ Result<T, E> patterns
-   ✓ .spectre/specs/design/design-v1.md ready (based_on: spec-v2)
+   ✓ design-v1.md ready (based_on: spec-v2)
 
-"What type of tests?"
-> E2E (Playwright)
+🧪 What tests should QA write?
+   ▸ 🎭 E2E (Playwright)
+   ▹ 🔌 Integration
 
-💻 Dev: Implementing...
+> E2E
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+               💜 IMPLEMENTATION PHASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💻 Dev implementing...
    ✓ Domain layer + unit tests (BDD)
    ✓ Application layer + unit tests
    ✓ UI components + unit tests
 
-🧪 QA: E2E Tests (Playwright)...
+🧪 QA writing E2E tests...
    ✓ e2e/ folder created
    ✓ Page Objects ready
-   ✓ happy-path.spec.ts (3 tests)
-   ✓ edge-cases.spec.ts (2 tests)
-   ✓ error-cases.spec.ts (2 tests)
-   ✓ 7/7 E2E tests passing
+   ✓ 7 tests written
+   ✓ Running...
+   ✓ 7/7 passing
    ✓ 100% spec coverage
 
-✨ Done.
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✨ CRAFT COMPLETE
+
+💜 All agents passed. All tests green.
 ```
 
 ---
@@ -733,96 +759,117 @@ if retry_count >= max_retries:
 ```
 > /craft
 
-"Do you have a spec?"
-> No, just an idea
+🔮 SPECTRE CRAFT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-"What do you want to build?"
+📋 Do you have a spec or requirements?
+   ▹ ✅ Yes, I have one
+   ▸ 💡 No, just an idea
+
+> No
+
+🎯 What are we building?
+   ▸ ✨ New feature
+   ▹ 🐛 Bug fix
+   ▹ ♻️ Refactor
+
 > New feature
 
-"Describe it:"
+💬 Describe what you want:
 > User authentication with email/password and OAuth
 
-🔍 Detected: TypeScript + React + Node (monorepo)
+🔍 Auto-detected: TypeScript + React + Node (monorepo)
 
-═══════════════════════════════════════════════════════════════
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                    💜 PO PHASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-👤 PO: Creating spec...
+👤 Product Owner creating spec...
    ✓ Objective defined
    ✓ 7 acceptance criteria
    ✓ Edge cases covered
-   📋 spec-v1.md created
+   📋 spec-v1.md drafted
 
-"Review the spec. Ready to proceed?"
-> Approve
+🔮 Spec ready. Ship it?
+   ▸ 💜 Let's go!
+   ▹ ✏️ Needs tweaks
+
+> Let's go!
 
    ✓ .spectre/specs/functional/spec-v1.md approved
 
-🏗️ Architect: Designing...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+                 💜 ARCHITECT PHASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🏗️ Architect designing...
    ✓ Auth module structure
    ✓ 12 files planned
    ✓ Security patterns
-   ✓ .spectre/specs/design/design-v1.md ready (based_on: spec-v1)
+   ✓ design-v1.md ready (based_on: spec-v1)
 
-"What type of tests?"
-> E2E (Playwright)
+🧪 What tests should QA write?
+   ▸ 🎭 E2E (Playwright)
+   ▹ 🔌 Integration
 
-═══════════════════════════════════════════════════════════════
-                    IMPLEMENTATION PHASE
-═══════════════════════════════════════════════════════════════
+> E2E
 
-💻 Dev: Implementing...
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+               💜 IMPLEMENTATION PHASE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+💻 Dev implementing...
    ✓ Domain layer + unit tests
    ✓ Application layer + unit tests
    ✓ UI components + unit tests
 
-🧪 QA: E2E Tests (Playwright)...
+🧪 QA writing E2E tests...
    ✓ e2e/ folder created
-   ✗ 2 tests failed → .spectre/failures.md
+   ✗ 2 tests failed
 
-═══════════════════════════════════════════════════════════════
-                 AUTONOMOUS FIXING LOOP (1/3)
-═══════════════════════════════════════════════════════════════
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            🔄 SELF-HEALING LOOP (1/3)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📋 Failures detected:
-   - oauth-callback.spec.ts: redirect URL mismatch
-   - login-form.spec.ts: missing error message
+📋 Failures:
+   • oauth-callback.spec.ts → redirect URL mismatch
+   • login-form.spec.ts → missing error message
 
-🔧 Dev: Fixing OAuth callback... (auto)
+🔧 Dev auto-fixing...
    ✓ Fixed redirect URL in AuthService
-
-🔧 Dev: Fixing login error message... (auto)
    ✓ Added error display in LoginForm
 
-🧪 QA: Re-running tests...
+🧪 QA re-running...
    ✗ 1 test still failing
 
-═══════════════════════════════════════════════════════════════
-                 AUTONOMOUS FIXING LOOP (2/3)
-═══════════════════════════════════════════════════════════════
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+            🔄 SELF-HEALING LOOP (2/3)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📋 Remaining failure:
-   - oauth-callback.spec.ts: type error in response
+📋 Remaining:
+   • oauth-callback.spec.ts → type error in response
 
-🏗️ Architect: Fixing type error... (auto)
-   ✓ Updated OAuthResponse type in design.md
+🏗️ Architect auto-fixing type...
+   ✓ Updated OAuthResponse type
 
-🔧 Dev: Re-implementing with new type... (auto)
+🔧 Dev re-implementing...
    ✓ Applied type fix
 
-🧪 QA: Re-running tests...
+🧪 QA re-running...
    ✓ 9/9 E2E tests passing
    ✓ 100% spec coverage
 
-═══════════════════════════════════════════════════════════════
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-✨ CRAFT COMPLETE — All tests green, all agents passed.
+✨ CRAFT COMPLETE
+
+💜 All agents passed. All tests green.
 
 📁 Output:
-   .spectre/specs/functional/spec-v1.md   (functional spec v1.0.0)
-   .spectre/specs/design/design-v2.md     (design v2.0.0, after fix)
-   .spectre/test-coverage.md              (100% coverage)
-   src/features/auth/                     (implementation)
-   e2e/tests/auth/                        (E2E tests)
+   spec-v1.md      functional spec
+   design-v2.md    design (updated after type fix)
+   src/auth/       implementation
+   e2e/auth/       E2E tests
 ```
 
 ---
