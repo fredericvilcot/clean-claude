@@ -46,7 +46,7 @@ banner() {
 }
 
 step() {
-    echo -e "${CYAN}▸${NC} $1"
+    echo -e "${PURPLE}▸${NC} $1"
 }
 
 done_step() {
@@ -144,19 +144,19 @@ main() {
 
     # Success
     echo ""
-    echo -e "${GREEN}┌─────────────────────────────────────────────────────────┐${NC}"
-    echo -e "${GREEN}│${NC}                                                         ${GREEN}│${NC}"
-    echo -e "${GREEN}│${NC}   ${WHITE}${BOLD}Installation complete!${NC}                              ${GREEN}│${NC}"
-    echo -e "${GREEN}│${NC}                                                         ${GREEN}│${NC}"
-    echo -e "${GREEN}│${NC}   ${DIM}Restart Claude Code, then type:${NC}                    ${GREEN}│${NC}"
-    echo -e "${GREEN}│${NC}                                                         ${GREEN}│${NC}"
-    echo -e "${GREEN}│${NC}   ${CYAN}/craft${NC}  ${DIM}→${NC} Build with your AI dev team              ${GREEN}│${NC}"
-    echo -e "${GREEN}│${NC}   ${CYAN}/heal${NC}   ${DIM}→${NC} Auto-fix issues with smart routing       ${GREEN}│${NC}"
-    echo -e "${GREEN}│${NC}   ${CYAN}/learn${NC}  ${DIM}→${NC} Adapt to your codebase patterns          ${GREEN}│${NC}"
-    echo -e "${GREEN}│${NC}                                                         ${GREEN}│${NC}"
-    echo -e "${GREEN}└─────────────────────────────────────────────────────────┘${NC}"
+    echo -e "${PURPLE}┌─────────────────────────────────────────────────────────┐${NC}"
+    echo -e "${PURPLE}│${NC}                                                         ${PURPLE}│${NC}"
+    echo -e "${PURPLE}│${NC}   ${WHITE}${BOLD}Installation complete!${NC}                              ${PURPLE}│${NC}"
+    echo -e "${PURPLE}│${NC}                                                         ${PURPLE}│${NC}"
+    echo -e "${PURPLE}│${NC}   ${DIM}Restart Claude Code, then type:${NC}                    ${PURPLE}│${NC}"
+    echo -e "${PURPLE}│${NC}                                                         ${PURPLE}│${NC}"
+    echo -e "${PURPLE}│${NC}   ${WHITE}/craft${NC}  ${DIM}→${NC} Build with your AI dev team              ${PURPLE}│${NC}"
+    echo -e "${PURPLE}│${NC}   ${WHITE}/heal${NC}   ${DIM}→${NC} Auto-fix issues with smart routing       ${PURPLE}│${NC}"
+    echo -e "${PURPLE}│${NC}   ${WHITE}/learn${NC}  ${DIM}→${NC} Adapt to your codebase patterns          ${PURPLE}│${NC}"
+    echo -e "${PURPLE}│${NC}                                                         ${PURPLE}│${NC}"
+    echo -e "${PURPLE}└─────────────────────────────────────────────────────────┘${NC}"
     echo ""
-    echo -e "${DIM}   Kent Beck • Uncle Bob • Martin Fowler • Eric Evans${NC}"
+    echo -e "${PURPLE}   Kent Beck • Uncle Bob • Martin Fowler • Eric Evans${NC}"
     echo -e "${DIM}   The craft masters are now in your terminal.${NC}"
     echo ""
 }
