@@ -32,12 +32,32 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, AskUserQuestion
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
-## STEP 2: Ask User
+## STEP 2: IMMEDIATELY spawn learning-agent
+
+**BEFORE asking user anything, detect the stack:**
+
+```
+Task(
+  subagent_type: "learning-agent",
+  prompt: "Detect stack and generate skills for this project. Output detected libraries."
+)
+```
+
+**DO NOT:**
+- ❌ Use Explore agent
+- ❌ Read files directly
+- ❌ Ask user before learning
+
+**WAIT for learning-agent to complete.**
+
+## STEP 3: Ask User (with stack context)
+
+After learning-agent returns detected stack, ask:
 
 ```json
 {
   "questions": [{
-    "question": "What do you want to craft?",
+    "question": "Stack detected: [STACK]. What do you want to craft?",
     "header": "Craft",
     "multiSelect": false,
     "options": [
@@ -66,29 +86,6 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, AskUserQuestion
     ]
   }]
 }
-```
-
-## STEP 3: MANDATORY — Spawn learning-agent FIRST
-
-```
-╔═══════════════════════════════════════════════════════════════════╗
-║                                                                   ║
-║   🚨 BEFORE ANY OTHER ACTION, SPAWN learning-agent 🚨            ║
-║                                                                   ║
-║   DO NOT use Explore agent.                                       ║
-║   DO NOT read files directly.                                     ║
-║   DO NOT scan the codebase yourself.                              ║
-║                                                                   ║
-║   ALWAYS spawn learning-agent FIRST:                              ║
-║                                                                   ║
-║   Task(                                                           ║
-║     subagent_type: "learning-agent",                              ║
-║     prompt: "Detect stack and generate skills for this project"  ║
-║   )                                                               ║
-║                                                                   ║
-║   WAIT for learning-agent to complete before continuing.          ║
-║                                                                   ║
-╚═══════════════════════════════════════════════════════════════════╝
 ```
 
 ## STEP 4: Handle Response
@@ -163,21 +160,19 @@ Then use AskUserQuestion again with the same options.
 
 ## AGENT ROUTING
 
-**Order matters. learning-agent ALWAYS runs first.**
+**learning-agent already ran in STEP 2. Now route based on user choice:**
 
-| Order | Agent | Task |
-|-------|-------|------|
-| **1st** | `learning-agent` | Detect stack, generate skills (MANDATORY) |
-| 2nd | `product-owner` | Functional spec (if new feature) |
-| 3rd | `architect` | Technical design / refacto plan |
-| 4th | `frontend-engineer` | UI code + unit tests |
-| 4th | `backend-engineer` | API code + unit tests |
-| 5th | `qa-engineer` | E2E / integration tests |
+| User Choice | Agents (in order) |
+|-------------|-------------------|
+| **New feature** | product-owner → architect → dev(s) → qa |
+| **Refactor** | architect → dev(s) → qa (regression) |
+| **Fix bug** | architect → dev → qa |
+| **Add tests** | qa (E2E) or dev (unit) |
 
 **RULES:**
-- NEVER use Explore agent — use learning-agent
+- NEVER use Explore agent
 - NEVER write code directly — spawn dev agents
-- NEVER skip learning-agent
+- NEVER skip the agent chain
 
 ---
 
