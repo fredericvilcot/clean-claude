@@ -38,68 +38,58 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 │   │ • 🐛 Bug fix       │  └───────┬────────┘                   │
 │   └────────┬───────────┘          │                             │
 │            │                      │                             │
-│   ┌────────┴────────┐             │                             │
-│   │                 │             │                             │
-│  CRAFT THE       OTHER            │                             │
-│  EXISTING          │              │                             │
-│   │                │              │                             │
-│   │                ▼              │                             │
-│   │         ┌──────────────┐      │                             │
-│   │         │ Q2: Spec?    │      │                             │
-│   │         └──────┬───────┘      │                             │
-│   │                │              │                             │
-│   │                └──────────────┘                             │
-│   │                       │                                      │
-│   │                       ▼                                      │
-│   │   ════════════════════════════════════════════════════════  │
-│   │   │         FULL CHAIN (WITH PO)                        │   │
-│   │   ════════════════════════════════════════════════════════  │
-│   │                       │                                      │
-│   │                       ▼                                      │
-│   │                ┌──────────┐                                 │
-│   │                │    PO    │ → spec-vN.md                    │
-│   │                └────┬─────┘                                 │
-│   │                     │                                        │
-│   │   ┌─────────────────┘                                       │
-│   │   │                                                          │
-│   │   ▼                                                          │
-│   │   ════════════════════════════════════════════════════════  │
-│   └──►│         CRAFT CHAIN (NO PO)                         │   │
-│       ════════════════════════════════════════════════════════  │
+│            └──────────────────────┘                             │
 │                       │                                          │
 │                       ▼                                          │
-│                ┌──────────┐                                     │
-│                │ Learning │ → Stack detection + skill injection │
-│                └────┬─────┘                                     │
-│                     │                                            │
-│                     ▼                                            │
-│                ┌──────────┐                                     │
-│                │ Architect│ → design-vN.md                      │
-│                └────┬─────┘   (CRAFT patterns)                  │
-│                     │                                            │
-│                     ▼                                            │
-│                ┌──────────┐                                     │
-│                │   Dev    │ → Implementation + Unit tests       │
-│                └────┬─────┘                                     │
-│                     │                                            │
-│                     ▼                                            │
-│              Q: "Want QA?"                                       │
-│                     │                                            │
-│            ┌────────┴────────┐                                  │
-│            │                 │                                  │
-│           YES               NO                                   │
-│            │                 │                                  │
-│            ▼                 ▼                                  │
-│      ┌──────────┐         DONE                                  │
-│      │    QA    │ (optional)                                    │
-│      └────┬─────┘                                               │
-│           │                                                      │
-│           ▼                                                      │
-│     Q: "Same repo?"                                              │
-│           │                                                      │
-│      ┌────┴────┐                                                │
-│      │         │                                                │
-│     YES       NO → Push to different repo                       │
+│   ╔═══════════════════════════════════════════════════════════╗ │
+│   ║              Q: "Want QA tests?" (UPFRONT)                ║ │
+│   ║                                                           ║ │
+│   ║   • ✅ Yes, with QA (E2E or Integration)                 ║ │
+│   ║   • ⏭️ No, Dev only (unit tests)                          ║ │
+│   ║                                                           ║ │
+│   ║   If YES → Q: "Same repo or different?"                   ║ │
+│   ╚═══════════════════════════════════════════════════════════╝ │
+│                       │                                          │
+│            ┌──────────┴──────────┐                              │
+│            │                     │                              │
+│      CRAFT THE              FULL CHAIN                          │
+│      EXISTING               (WITH PO)                           │
+│            │                     │                              │
+│            │                     ▼                              │
+│            │              ┌──────────┐                          │
+│            │              │    PO    │ → spec-vN.md             │
+│            │              └────┬─────┘                          │
+│            │                   │                                 │
+│            └─────────┬─────────┘                                │
+│                      │                                           │
+│                      ▼                                           │
+│               ┌──────────┐                                      │
+│               │ Learning │ → Stack + skills                     │
+│               └────┬─────┘                                      │
+│                    │                                             │
+│                    ▼                                             │
+│               ┌──────────┐                                      │
+│               │ Architect│ → design-vN.md                       │
+│               └────┬─────┘                                      │
+│                    │                                             │
+│                    ▼                                             │
+│          ┌─────────┴─────────┐                                  │
+│          │                   │                                  │
+│       QA_ENABLED         QA_DISABLED                            │
+│          │                   │                                  │
+│          ▼                   ▼                                  │
+│   ┌──────────────────┐  ┌──────────┐                           │
+│   │  Dev  ║    QA    │  │   Dev    │                           │
+│   │       ║ (parallel)│  │  only    │                           │
+│   └───────╨──────────┘  └────┬─────┘                           │
+│          │                   │                                  │
+│          └─────────┬─────────┘                                  │
+│                    │                                             │
+│                    ▼                                             │
+│              FIXING LOOP                                         │
+│                    │                                             │
+│                    ▼                                             │
+│                  DONE                                            │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -250,6 +240,70 @@ Ask for details (free text):
 💬 Describe what you want to build:
 > [user describes the feature/fix]
 ```
+
+---
+
+## Step 3c: QA Configuration (UPFRONT)
+
+**Ask QA preferences BEFORE launching the chain. This enables Dev + QA in parallel.**
+
+```
+AskUserQuestion(
+  questions: [{
+    question: "🧪 Do you want QA tests (E2E/Integration)?",
+    header: "QA",
+    options: [
+      { label: "✅ Yes, with QA", description: "E2E or Integration tests (Recommended)" },
+      { label: "⏭️ No, Dev only", description: "Unit tests only (colocated)" }
+    ]
+  }]
+)
+```
+
+### If "Yes, with QA" → Ask Test Type + Repo
+
+```
+AskUserQuestion(
+  questions: [
+    {
+      question: "🧪 What type of tests?",
+      header: "Tests",
+      options: [
+        { label: "🎭 E2E (Playwright)", description: "Full browser tests" },
+        { label: "🔌 Integration", description: "API boundary tests" }
+      ]
+    },
+    {
+      question: "📁 Where to store tests?",
+      header: "Repo",
+      options: [
+        { label: "📦 Same repo", description: "e2e/ or tests/integration/" },
+        { label: "🔗 Different repo", description: "Separate test repository" }
+      ]
+    }
+  ]
+)
+```
+
+### If "Different repo" → Ask for Remote URL
+
+```
+# User provides git remote URL
+# Example: git@github.com:org/project-tests.git
+```
+
+### Store QA Config
+
+```
+QA_CONFIG = {
+  enabled: true | false,
+  type: "e2e" | "integration",
+  repo: "same" | "different",
+  remote_url: "<url>" | null
+}
+```
+
+**This config is used in Step 6 to launch Dev + QA in parallel (if enabled).**
 
 ---
 
@@ -918,96 +972,111 @@ Task(
 
 ---
 
-## Step 6: Dev + QA — AUTONOMOUS FIXING LOOP
+## Step 6: Dev + QA — PARALLEL EXECUTION + FIXING LOOP
 
-**THE LOOP NEVER STOPS UNTIL EVERYTHING IS GREEN.**
-
-### Step 6.1: Ask if QA is Wanted (Optional)
-
-```
-AskUserQuestion(
-  questions: [{
-    question: "🧪 Do you want QA tests (E2E/Integration)?",
-    header: "QA",
-    options: [
-      { label: "✅ Yes, with QA", description: "E2E or Integration tests (Recommended)" },
-      { label: "⏭️ No, skip QA", description: "Only Dev with unit tests" }
-    ]
-  }]
-)
-```
-
-### If "Skip QA" → Dev Only
+**QA config was set in Step 3c. Now execute based on that config.**
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    DEV ONLY (NO QA)                              │
+│                    STEP 6: IMPLEMENTATION                        │
 │                                                                  │
-│   Dev implements + Unit tests (BDD colocated)                    │
-│        │                                                         │
-│        ▼                                                         │
-│   Unit tests pass?                                               │
+│   QA_CONFIG from Step 3c                                         │
 │        │                                                         │
 │   ┌────┴────┐                                                   │
 │   │         │                                                   │
-│  YES       NO                                                    │
+│  ENABLED   DISABLED                                              │
 │   │         │                                                   │
 │   ▼         ▼                                                   │
-│  DONE    Dev fixes (loop)                                        │
-│                                                                  │
-│   ⚠️ No E2E/Integration coverage                                 │
+│  ┌─────────────────────────┐  ┌─────────────────────────┐      │
+│  │   DEV    ║      QA      │  │        DEV ONLY         │      │
+│  │          ║   (PARALLEL) │  │                         │      │
+│  │  Code +  ║   E2E or     │  │  Code + Unit tests      │      │
+│  │  Unit    ║   Integration│  │  (BDD colocated)        │      │
+│  │  tests   ║              │  │                         │      │
+│  └────┬─────╨──────┬───────┘  └───────────┬─────────────┘      │
+│       │            │                      │                     │
+│       └──────┬─────┘                      │                     │
+│              │                            │                     │
+│              ▼                            ▼                     │
+│         FIXING LOOP                   FIXING LOOP               │
+│         (Dev + QA)                    (Dev only)                │
+│              │                            │                     │
+│              ▼                            ▼                     │
+│            DONE                         DONE                    │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### If "Yes, with QA" → Ask Test Type
+### Branch A: QA Disabled → Dev Only
 
 ```
-AskUserQuestion(
-  questions: [{
-    question: "🧪 What tests should QA write?",
-    header: "Tests",
-    options: [
-      { label: "🎭 E2E (Playwright)", description: "Full browser tests — sees what users see" },
-      { label: "🔌 Integration", description: "API boundaries — fast & focused" }
-    ]
-  }]
+Task(
+  subagent_type: "frontend-engineer",  # or backend-engineer
+  prompt: """
+    SPEC: .spectre/specs/functional/spec-vN.md
+    DESIGN: .spectre/specs/design/design-vN.md
+
+    ## Your Job
+    Implement EXACTLY what design specifies.
+    CRAFT: strict TS, Result<T,E>, domain isolated.
+
+    ## Unit Tests (BDD)
+    - Colocated *.test.ts next to source
+    - Test domain logic, pure functions
+    - Given-When-Then format
+
+    ## Output
+    - Implementation files
+    - Unit tests (colocated)
+    - .spectre/dev-status.md
+  """
+)
+
+# Run unit tests
+# If failures → Dev fixes (loop)
+# Until all green → DONE
+```
+
+### Branch B: QA Enabled → Dev + QA in Parallel
+
+**PARALLEL EXECUTION: Both agents work simultaneously.**
+
+```
+# PARALLEL — Launch both at the same time
+Task(
+  subagent_type: "frontend-engineer",
+  prompt: """
+    SPEC: .spectre/specs/functional/spec-vN.md
+    DESIGN: .spectre/specs/design/design-vN.md
+
+    Implement + Unit tests (BDD colocated).
+  """
+)
+
+Task(
+  subagent_type: "qa-engineer",
+  prompt: """
+    MODE: <QA_CONFIG.type>  # e2e or integration
+    SPEC: .spectre/specs/functional/spec-vN.md
+    REPO: <QA_CONFIG.repo>  # same or different
+    REMOTE: <QA_CONFIG.remote_url>  # if different repo
+
+    ## If Same Repo
+    Write tests in e2e/ or tests/integration/
+
+    ## If Different Repo
+    1. Clone: git clone <remote> .spectre/test-repo/
+    2. Branch: git checkout -b feat/<feature>
+    3. Write tests in .spectre/test-repo/
+    4. Commit + push to remote
+
+    ## Coverage
+    100% of acceptance criteria from spec.
+  """
 )
 ```
 
-### Step 6.2: Ask Test Repository (Optional)
-
-```
-AskUserQuestion(
-  questions: [{
-    question: "📁 Where should QA tests be stored?",
-    header: "Repo",
-    options: [
-      { label: "📦 Same repo", description: "Tests in current project (Recommended)" },
-      { label: "🔗 Different repo", description: "Push tests to a separate repository" }
-    ]
-  }]
-)
-```
-
-### If "Different repo" → Ask for Remote
-
-```
-AskUserQuestion(
-  questions: [{
-    question: "🔗 What's the test repository URL?",
-    header: "Remote",
-    options: [
-      { label: "📝 I'll provide it", description: "Enter git remote URL" }
-    ]
-  }]
-)
-
-# User provides: git@github.com:org/project-tests.git
-# OR: https://github.com/org/project-tests.git
-```
-
-### Test Repository Configuration
+### Test Repository Options
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -1017,52 +1086,26 @@ AskUserQuestion(
 │   ─────────────────────────────                                  │
 │   project/                                                       │
 │   ├── src/                                                       │
-│   ├── e2e/              ← Tests here                            │
-│   └── tests/integration/ ← Tests here                           │
+│   ├── e2e/              ← E2E tests here                        │
+│   └── tests/integration/ ← Integration tests here               │
 │                                                                  │
 │   Option B: Different Repo                                       │
 │   ────────────────────────                                       │
-│   project/              project-tests/                           │
+│   project/              project-tests/ (cloned)                  │
 │   ├── src/              ├── e2e/                                │
 │   └── ...               ├── integration/                        │
 │                         └── playwright.config.ts                │
 │                                                                  │
-│   QA will:                                                       │
-│   1. Clone test repo to .spectre/test-repo/                     │
-│   2. Write tests there                                           │
-│   3. Commit and push to test remote                              │
+│   QA workflow for different repo:                                │
+│   1. Clone to .spectre/test-repo/                               │
+│   2. Create feature branch                                       │
+│   3. Write tests                                                 │
+│   4. Commit + push to test remote                                │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### QA with Remote Test Repo
-
-```
-Task(
-  subagent_type: "qa-engineer",
-  prompt: """
-    MODE: E2E/Integration tests
-    TEST REPO: <remote URL>
-
-    ## Setup
-    1. Clone test repo: git clone <remote> .spectre/test-repo/
-    2. Create branch: git checkout -b feat/<feature-name>
-    3. Write tests in .spectre/test-repo/
-
-    ## After Tests Written
-    1. Commit tests
-    2. Push to remote: git push -u origin feat/<feature-name>
-    3. Report: "Tests pushed to <remote> on branch feat/<feature>"
-
-    ## Running Tests
-    Tests point to main project via config:
-    - baseURL in playwright.config.ts
-    - API_URL in integration setup
-  """
-)
-```
-
-### Launch Dev + QA
+### After Parallel Execution → Fixing Loop
 
 ```
 # PARALLEL EXECUTION
@@ -1449,13 +1492,14 @@ if retry_count >= max_retries:
 |------|----------|------|
 | Step | Question | When |
 |------|----------|------|
-| 1 | "Do you have a spec?" | ALWAYS (if not "Craft the existing") |
-| 2a | "Where is it?" | If has spec |
-| 2b | "What do you want?" | If no spec |
-| 3 | "What stack?" | Only if no project |
+| 1 | "What do you want to do?" | If project exists |
+| 1b | "What's your stack?" | If no project |
+| 2 | "Do you have a spec?" | If not "Craft the existing" |
+| 3a | "Where is it?" | If has spec |
+| 3b | "Describe what you want" | If no spec |
+| **3c** | **"Want QA tests?"** | **UPFRONT — before chain starts** |
+| 3c+ | "Test type? Same repo?" | If QA enabled |
 | 4 | "Accept spec changes?" | After PO review |
-| 5 | "Want QA tests?" | After Dev (OPTIONAL) |
-| 5b | "Same repo or different?" | If QA enabled |
 
 | Agent | Runs | Output |
 |-------|------|--------|
