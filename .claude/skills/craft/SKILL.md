@@ -7,13 +7,59 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 
 # Spectre Craft — Professional Flow
 
-**Spec first. Always ask. QA optional.**
+**Learn first. Smart choices. Then build.**
+
+---
+
+## The Flow — Learning FIRST, Questions AFTER
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│   /craft                                                         │
+│       │                                                          │
+│       ▼                                                          │
+│   ╔═══════════════════════════════════════════════════════════╗ │
+│   ║  STEP 1: LEARNING (IMMEDIATE)                             ║ │
+│   ║                                                           ║ │
+│   ║  📦 Detecting stack...                                    ║ │
+│   ║     → typescript, react, fp-ts, zustand, zod, vitest     ║ │
+│   ║                                                           ║ │
+│   ║  🏛️ Architect generating library skills...                ║ │
+│   ║     → .spectre/stack-skills.md                           ║ │
+│   ║                                                           ║ │
+│   ╚═══════════════════════════════════════════════════════════╝ │
+│       │                                                          │
+│       ▼                                                          │
+│   ╔═══════════════════════════════════════════════════════════╗ │
+│   ║  STEP 2: SMART CHOICES (based on detected stack)          ║ │
+│   ║                                                           ║ │
+│   ║  "I detected: TypeScript + React + fp-ts + Zustand"       ║ │
+│   ║                                                           ║ │
+│   ║  What do you want to do?                                  ║ │
+│   ║                                                           ║ │
+│   ║  • ✨ New feature (I have a spec or idea)                ║ │
+│   ║  • 🐛 Fix a bug                                          ║ │
+│   ║  • 💜 Improve existing code (CRAFT refactoring)          ║ │
+│   ║      └─ [contextual sub-options based on stack]          ║ │
+│   ║         • Migrate to Result<T,E> with fp-ts              ║ │
+│   ║         • Remove all `any` types                          ║ │
+│   ║         • Restructure to hexagonal                        ║ │
+│   ║         • Add missing tests                               ║ │
+│   ║                                                           ║ │
+│   ╚═══════════════════════════════════════════════════════════╝ │
+│       │                                                          │
+│       ▼                                                          │
+│   [Continue based on choice...]                                  │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+**Key insight: We know the stack BEFORE asking questions, so we can propose SMART options.**
 
 ---
 
 ## What The User Sees
-
-**Show the magic. Be explicit at every step.**
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -22,96 +68,152 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 │                                                                  │
 │  ─────────────────────────────────────────────────────────────  │
 │                                                                  │
-│  📦 Detecting project...                                        │
-│     → Found: package.json, tsconfig.json                        │
-│     → Stack: TypeScript + React + Vite                          │
-│                                                                  │
-│  ─────────────────────────────────────────────────────────────  │
-│                                                                  │
-│  ❓ QUESTIONS                                                    │
-│     → What do you want to do?                                   │
-│     → Do you have a spec?                                       │
-│     → Want QA tests?                                            │
-│                                                                  │
-│  ─────────────────────────────────────────────────────────────  │
-│                                                                  │
 │  📚 LEARNING                                                    │
-│     📦 Detecting stack...                                       │
-│        → typescript, react, zustand, zod, fp-ts, vitest        │
-│     🏛️ Architect generating library skills...                   │
-│        → TypeScript: utility types, type guards                 │
-│        → React: hooks, composition                              │
-│        → fp-ts: Option, Either, pipe                            │
-│        → Zustand: stores, selectors                             │
-│        → Zod: schemas, parsing                                  │
-│     ✅ Stack skills ready (.spectre/stack-skills.md)           │
+│                                                                  │
+│  📦 Detecting stack...                                          │
+│     → typescript, react, zustand, zod, fp-ts, vitest           │
+│                                                                  │
+│  🏛️ Architect generating library skills...                      │
+│     → TypeScript: utility types, strict mode                    │
+│     → React: hooks, composition                                 │
+│     → fp-ts: Option, Either, TaskEither, pipe                   │
+│     → Zustand: stores, selectors                                │
+│     → Zod: schemas, safeParse                                   │
+│     → Vitest: describe, expect, mocking                         │
+│                                                                  │
+│  ✅ Stack skills ready                                          │
 │                                                                  │
 │  ─────────────────────────────────────────────────────────────  │
+│                                                                  │
+│  ❓ WHAT DO YOU WANT TO DO?                                     │
+│                                                                  │
+│  I detected: TypeScript + React + fp-ts + Zustand + Zod        │
+│                                                                  │
+│  • ✨ New feature                                               │
+│  • 🐛 Fix a bug                                                 │
+│  • 💜 Improve existing code                                     │
+│      ├─ 🔄 Migrate to Result<T,E> (you have fp-ts!)            │
+│      ├─ 🚫 Remove all `any` types                               │
+│      ├─ 🏛️ Restructure to hexagonal                             │
+│      └─ 🧪 Add missing tests                                    │
+│                                                                  │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                  │
+│  [After choice: QA question, then PO/Architect/Dev flow]       │
 │                                                                  │
 │  📋 PO — Writing functional spec...                             │
-│     → Analyzing requirements...                                  │
-│     → User stories defined                                       │
-│     → Acceptance criteria written                               │
-│     → Writing .spectre/specs/functional/spec-v1.md              │
 │     ✅ Spec ready for review                                    │
 │                                                                  │
-│  ─────────────────────────────────────────────────────────────  │
-│                                                                  │
 │  🏛️ ARCHITECT — Designing implementation...                     │
-│     → Reading CRAFT skills from .spectre/stack-skills.md       │
-│     → Applying hexagonal architecture                           │
-│     → Defining domain boundaries                                │
-│     → Writing .spectre/specs/design/design-v1.md               │
+│     → Using fp-ts skills for error handling                     │
+│     → Using Zustand skills for state                            │
 │     ✅ Technical design ready                                   │
 │                                                                  │
-│  ─────────────────────────────────────────────────────────────  │
-│                                                                  │
 │  ⚡ DEV + QA — Implementing in parallel...                      │
-│                                                                  │
-│     DEV:                                                         │
-│     → Reading design from .spectre/specs/design/design-v1.md   │
-│     → Implementing domain layer...                              │
-│     → Implementing application layer...                         │
-│     → Writing unit tests (BDD colocated)...                     │
 │     ✅ Implementation complete                                  │
-│                                                                  │
-│     QA:                                                          │
-│     → Reading spec from .spectre/specs/functional/spec-v1.md   │
-│     → Writing E2E tests in e2e/...                              │
-│     → Covering all acceptance criteria...                       │
 │     ✅ E2E tests complete                                       │
 │                                                                  │
-│  ─────────────────────────────────────────────────────────────  │
-│                                                                  │
 │  🔄 FIXING LOOP                                                  │
-│     → Running all tests...                                       │
-│     → 2 failures detected                                        │
-│     → Dev fixing cart.test.ts:45...                             │
-│     → Re-running tests...                                        │
 │     ✅ All tests pass                                           │
 │                                                                  │
 │  ─────────────────────────────────────────────────────────────  │
 │                                                                  │
 │  ✅ CRAFT COMPLETE                                              │
 │                                                                  │
-│     📁 Files created:                                           │
-│        .spectre/specs/functional/spec-v1.md                     │
-│        .spectre/specs/design/design-v1.md                       │
-│        src/domain/cart/cart.ts                                  │
-│        src/domain/cart/cart.test.ts                             │
-│        src/application/useAddToCart.ts                          │
-│        e2e/cart.spec.ts                                         │
-│                                                                  │
-│     🧪 Tests: 12 passed, 0 failed                               │
-│                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Each step MUST output its progress explicitly.**
+---
+
+## Step 1: Immediate Learning (NO questions first)
+
+**As soon as `/craft` is called, run Learning Agent.**
+
+```
+Task(
+  subagent_type: "learning-agent",
+  prompt: """
+    DETECT STACK AND GENERATE SKILLS
+
+    1. Read package.json, tsconfig.json, go.mod, etc.
+    2. Extract ALL libraries
+    3. Write .spectre/context.json
+    4. Spawn Architect to generate library skills
+    5. Write .spectre/stack-skills.md
+
+    OUTPUT:
+    "📦 Detecting stack...
+       → <libraries>"
+    "🏛️ Architect generating library skills...
+       → <lib>: <what>"
+    "✅ Stack skills ready"
+
+    Return the detected stack for next step.
+  """
+)
+```
 
 ---
 
-## The Flow
+## Step 2: Smart Contextual Choices
+
+**Based on detected stack, propose intelligent options.**
+
+### If Project Exists (has package.json, src/, etc.)
+
+```
+AskUserQuestion(
+  questions: [{
+    question: "I detected: <STACK>. What do you want to do?",
+    header: "Action",
+    options: [
+      { label: "✨ New feature", description: "Build something new (I have a spec or idea)" },
+      { label: "🐛 Fix a bug", description: "Something is broken" },
+      { label: "💜 Improve existing", description: "CRAFT refactoring (Recommended)" }
+    ]
+  }]
+)
+```
+
+### If "Improve existing" → Contextual Sub-Options
+
+**Options depend on what was detected:**
+
+```
+# If fp-ts detected
+{ label: "🔄 Migrate to Result<T,E>", description: "Use fp-ts Either for error handling" }
+
+# If TypeScript detected
+{ label: "🚫 Remove `any` types", description: "Strict typing everywhere" }
+
+# Always available
+{ label: "🏛️ Restructure to hexagonal", description: "Domain/Application/Infrastructure" }
+{ label: "🧪 Add missing tests", description: "BDD colocated tests" }
+{ label: "✨ Full CRAFT migration", description: "All of the above" }
+```
+
+### If No Project (fresh start)
+
+```
+AskUserQuestion(
+  questions: [{
+    question: "No project detected. What stack?",
+    header: "Stack",
+    options: [
+      { label: "⚛️ React + TypeScript", description: "Frontend app with Vite" },
+      { label: "🟢 Node + TypeScript", description: "Backend API" },
+      { label: "🔥 Full-stack", description: "React + Node monorepo" },
+      { label: "🐹 Go", description: "Backend service" }
+    ]
+  }]
+)
+```
+
+Then run Learning Agent with the chosen stack.
+
+---
+
+## Full Flow Diagram
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -119,77 +221,61 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 │   /craft                                                         │
 │       │                                                          │
 │       ▼                                                          │
+│   ╔═══════════════════════════════════════════════════════════╗ │
+│   ║  1. LEARNING (IMMEDIATE)                                  ║ │
+│   ║     → Detect stack                                        ║ │
+│   ║     → Architect generates library skills                  ║ │
+│   ║     → .spectre/context.json + stack-skills.md            ║ │
+│   ╚═══════════════════════════════════════════════════════════╝ │
+│       │                                                          │
+│       ▼                                                          │
 │   ┌─────────────────────────────────────┐                       │
-│   │  PROJECT EXISTS? (auto-detect)      │                       │
+│   │  2. SMART CHOICES (contextual)      │                       │
+│   │     → Options based on detected stack│                       │
+│   │     → "New feature" / "Bug" / "Improve"                    │
 │   └─────────────────┬───────────────────┘                       │
 │                     │                                            │
-│            ┌────────┴────────┐                                  │
-│            │                 │                                  │
-│           YES               NO                                   │
-│            │                 │                                  │
-│            ▼                 ▼                                  │
-│   ┌────────────────────┐  ┌────────────────┐                   │
-│   │ Q1: "What do you   │  │ Q1: Stack?     │                   │
-│   │ want to do?"       │  └───────┬────────┘                   │
-│   │                    │          │                             │
-│   │ • 💜 Craft the     │          ▼                             │
-│   │   existing         │  ┌────────────────┐                   │
-│   │ • ✨ New feature   │  │ Q2: Spec?      │                   │
-│   │ • 🐛 Bug fix       │  └───────┬────────┘                   │
-│   └────────┬───────────┘          │                             │
-│            │                      │                             │
-│            └──────────────────────┘                             │
-│                       │                                          │
-│                       ▼                                          │
-│   ╔═══════════════════════════════════════════════════════════╗ │
-│   ║              Q: "Want QA tests?" (UPFRONT)                ║ │
-│   ║                                                           ║ │
-│   ║   • ✅ Yes, with QA (E2E or Integration)                 ║ │
-│   ║   • ⏭️ No, Dev only (unit tests)                          ║ │
-│   ║                                                           ║ │
-│   ║   If YES → Q: "Same repo or different?"                   ║ │
-│   ╚═══════════════════════════════════════════════════════════╝ │
-│                       │                                          │
-│            ┌──────────┴──────────┐                              │
-│            │                     │                              │
-│      CRAFT THE              FULL CHAIN                          │
-│      EXISTING               (WITH PO)                           │
-│            │                     │                              │
-│            │                     ▼                              │
-│            │              ┌──────────┐                          │
-│            │              │    PO    │ → spec-vN.md             │
-│            │              └────┬─────┘                          │
-│            │                   │                                 │
-│            └─────────┬─────────┘                                │
-│                      │                                           │
-│                      ▼                                           │
-│               ┌──────────┐                                      │
-│               │ Learning │ → Stack + skills                     │
-│               └────┬─────┘                                      │
-│                    │                                             │
-│                    ▼                                             │
-│               ┌──────────┐                                      │
-│               │ Architect│ → design-vN.md                       │
-│               └────┬─────┘                                      │
-│                    │                                             │
-│                    ▼                                             │
-│          ┌─────────┴─────────┐                                  │
-│          │                   │                                  │
-│       QA_ENABLED         QA_DISABLED                            │
-│          │                   │                                  │
-│          ▼                   ▼                                  │
-│   ┌──────────────────┐  ┌──────────┐                           │
-│   │  Dev  ║    QA    │  │   Dev    │                           │
-│   │       ║ (parallel)│  │  only    │                           │
-│   └───────╨──────────┘  └────┬─────┘                           │
-│          │                   │                                  │
-│          └─────────┬─────────┘                                  │
-│                    │                                             │
-│                    ▼                                             │
-│              FIXING LOOP                                         │
-│                    │                                             │
-│                    ▼                                             │
-│                  DONE                                            │
+│       ┌─────────────┼─────────────┐                             │
+│       │             │             │                             │
+│       ▼             ▼             ▼                             │
+│   NEW FEATURE    BUG FIX     IMPROVE EXISTING                   │
+│       │             │             │                             │
+│       ▼             ▼             │                             │
+│   ┌─────────────────────┐         │                             │
+│   │ 3. QA CONFIG        │         │                             │
+│   │    → E2E? Integration?│        │                             │
+│   │    → Same repo? Remote?│       │                             │
+│   └──────────┬──────────┘         │                             │
+│              │                    │                             │
+│       ┌──────┴──────┐             │                             │
+│       │             │             │                             │
+│       ▼             │             ▼                             │
+│   ┌──────────┐      │      ┌──────────────────┐                │
+│   │    PO    │      │      │ ARCHITECT AUDIT  │                │
+│   │  spec    │      │      │ (refactoring plan)│                │
+│   └────┬─────┘      │      └────────┬─────────┘                │
+│        │            │               │                           │
+│        └──────┬─────┘               │                           │
+│               │                     │                           │
+│               ▼                     ▼                           │
+│        ┌──────────┐          ┌──────────┐                      │
+│        │ ARCHITECT│          │   DEV    │                      │
+│        │  design  │          │  refacto │                      │
+│        └────┬─────┘          └────┬─────┘                      │
+│             │                     │                             │
+│             ▼                     │                             │
+│        ┌──────────┐               │                             │
+│        │ DEV + QA │               │                             │
+│        │ (parallel)│              │                             │
+│        └────┬─────┘               │                             │
+│             │                     │                             │
+│             └──────────┬──────────┘                             │
+│                        │                                         │
+│                        ▼                                         │
+│                  FIXING LOOP                                     │
+│                        │                                         │
+│                        ▼                                         │
+│                      DONE                                        │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
