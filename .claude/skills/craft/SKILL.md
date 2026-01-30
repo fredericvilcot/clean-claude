@@ -13,43 +13,58 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 
 ## CRAFT Rule: Agent Ownership
 
-**CLAUDE NEVER ANSWERS DIRECTLY. Always route to the owning agent.**
+**CLAUDE NEVER ACTS DIRECTLY. Always spawn the owning agent.**
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│  USER QUESTION                        WHO ANSWERS               │
+│                                                                  │
+│  ⚠️  CRITICAL: This applies to QUESTIONS *AND* ACTIONS          │
+│                                                                  │
+│  ─────────────────────────────────────────────────────────────  │
+│  DOMAIN                     AGENT              CLAUDE MUST NOT  │
 │  ─────────────────────────────────────────────────────────────  │
 │                                                                  │
-│  About the spec / user stories        → PO Agent                │
-│  About the design / architecture      → Architect Agent         │
-│  About implementation / code          → Dev Agent               │
-│  About tests / coverage               → QA Agent                │
-│  About stack / libraries              → Learning Agent          │
+│  Spec / user stories        PO Agent           Write specs      │
+│  Design / architecture      Architect Agent    Design systems   │
+│  Implementation / code      Dev Agent          Write/Edit code  │
+│  E2E / Integration tests    QA Agent           Touch e2e/tests/ │
+│  Stack / libraries          Learning Agent     Detect stack     │
 │                                                                  │
-│  WHY: Each agent has CRAFT expertise in their domain.           │
-│  Claude answering directly may miss CRAFT principles.           │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                  │
+│  ❌ CLAUDE MUST NEVER:                                          │
+│     - Use Write/Edit on src/**                                  │
+│     - Use Write/Edit on e2e/** or tests/**                      │
+│     - Answer technical questions directly                       │
+│     - Make architectural decisions                               │
+│                                                                  │
+│  ✅ CLAUDE MUST ALWAYS:                                         │
+│     - Spawn the appropriate agent via Task()                    │
+│     - Let agents do ALL the work                                │
+│     - Only orchestrate and relay results                        │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ### Implementation
 
-When user asks a question during /craft flow:
+**For ANY question OR action during /craft flow:**
 
 ```
-Task(
-  subagent_type: "<owning-agent>",
-  prompt: """
-    USER QUESTION: <question>
+# Question about code?
+Task(subagent_type: "frontend-engineer", prompt: "USER QUESTION: ...")
 
-    CONTEXT: <current phase, relevant files>
+# Need to write code?
+Task(subagent_type: "frontend-engineer", prompt: "IMPLEMENT: ...")
 
-    Answer as the domain expert. Apply CRAFT principles.
-  """
-)
+# Need to update e2e tests?
+Task(subagent_type: "qa-engineer", prompt: "UPDATE TESTS: ...")
+
+# Design decision?
+Task(subagent_type: "architect", prompt: "DESIGN: ...")
 ```
 
-**NEVER let Claude answer functional, technical, or testing questions directly.**
+**NEVER use Read/Write/Edit on source code directly. ALWAYS spawn an agent.**
 
 ---
 
