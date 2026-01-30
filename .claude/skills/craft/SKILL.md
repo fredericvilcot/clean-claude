@@ -35,11 +35,16 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 │                                                                  │
 │  ─────────────────────────────────────────────────────────────  │
 │                                                                  │
-│  📚 LEARNING — Generating CRAFT skills for your stack...       │
-│     → Analyzing React patterns...                               │
-│     → Analyzing Vite configuration...                           │
-│     → Writing .spectre/stack-skills.md                          │
-│     ✅ CRAFT skills ready for Architect and Dev                 │
+│  📚 LEARNING                                                    │
+│     📦 Detecting stack...                                       │
+│        → typescript, react, zustand, zod, fp-ts, vitest        │
+│     🏛️ Architect generating library skills...                   │
+│        → TypeScript: utility types, type guards                 │
+│        → React: hooks, composition                              │
+│        → fp-ts: Option, Either, pipe                            │
+│        → Zustand: stores, selectors                             │
+│        → Zod: schemas, parsing                                  │
+│     ✅ Stack skills ready (.spectre/stack-skills.md)           │
 │                                                                  │
 │  ─────────────────────────────────────────────────────────────  │
 │                                                                  │
@@ -950,24 +955,25 @@ AskUserQuestion(
 **The user MUST see this progress:**
 
 ```
-📚 LEARNING — Generating CRAFT skills for your stack...
+📚 LEARNING
 
-   📦 Detecting project...
-      → Found: package.json, tsconfig.json, vite.config.ts
-      → Stack: TypeScript + React + Vite + Vitest + Zustand + Zod
+📦 Detecting stack...
+   → Found: package.json, tsconfig.json
+   → Libraries: typescript, react, zustand, zod, fp-ts, vitest
 
-   ✍️ Writing CRAFT skills...
-      → React patterns (hooks, composition, state)
-      → Zustand patterns (stores, selectors, actions)
-      → Zod patterns (validation at boundaries)
-      → Testing patterns (BDD, colocated)
-      → Hexagonal structure (domain/application/infrastructure/ui)
+🏛️ Architect generating library skills...
+   → TypeScript: utility types, type guards
+   → React: hooks, composition
+   → fp-ts: Option, Either, pipe, flow
+   → Zustand: stores, selectors
+   → Zod: schemas, parsing
+   → Vitest: describe, expect, mocking
 
-   📁 Output:
-      → .spectre/context.json (stack detected)
-      → .spectre/stack-skills.md (CRAFT skills)
+✅ Stack skills ready
+   → .spectre/context.json
+   → .spectre/stack-skills.md
 
-   ✅ CRAFT skills ready for Architect and Dev
+Architect will use for design.
 ```
 
 ### Learning Agent Task
@@ -976,51 +982,48 @@ AskUserQuestion(
 Task(
   subagent_type: "learning-agent",
   prompt: """
-    GENERATE CRAFT SKILLS FOR STACK
+    DETECT STACK AND GENERATE LIBRARY SKILLS
 
     ## Step 1: Detect Stack
 
-    Check project files:
-    - package.json → dependencies
-    - tsconfig.json → TypeScript config
-    - vite.config.ts, next.config.js → bundler
-    - go.mod, Cargo.toml, pyproject.toml → language
+    Read package.json dependencies.
+    Extract ALL libraries (not just frameworks).
 
-    Write .spectre/context.json with detected stack.
-
-    OUTPUT TO USER:
-    "📦 Detecting project...
-       → Found: <files>
-       → Stack: <detected stack>"
-
-    ## Step 2: Generate CRAFT Skills
-
-    Write .spectre/stack-skills.md with CRAFT-oriented skills.
-    Skills are written AS THE ARCHITECT would write them.
-
-    Include:
-    - TypeScript strict patterns
-    - Framework-specific CRAFT patterns (React, Vue, Node, Go...)
-    - State management patterns (if detected)
-    - Validation patterns (Zod, etc.)
-    - Testing patterns (BDD, colocated)
-    - Hexagonal architecture for this stack
+    Write .spectre/context.json:
+    {
+      "stack": {
+        "language": "typescript",
+        "libraries": ["react", "zustand", "zod", "fp-ts", "vitest", ...]
+      }
+    }
 
     OUTPUT TO USER:
-    "✍️ Writing CRAFT skills...
-       → <framework> patterns
-       → <state> patterns
-       → Testing patterns
-       → Hexagonal structure"
+    "📦 Detecting stack...
+       → Libraries: <list>"
+
+    ## Step 2: Spawn Architect for Skills
+
+    Task(
+      subagent_type: "architect",
+      prompt: "Generate library documentation for: <detected libs>.
+               Write API, patterns, examples for EACH library.
+               Output to .spectre/stack-skills.md.
+               DON'T include CRAFT patterns (you already know them).
+               DON'T analyze existing code (it might be garbage)."
+    )
+
+    OUTPUT TO USER:
+    "🏛️ Architect generating library skills...
+       → <lib1>: <what>
+       → <lib2>: <what>"
 
     ## Step 3: Report Complete
 
     OUTPUT TO USER:
-    "📁 Output:
-       → .spectre/context.json (stack detected)
-       → .spectre/stack-skills.md (CRAFT skills)
+    "✅ Stack skills ready
+       → .spectre/stack-skills.md
 
-     ✅ CRAFT skills ready for Architect and Dev"
+       Architect will use for design."
   """
 )
 ```

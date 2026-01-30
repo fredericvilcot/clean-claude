@@ -1,77 +1,85 @@
 ---
 name: learn
-description: "Re-run stack learning. Generates CRAFT skills for your stack. Use when stack evolved manually."
+description: "Re-run stack detection and skill generation. Use when stack evolved or on first run."
 context: conversation
 allowed-tools: Read, Bash, Glob, Grep, Write, Task
 ---
 
-# Spectre Learn — Re-generate Stack Skills
+# Spectre Learn — Stack Detection & Skill Generation
 
-**Re-run learning when your stack has evolved.**
+**Detect stack. Architect generates library skills. Skills used for design or audit.**
 
 ---
 
 ## When to Use
 
 ```
-/learn    # Re-generate CRAFT skills for current stack
+/learn    # Re-detect stack and regenerate skills
 ```
 
 Use when:
-- Stack changed (added new framework, library)
+- Stack changed (added new library)
 - First time on existing project
 - Skills seem outdated
 
 ---
 
-## What It Does
+## The Flow
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                                                                  │
-│   /learn                                                         │
-│       │                                                          │
-│       ▼                                                          │
+│   /learn (or auto at /craft start)                              │
+│        │                                                         │
+│        ▼                                                         │
 │   ┌─────────────────────────────────────────────────────────┐   │
-│   │  1. DETECT STACK                                         │   │
-│   │     → package.json, tsconfig.json, go.mod, etc.         │   │
+│   │  1. LEARNING AGENT: Detect Stack                         │   │
+│   │     → Read package.json, tsconfig.json, go.mod...       │   │
 │   │     → Write .spectre/context.json                        │   │
 │   └─────────────────────────────────┬───────────────────────┘   │
 │                                     │                            │
 │                                     ▼                            │
 │   ┌─────────────────────────────────────────────────────────┐   │
-│   │  2. GENERATE CRAFT SKILLS                                │   │
-│   │     → Written as Architect would write them             │   │
-│   │     → Write .spectre/stack-skills.md                    │   │
+│   │  2. SPAWN ARCHITECT: Generate Library Skills             │   │
+│   │     → For each detected library                         │   │
+│   │     → Write API, patterns, examples                     │   │
+│   │     → Output: .spectre/stack-skills.md                  │   │
 │   └─────────────────────────────────┬───────────────────────┘   │
 │                                     │                            │
 │                                     ▼                            │
-│                                   DONE                           │
-│   Skills ready for Architect and Dev                            │
+│   ┌─────────────────────────────────────────────────────────┐   │
+│   │  3. SKILLS INJECTED                                      │   │
+│   │     → Architect uses for design (new feature)           │   │
+│   │     → Or for audit (refactoring proposal)               │   │
+│   └─────────────────────────────────────────────────────────┘   │
 │                                                                  │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Automatic During /craft
-
-Learning runs automatically at the start of `/craft`:
+## What Gets Generated
 
 ```
-/craft
-   │
-   ├─ Stack detected or asked
-   │
-   ├─ ══════════════════════════════════
-   │   LEARNING AGENT RUNS AUTOMATICALLY
-   │   → context.json + stack-skills.md
-   │  ══════════════════════════════════
-   │
-   └─ PO → Architect (with skills) → Dev (with skills) → QA
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│   ✅ LIBRARY KNOWLEDGE               ❌ NOT THIS                │
+│   ────────────────────               ──────────                 │
+│                                                                  │
+│   • TypeScript utility types         • CRAFT patterns           │
+│   • fp-ts (Option, Either, pipe)       (Architect knows them)   │
+│   • React hooks API                                              │
+│   • Zustand store patterns           • Existing code patterns   │
+│   • Zod schemas                        (might be garbage)       │
+│   • Tailwind utilities                                          │
+│   • Vitest matchers                                             │
+│   • etc.                                                        │
+│                                                                  │
+│   Written BY Architect,                                         │
+│   FOR Architect and Dev.                                        │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
 ```
-
-**You only need `/learn` to re-run manually if stack changed.**
 
 ---
 
@@ -81,13 +89,17 @@ Learning runs automatically at the start of `/craft`:
 Task(
   subagent_type: "learning-agent",
   prompt: """
-    RE-GENERATE STACK SKILLS
+    DETECT STACK AND GENERATE SKILLS
 
-    1. Detect current stack from project files
-    2. Generate CRAFT-oriented skills for the stack
-    3. Output to .spectre/stack-skills.md
+    1. Detect libraries from package.json
+    2. Write .spectre/context.json
+    3. Spawn Architect to generate library skills
+    4. Skills written to .spectre/stack-skills.md
 
-    Skills will be injected to Architect and Dev.
+    OUTPUT progress to user:
+    - "📦 Detecting stack..."
+    - "🏛️ Architect generating library skills..."
+    - "✅ Stack skills ready"
   """
 )
 ```
@@ -98,24 +110,39 @@ Task(
 
 ```
 .spectre/
-├── context.json        # Detected stack (gitignored)
-└── stack-skills.md     # CRAFT skills (gitignored)
+├── context.json        # Detected libraries (gitignored)
+└── stack-skills.md     # Library documentation (gitignored)
 ```
 
-### .gitignore
+---
 
-On first run, adds to `.gitignore`:
+## Automatic in /craft
+
+Learning runs automatically at `/craft` start:
 
 ```
-# Spectre Agents
-.spectre/
+/craft
+   │
+   ├─ ══════════════════════════════════
+   │   LEARNING (auto)
+   │   → Detect stack
+   │   → Architect generates skills
+   │  ══════════════════════════════════
+   │
+   ├─ PO → spec
+   ├─ Architect → design (uses skills)
+   └─ Dev → implements
 ```
+
+**Use `/learn` only to re-run manually.**
 
 ---
 
 ## Summary
 
-| Command | When |
-|---------|------|
-| `/craft` | Learning runs automatically |
-| `/learn` | Re-run manually if stack evolved |
+| Step | Who | What |
+|------|-----|------|
+| Detect | Learning Agent | Read package.json → context.json |
+| Generate | Architect | Library documentation → stack-skills.md |
+| Use | Architect | Design with library knowledge |
+| Use | Dev | Implement with library knowledge |
