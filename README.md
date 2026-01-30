@@ -2,7 +2,7 @@
   <img src="https://img.shields.io/badge/SPECTRE-AGENTS-blueviolet?style=for-the-badge&logo=ghost&logoColor=white" alt="Spectre Agents"/>
 </p>
 
-<h1 align="center">Not just agents. A craft-driven, self-healing system.</h1>
+<h1 align="center">Stop prompting. Start crafting.</h1>
 
 <p align="center">
   <em>Other agent libs give you tools. Spectre gives you <strong>standards</strong>.<br/>
