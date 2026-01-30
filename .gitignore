@@ -4,5 +4,5 @@
 # Local documentation (not committed)
 .local-docs/
 
-# Local status file
-.spectre-status.md
+# Claude local files (status, architecture, notes)
+.claude/local/
