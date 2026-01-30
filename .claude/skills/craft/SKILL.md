@@ -159,6 +159,117 @@ Task(
 
 **Based on detected stack, propose intelligent options.**
 
+**IMPORTANT: User can ALWAYS express a custom need via "Other".**
+
+### Free Text = Smart Routing
+
+When user types a custom need, interpret and route to the right CRAFT flow:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  USER INPUT                      SMART ROUTING                   │
+│  ───────────────────────────────────────────────────────────────│
+│                                                                  │
+│  "Create e2e regression tests"   → QA Agent (regression mode)   │
+│  "Check my Tailwind is clean"    → Architect Audit (Tailwind)   │
+│  "Add dark mode"                 → Feature flow (PO→Arch→Dev)   │
+│  "Migrate to fp-ts"              → Refactoring (Architect plan) │
+│  "Just write unit tests"         → Dev only (BDD tests)         │
+│  "Review my code quality"        → Architect Audit (full)       │
+│  "Setup CI/CD"                   → Architect (infra design)     │
+│  "I don't know, help me"         → Guided questions             │
+│                                                                  │
+│  ALWAYS RESPECT CRAFT:                                          │
+│  → Hexagonal architecture                                       │
+│  → Result<T, E> for errors                                      │
+│  → Strict TypeScript                                            │
+│  → BDD colocated tests                                          │
+│  → Domain isolation                                             │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Routing Logic
+
+```
+IF user_input contains "test" or "e2e" or "regression":
+   → QA Agent
+   → Mode: e2e | integration | regression
+
+IF user_input contains "review" or "audit" or "check" or "clean":
+   → Architect Audit
+   → Focus: code quality | specific lib (Tailwind, etc.)
+
+IF user_input contains "migrate" or "refactor" or "restructure":
+   → Architect Refactoring Plan
+   → Then Dev implements
+
+IF user_input contains "add" or "create" or "build" or "implement":
+   → Feature Flow
+   → PO (if functional) → Architect → Dev → QA
+
+IF user_input contains "fix" or "bug" or "broken":
+   → Bug Fix Flow
+   → Architect diagnoses → Dev fixes → QA verifies
+
+IF user_input is vague or "help":
+   → Continue with guided questions
+```
+
+### Example: Custom Input Handling
+
+```
+User: "I just want to create e2e regression tests for my app"
+
+Response:
+"Got it! You want regression tests.
+
+📦 Stack detected: React + Vitest + Playwright
+
+I'll launch QA Agent in regression mode:
+→ Analyze existing functionality
+→ Create characterization tests
+→ Cover critical user flows
+
+Where should tests go?
+• 📦 Default (e2e/)
+• 📂 Custom path
+• 🔗 Different repo"
+```
+
+```
+User: "Check my Tailwind code is properly organized"
+
+Response:
+"Got it! Tailwind audit.
+
+🏛️ Architect will review:
+→ Utility class usage
+→ Component consistency
+→ Dark mode patterns
+→ Responsive breakpoints
+→ Custom config
+
+Launching Architect audit..."
+```
+
+```
+User: "I want to add a shopping cart"
+
+Response:
+"Got it! New feature: Shopping Cart.
+
+This needs the full flow:
+→ 📋 PO: Functional spec (user stories)
+→ 🏛️ Architect: Technical design (CRAFT)
+→ ⚡ Dev: Implementation
+→ 🧪 QA: E2E tests
+
+Do you have a spec or should PO create one?"
+```
+
+---
+
 ### If Project Exists (has package.json, src/, etc.)
 
 ```
@@ -167,10 +278,13 @@ AskUserQuestion(
     question: "I detected: <STACK>. What do you want to do?",
     header: "Action",
     options: [
-      { label: "✨ New feature", description: "Build something new (I have a spec or idea)" },
+      { label: "✨ New feature", description: "Build something new" },
       { label: "🐛 Fix a bug", description: "Something is broken" },
-      { label: "💜 Improve existing", description: "CRAFT refactoring (Recommended)" }
+      { label: "💜 Improve existing", description: "CRAFT refactoring" },
+      { label: "🧪 Add tests", description: "E2E, integration, or unit tests" },
+      { label: "🔍 Audit my code", description: "Review quality & patterns" }
     ]
+    // User can ALWAYS type custom need via "Other"
   }]
 )
 ```
@@ -186,10 +300,15 @@ AskUserQuestion(
 # If TypeScript detected
 { label: "🚫 Remove `any` types", description: "Strict typing everywhere" }
 
+# If Tailwind detected
+{ label: "🎨 Clean up Tailwind", description: "Consistent utilities, proper patterns" }
+
 # Always available
 { label: "🏛️ Restructure to hexagonal", description: "Domain/Application/Infrastructure" }
 { label: "🧪 Add missing tests", description: "BDD colocated tests" }
 { label: "✨ Full CRAFT migration", description: "All of the above" }
+
+// User can ALWAYS type custom need via "Other"
 ```
 
 ### If No Project (fresh start)
@@ -205,6 +324,7 @@ AskUserQuestion(
       { label: "🔥 Full-stack", description: "React + Node monorepo" },
       { label: "🐹 Go", description: "Backend service" }
     ]
+    // User can ALWAYS type custom stack via "Other"
   }]
 )
 ```
