@@ -2,17 +2,36 @@
   <img src="https://img.shields.io/badge/SPECTRE-AGENTS-blueviolet?style=for-the-badge&logo=ghost&logoColor=white" alt="Spectre Agents"/>
 </p>
 
-<h1 align="center">Stop prompting. Start crafting.</h1>
+<h1 align="center">Not just agents. A craft-driven, self-healing system.</h1>
 
 <p align="center">
-  <em>Turn Claude Code into a team of Software Craft experts.<br/>Clean architecture. Result types. TDD. Domain-driven.<br/>Production-ready code, crafted together.</em>
+  <em>Other agent libs give you tools. Spectre gives you <strong>standards</strong>.<br/>
+  Clean architecture. Result types. TDD. Domain-driven.<br/>
+  Code that fixes itself. Code that learns YOUR patterns.</em>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Auto--healing-agents%20fix%20bugs-9400D3?style=flat-square" alt="Auto-healing"/>
-  <img src="https://img.shields.io/badge/Auto--learning-adapts%20to%20YOU-8A2BE2?style=flat-square" alt="Auto-learning"/>
-  <img src="https://img.shields.io/badge/Fully%20reactive-errors%20route%20smart-9932CC?style=flat-square" alt="Fully reactive"/>
+  <img src="https://img.shields.io/badge/🛠️_CRAFT-Clean_Code_&_DDD-8A2BE2?style=for-the-badge" alt="Craft"/>
+  <img src="https://img.shields.io/badge/⚡_REACTIVE-Agents_route_errors-9400D3?style=for-the-badge" alt="Reactive"/>
 </p>
+<p align="center">
+  <img src="https://img.shields.io/badge/🔄_SELF--HEALING-Auto--fix_loop-9932CC?style=for-the-badge" alt="Self-healing"/>
+  <img src="https://img.shields.io/badge/🧠_ADAPTIVE-Learns_YOUR_code-8A2BE2?style=for-the-badge" alt="Adaptive"/>
+</p>
+
+---
+
+## Why Spectre is Different
+
+| Other Agent Libs | Spectre |
+|------------------|---------|
+| Agents do tasks | Agents **enforce standards** |
+| You fix the bugs | Agents **fix their own bugs** |
+| Generic output | **Learns YOUR patterns** |
+| No architecture | **Clean Architecture, DDD, Hexagonal** |
+| `any`, `throw`, chaos | **Strict types, Result<T,E>, order** |
+
+**Spectre isn't a tool. It's a philosophy.**
 
 ---
 
