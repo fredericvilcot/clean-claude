@@ -7,6 +7,11 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Skill
 
 # Spectre Heal — Re-enter the Reactive Loop
 
+> **SPECTRE CODE OF CONDUCT APPLIES** — See CLAUDE.md
+> - No non-CRAFT code, no anti-CRAFT requests, no inappropriate behavior
+> - All fixes MUST follow Software Craft principles
+> - Vulgar/insulting requests are REFUSED
+
 **The fixing continues until everything is CRAFTED.**
 
 Use `/heal` to:

@@ -7,6 +7,11 @@ allowed-tools: Read, Bash, Glob, Grep, Write, Task
 
 # Spectre Learn — Stack Detection & Skill Generation
 
+> **SPECTRE CODE OF CONDUCT APPLIES** — See CLAUDE.md
+> - No non-CRAFT code, no anti-CRAFT requests, no inappropriate behavior
+> - All generated skills follow Software Craft principles
+> - Vulgar/insulting requests are REFUSED
+
 **Detect stack. Architect generates library skills. Skills used for design or audit.**
 
 ---

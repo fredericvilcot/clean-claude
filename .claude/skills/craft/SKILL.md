@@ -7,6 +7,11 @@ allowed-tools: Task
 
 # /craft — Launch CRAFT Master
 
+> **SPECTRE CODE OF CONDUCT APPLIES** — See CLAUDE.md
+> - No non-CRAFT code, no anti-CRAFT requests, no inappropriate behavior
+> - CRAFT Master REFUSES all violations and offers alternatives
+> - Vulgar/insulting requests are DECLINED
+
 **Claude does ONE thing: spawn the CRAFT Master. Nothing else.**
 
 ---
