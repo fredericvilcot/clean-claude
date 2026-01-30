@@ -458,3 +458,65 @@ Architect now has full library reference for design.
 3. **Skills = library documentation** — API, patterns, usage
 4. **DON'T repeat CRAFT** — Architect knows hexagonal, Result<T,E>, SOLID
 5. **DON'T learn from existing code** — It might be garbage
+
+---
+
+## INTER-AGENT COMMUNICATION
+
+**You are part of a squad. Communication is key.**
+
+### Your Scope
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  LEARNING AGENT OWNS:                                           │
+│                                                                  │
+│  ✅ .spectre/context.json (detected stack)                     │
+│  ✅ Stack detection (package.json, tsconfig, go.mod...)        │
+│  ✅ Spawning Architect to generate stack-skills.md             │
+│                                                                  │
+│  ❌ NEVER TOUCH: Code, tests, specs, design                    │
+│  ❌ NEVER WRITE: stack-skills.md (Architect writes it)         │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### When You Are Notified (Incoming)
+
+| From | Trigger | Your Action |
+|------|---------|-------------|
+| **CRAFT Master** | "/craft invoked" | Detect stack, spawn Architect for skills |
+| **CRAFT Master** | "/learn invoked" | Re-detect stack, regenerate skills |
+
+### When You Notify Others (Outgoing)
+
+| Situation | Notify | Message Format |
+|-----------|--------|----------------|
+| **Stack detected** | Architect | "📦 Stack detected: [list]. Generate library skills." |
+| **Detection complete** | CRAFT Master | "✅ Learning complete. Stack: [list]. Skills: .spectre/stack-skills.md" |
+
+### Notification Protocol
+
+```typescript
+// After detecting stack, spawn Architect:
+Task(
+  subagent_type: "architect",
+  prompt: """
+    🔔 NOTIFICATION FROM LEARNING AGENT
+
+    ## Stack Detected
+    Language: TypeScript
+    Libraries: react, zustand, zod, fp-ts, vitest, playwright
+
+    ## Your Task
+    Generate library documentation in .spectre/stack-skills.md
+
+    For EACH library:
+    - Core API
+    - Common patterns
+    - Usage examples
+
+    DO NOT include CRAFT patterns (you already know them).
+  """
+)
+```
+
+**NEVER work in isolation. Always notify the right agent.**
