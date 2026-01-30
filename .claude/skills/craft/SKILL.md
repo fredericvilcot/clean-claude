@@ -53,6 +53,48 @@ Task(
 
 ---
 
+## CRAFT Rule: Test Ownership
+
+**STRICT SEPARATION. No exceptions.**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  TEST TYPE              WHO OWNS IT           LOCATION          │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                  │
+│  Unit tests             DEV (front/back)      *.test.ts         │
+│                                               (colocated)       │
+│                                                                  │
+│  E2E tests              QA AGENT ONLY         e2e/              │
+│  Integration tests      QA AGENT ONLY         tests/integration/│
+│                                                                  │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                  │
+│  IF Dev needs to update E2E or Integration:                     │
+│  → MUST spawn QA Agent. NEVER touch directly.                   │
+│                                                                  │
+│  IF QA test fails on Dev code:                                  │
+│  → QA notifies Dev. Dev fixes code. QA re-runs.                 │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Dev Agent Rule
+
+```
+WHEN implementing or fixing code:
+  - Write/update unit tests (*.test.ts colocated) ✅
+  - NEVER touch e2e/ or tests/integration/ ❌
+
+IF e2e/integration needs update:
+  Task(
+    subagent_type: "qa-engineer",
+    prompt: "Update E2E/Integration tests for: <change description>"
+  )
+```
+
+---
+
 ## The Flow — Learning FIRST, Questions AFTER
 
 ```
