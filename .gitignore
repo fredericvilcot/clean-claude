@@ -3,3 +3,6 @@
 
 # Local documentation (not committed)
 .local-docs/
+
+# Local status file
+.spectre-status.md
