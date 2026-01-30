@@ -138,6 +138,122 @@ function getUser(id: string): Result<User, NotFoundError> {
 
 ---
 
+## ⚡ Reactive — Agents Talk to Each Other
+
+<table>
+<tr>
+<td width="120" align="center">
+
+```
+   🔴
+  ERROR
+   │
+   ▼
+```
+
+</td>
+<td>
+
+**Errors don't stop the flow. They route it.**
+
+```
+Test fails     → Dev fixes automatically
+Type error     → Architect redesigns
+Spec unclear   → PO clarifies
+```
+
+No manual intervention. The right agent handles it.
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🔄 Self-Healing — Bugs Fix Themselves
+
+<table>
+<tr>
+<td>
+
+```
+  ┌─────────────────────────────────────┐
+  │                                     │
+  │   QA finds bug                      │
+  │        │                            │
+  │        ▼                            │
+  │   Dev fixes (auto)                  │
+  │        │                            │
+  │        ▼                            │
+  │   QA re-tests                       │
+  │        │                            │
+  │   ┌────┴────┐                       │
+  │   │         │                       │
+  │  ✅ Pass   🔄 Loop (max 3x)         │
+  │                                     │
+  └─────────────────────────────────────┘
+```
+
+</td>
+<td width="300">
+
+**You don't debug AI code.**
+
+The agents debug themselves.
+
+- QA catches the bug
+- Dev fixes without asking
+- QA verifies the fix
+- Loop until green
+
+**Zero human intervention.**
+
+</td>
+</tr>
+</table>
+
+---
+
+## 🧠 Adaptive — Learns YOUR Codebase
+
+<table>
+<tr>
+<td width="300">
+
+**Not generic. Personal.**
+
+Spectre scans your code and learns:
+
+- 📁 Your folder structure
+- 📝 Your naming conventions
+- 🎨 Your patterns
+- ⚠️ Your anti-patterns (to avoid)
+
+Then **enforces them everywhere**.
+
+</td>
+<td>
+
+```
+> /learn
+
+📦 Stack: TypeScript + React + Vitest
+📐 Pattern: Feature folders
+📐 Pattern: Result<T, E> for errors
+📐 Pattern: Colocated tests
+
+⚠️ Violation: 5x 'any' found
+⚠️ Violation: 2x throw in domain
+
+🏗️ Architect → Refactoring plan...
+```
+
+</td>
+</tr>
+</table>
+
+---
+
 ## Three Commands. That's It.
 
 ```bash
