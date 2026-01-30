@@ -265,17 +265,34 @@ Task(
 )
 ```
 
-### After PO Review → User Validation
+### After PO Review → Diff Approval (if major changes)
+
+**If major changes needed, PO generates a diff file first.**
+
+```
+# PO generates diff file
+.spectre/specs/functional/spec-v1-to-v2.diff.md
+
+# Contains:
+# - Summary of changes
+# - 🔴 MISSING (what must be added)
+# - 🟢 ADDED (what PO added)
+# - 🟡 MODIFIED (what changed)
+# - WHY each change (CRAFT reason)
+# - CRAFT compliance table (v1 vs v2)
+```
+
+**Then ask user to approve:**
 
 ```
 AskUserQuestion(
   questions: [{
-    question: "PO reviewed your spec. Accept the changes?",
-    header: "Spec",
+    question: "PO found issues. Review the diff and approve?",
+    header: "Diff",
     options: [
-      { label: "Accept v2", description: "Use PO's improved version" },
-      { label: "Keep v1", description: "Use my original spec as-is" },
-      { label: "Discuss", description: "I have questions" }
+      { label: "Approve changes", description: "Create spec-v2 and proceed to Architect" },
+      { label: "Reject, keep v1", description: "Use my original spec (may cause issues)" },
+      { label: "Discuss", description: "I have questions about specific changes" }
     ]
   }]
 )

@@ -381,6 +381,114 @@ User provides spec in ANY format (paste, file, Jira, vague idea...) → YOU tran
 
 The Architect receives ONLY standardized, frontmatter-formatted specs.
 
+---
+
+## DIFF APPROVAL WORKFLOW
+
+**If significant changes needed → Generate diff → User approves → New version**
+
+```
+User spec transformed to v1.md
+       │
+       ▼
+PO reviews for CRAFT compliance
+       │
+   ┌───┴───┐
+   │       │
+MINOR    MAJOR CHANGES NEEDED
+CHANGES   │
+   │       ▼
+   │   ┌─────────────────────────────────────────────┐
+   │   │ Generate: .spectre/specs/functional/        │
+   │   │           spec-v1-to-v2.diff.md             │
+   │   │                                             │
+   │   │ Contents:                                   │
+   │   │ - Summary of changes                        │
+   │   │ - What's MISSING (red)                      │
+   │   │ - What's ADDED (green)                      │
+   │   │ - What's MODIFIED (yellow)                  │
+   │   │ - WHY each change is needed (CRAFT reason)  │
+   │   └─────────────────────────────────────────────┘
+   │       │
+   │       ▼
+   │   USER APPROVAL REQUIRED
+   │       │
+   │   ┌───┴───┐
+   │   │       │
+   │  APPROVE REJECT
+   │   │       │
+   │   ▼       ▼
+   │ Create   Keep v1
+   │ spec-v2  as-is
+   │   │       │
+   └───┴───────┘
+       │
+       ▼
+   → Architect (latest approved version)
+```
+
+### Diff File Format: spec-vN-to-v(N+1).diff.md
+
+```markdown
+---
+from_version: "1.0.0"
+to_version: "2.0.0"
+change_type: major | minor
+created: YYYY-MM-DD
+---
+
+# Proposed Changes: spec-v1 → spec-v2
+
+## Summary
+[Brief explanation of why changes are needed]
+
+## Changes
+
+### 🔴 MISSING (must add)
+- [ ] User Story incomplete — missing "So that [benefit]"
+- [ ] No edge cases defined
+- [ ] Error scenarios not covered
+
+### 🟢 ADDED
+- [ ] Edge case: empty input validation
+- [ ] Error case: network failure handling
+- [ ] Business rule: rate limiting
+
+### 🟡 MODIFIED
+- [ ] Acceptance criteria: vague → Given/When/Then format
+- [ ] Out of scope: clarified boundaries
+
+## CRAFT Compliance
+
+| Criteria | v1 | v2 |
+|----------|----|----|
+| User Story complete | ❌ | ✅ |
+| Acceptance testable | ❌ | ✅ |
+| Edge cases | ❌ | ✅ |
+| Error scenarios | ❌ | ✅ |
+| No tech details | ✅ | ✅ |
+
+## Decision Required
+
+Do you approve these changes?
+- **APPROVE** → Create spec-v2.md and proceed to Architect
+- **REJECT** → Keep spec-v1.md as-is (may cause issues downstream)
+- **DISCUSS** → Let's talk about specific changes
+```
+
+### When to Generate Diff
+
+| Situation | Action |
+|-----------|--------|
+| Spec is CRAFT-compliant | Approve v1, no diff needed |
+| Minor tweaks (formatting, typos) | Auto-fix, no diff needed |
+| **Missing sections** | DIFF REQUIRED |
+| **Vague acceptance criteria** | DIFF REQUIRED |
+| **No edge/error cases** | DIFF REQUIRED |
+| **Technical details present** | DIFF REQUIRED |
+
+**Rule: If changes affect WHAT gets built → DIFF REQUIRED.**
+
 ### IMMUTABILITY RULE
 
 ```
