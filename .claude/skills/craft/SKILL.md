@@ -37,14 +37,32 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, AskUserQuestion
 ```json
 {
   "questions": [{
-    "question": "What do you want to craft today?",
-    "header": "Goal",
+    "question": "What do you want to craft?",
+    "header": "Craft",
     "multiSelect": false,
     "options": [
-      { "label": "✨ New feature", "description": "Build something new" },
-      { "label": "🔄 Improve existing", "description": "Refactor with CRAFT principles" },
-      { "label": "🐛 Fix a bug", "description": "Fix with proper tests" },
-      { "label": "🧪 Add tests", "description": "E2E or unit test coverage" }
+      { "label": "New feature", "description": "Build something new" },
+      { "label": "Refactor", "description": "Improve existing code" },
+      { "label": "Fix bug", "description": "Fix with tests" },
+      { "label": "Add tests", "description": "E2E or unit coverage" }
+    ]
+  }]
+}
+```
+
+### If "Refactor" selected, ask:
+
+```json
+{
+  "questions": [{
+    "question": "What to improve?",
+    "header": "Refactor",
+    "multiSelect": false,
+    "options": [
+      { "label": "Remove any types", "description": "Strict TypeScript" },
+      { "label": "Result<T,E> pattern", "description": "Replace throw/catch" },
+      { "label": "Hexagonal", "description": "Isolate domain" },
+      { "label": "Add tests", "description": "BDD coverage" }
     ]
   }]
 }
