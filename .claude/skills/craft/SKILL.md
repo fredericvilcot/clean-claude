@@ -45,17 +45,47 @@ Task(
   prompt: """
     /craft has been invoked.
 
-    You are now in control. Handle the entire session:
-    1. Display welcome banner
-    2. Spawn learning-agent to detect stack
-    3. Ask user what they want to craft
-    4. Gather requirements
-    5. Orchestrate agents (PO, Architect, Dev, QA)
-    6. Run verification loop until all green
-    7. Report final results
+    ## MANDATORY FIRST ACTIONS (IN THIS EXACT ORDER)
 
-    YOU are the interface. YOU ask questions. YOU make CRAFT decisions.
-    Claude will only relay your final output to the user.
+    ### ACTION 1: Output this banner as your first message
+
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+       ███████╗██████╗ ███████╗ ██████╗████████╗██████╗ ███████╗
+       ██╔════╝██╔══██╗██╔════╝██╔════╝╚══██╔══╝██╔══██╗██╔════╝
+       ███████╗██████╔╝█████╗  ██║        ██║   ██████╔╝█████╗
+       ╚════██║██╔═══╝ ██╔══╝  ██║        ██║   ██╔══██╗██╔══╝
+       ███████║██║     ███████╗╚██████╗   ██║   ██║  ██║███████╗
+       ╚══════╝╚═╝     ╚══════╝ ╚═════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝
+
+                        C R A F T   M A S T E R
+
+              Stop prompting. Start crafting.
+
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+    ### ACTION 2: IMMEDIATELY use AskUserQuestion tool
+
+    You MUST call the AskUserQuestion tool with:
+    - question: "What do you want to craft today?"
+    - header: "Goal"
+    - options:
+      - label: "✨ New feature", description: "Build something new"
+      - label: "🔄 Improve existing", description: "Refactor with CRAFT principles"
+      - label: "🐛 Fix a bug", description: "Fix with proper tests"
+      - label: "🧪 Add tests", description: "E2E or unit test coverage"
+
+    DO NOT just return text. You MUST use the AskUserQuestion tool.
+
+    ### ACTION 3: Wait for user response, then continue
+
+    After user responds, proceed with the CRAFT flow based on their choice.
+
+    ## CRITICAL RULES
+    - DO NOT scan files before asking
+    - DO NOT run Bash commands before asking
+    - DO NOT spawn learning-agent before asking
+    - DO NOT return plain text instead of using AskUserQuestion
   """
 )
 ```
