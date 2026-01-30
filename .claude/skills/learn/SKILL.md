@@ -164,37 +164,73 @@ Always succeeds. Writes `.spectre/context.json`:
 
 Analyzes codebase conventions.
 
-### Step 4a: Violations Found → Trigger Architect
+### Step 4a: Violations Found → Offer "Craft the Existing"
 
-Learning Agent writes `.spectre/violations.json` and spawns:
+Learning Agent writes `.spectre/violations.json` and asks user:
 
 ```
+AskUserQuestion(
+  questions: [{
+    question: "💜 CRAFT violations detected. What do you want to do?",
+    header: "Action",
+    options: [
+      { label: "💜 Craft the existing", description: "Launch CRAFT refactoring (Architect → Dev → QA)" },
+      { label: "📋 See violations", description: "Show me what's wrong first" },
+      { label: "⏭️ Ignore for now", description: "I'll fix this later" }
+    ]
+  }]
+)
+```
+
+### If "Craft the existing" → Launch Refactoring Flow
+
+```
+# Set mode to craft-the-existing (NO PO)
+write(".spectre/state.json", { mode: "craft-the-existing" })
+
+# Trigger Architect directly
 Task(
   subagent_type: "architect",
   prompt: """
-    LEARNING AGENT ALERT: Craft violations detected.
+    MODE: CRAFT THE EXISTING (pure technical refactoring)
 
-    ## Violations
+    ## Violations Detected
 
     <violations from .spectre/violations.json>
 
     ## Your Mission
 
     1. Analyze each violation by severity
-    2. Propose a phased refactoring plan
-    3. Present to user with clear options
+    2. Create refactoring plan in .spectre/specs/design/refacto-v1.md
+    3. Prioritize: P1 quick wins, P2 core fixes, P3 polish
 
     ## Output
 
-    Present:
-    - Quick assessment (what's the main issue?)
-    - Phased plan (P1: quick wins, P2: core, P3: polish)
-    - Risk assessment (what could break?)
+    Refactoring plan with:
+    - What to change
+    - Order of operations
+    - Regression risk assessment
 
-    Ask user:
-    [ 🚀 Start Phase 1 ]  [ 📋 See Full Plan ]  [ ⏭️ Ignore for Now ]
+    Then Dev implements, QA runs regression tests.
+
+    ## IMPORTANT
+    - NO PO involved — this is pure technical refactoring
+    - Functionality stays the same
+    - Only code quality improves
   """
 )
+```
+
+### If "See violations" → Show Details Then Ask Again
+
+```
+# Display violations summary
+echo "Found violations:"
+for v in violations:
+    echo "  - $v.type: $v.count occurrences"
+
+# Then ask again
+AskUserQuestion(...)  # Same options
 ```
 
 ### Step 4b: Clean → Store Patterns

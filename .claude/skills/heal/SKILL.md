@@ -77,7 +77,25 @@ This ensures agents know the stack when fixing issues.
 
 > **`/heal` ≠ `npm test`**
 >
-> `/heal` relance la **boucle d'agents**. Il diagnostique, route vers le bon agent (Dev, Architect, PO), l'agent fix automatiquement, QA vérifie, et loop jusqu'à tout vert.
+> `/heal` relaunches the **agent loop**. It diagnoses, routes to the right agent (Dev, Architect, PO), the agent fixes automatically, QA verifies, and loops until all green.
+
+### Mode Awareness
+
+`/heal` adapts to the current mode:
+
+| Mode | PO Involved | Routing |
+|------|-------------|---------|
+| **Full flow** (new feature) | ✅ Yes | test_failure → Dev, type_error → Architect, spec_gap → PO |
+| **Craft the existing** (refacto) | ❌ No | test_failure → Dev, type_error → Architect, NO PO routing |
+
+```bash
+# Check current mode in .spectre/state.json
+if mode == "craft-the-existing":
+    # Never route to PO — this is pure technical refactoring
+    # Regressions go to Dev, design issues to Architect
+else:
+    # Full routing including PO for spec issues
+```
 
 ## What Can Be Healed
 
