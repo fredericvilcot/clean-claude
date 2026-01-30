@@ -68,7 +68,30 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, AskUserQuestion
 }
 ```
 
-## STEP 3: Handle Response
+## STEP 3: MANDATORY — Spawn learning-agent FIRST
+
+```
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║   🚨 BEFORE ANY OTHER ACTION, SPAWN learning-agent 🚨            ║
+║                                                                   ║
+║   DO NOT use Explore agent.                                       ║
+║   DO NOT read files directly.                                     ║
+║   DO NOT scan the codebase yourself.                              ║
+║                                                                   ║
+║   ALWAYS spawn learning-agent FIRST:                              ║
+║                                                                   ║
+║   Task(                                                           ║
+║     subagent_type: "learning-agent",                              ║
+║     prompt: "Detect stack and generate skills for this project"  ║
+║   )                                                               ║
+║                                                                   ║
+║   WAIT for learning-agent to complete before continuing.          ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+```
+
+## STEP 4: Handle Response
 
 ### If ANTI-CRAFT detected (via "Other" free text)
 
@@ -100,14 +123,14 @@ Then use AskUserQuestion again with the same options.
 
 ### If VALID request
 
-Route based on choice:
+**AFTER learning-agent completes**, route based on choice:
 
 | Choice | Flow |
 |--------|------|
-| **✨ New feature** | Ask for spec → PO agent → Architect agent → Dev + QA |
-| **🔄 Improve existing** | Ask what to improve → Architect agent (refacto plan) → Dev |
-| **🐛 Fix a bug** | Ask for details → Architect diagnose → Dev fix → QA verify |
-| **🧪 Add tests** | Ask E2E or unit → QA agent (E2E) or Dev (unit) |
+| **New feature** | Ask for spec → PO → Architect → Dev + QA |
+| **Refactor** | Architect (refacto plan) → Dev → QA (regression) |
+| **Fix bug** | Architect diagnose → Dev fix → QA verify |
+| **Add tests** | QA (E2E) or Dev (unit) |
 
 ---
 
@@ -140,16 +163,21 @@ Route based on choice:
 
 ## AGENT ROUTING
 
-| Task | Agent | What they do |
-|------|-------|--------------|
-| Functional spec | `product-owner` | User stories, acceptance criteria |
-| Technical design | `architect` | Hexagonal, Result<T,E>, file structure |
-| Frontend code | `frontend-engineer` | React components + BDD unit tests |
-| Backend code | `backend-engineer` | APIs, services + BDD unit tests |
-| E2E tests | `qa-engineer` | Playwright tests covering spec |
-| Stack detection | `learning-agent` | Detect libraries, generate skills |
+**Order matters. learning-agent ALWAYS runs first.**
 
-**Always spawn agents for implementation. Never write code directly in /craft.**
+| Order | Agent | Task |
+|-------|-------|------|
+| **1st** | `learning-agent` | Detect stack, generate skills (MANDATORY) |
+| 2nd | `product-owner` | Functional spec (if new feature) |
+| 3rd | `architect` | Technical design / refacto plan |
+| 4th | `frontend-engineer` | UI code + unit tests |
+| 4th | `backend-engineer` | API code + unit tests |
+| 5th | `qa-engineer` | E2E / integration tests |
+
+**RULES:**
+- NEVER use Explore agent — use learning-agent
+- NEVER write code directly — spawn dev agents
+- NEVER skip learning-agent
 
 ---
 
