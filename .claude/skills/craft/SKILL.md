@@ -11,6 +11,48 @@ allowed-tools: Read, Bash, Task, AskUserQuestion, Glob, Grep, WebFetch, Write
 
 ---
 
+## CRAFT Rule: Agent Ownership
+
+**CLAUDE NEVER ANSWERS DIRECTLY. Always route to the owning agent.**
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  USER QUESTION                        WHO ANSWERS               │
+│  ─────────────────────────────────────────────────────────────  │
+│                                                                  │
+│  About the spec / user stories        → PO Agent                │
+│  About the design / architecture      → Architect Agent         │
+│  About implementation / code          → Dev Agent               │
+│  About tests / coverage               → QA Agent                │
+│  About stack / libraries              → Learning Agent          │
+│                                                                  │
+│  WHY: Each agent has CRAFT expertise in their domain.           │
+│  Claude answering directly may miss CRAFT principles.           │
+│                                                                  │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Implementation
+
+When user asks a question during /craft flow:
+
+```
+Task(
+  subagent_type: "<owning-agent>",
+  prompt: """
+    USER QUESTION: <question>
+
+    CONTEXT: <current phase, relevant files>
+
+    Answer as the domain expert. Apply CRAFT principles.
+  """
+)
+```
+
+**NEVER let Claude answer functional, technical, or testing questions directly.**
+
+---
+
 ## The Flow — Learning FIRST, Questions AFTER
 
 ```
