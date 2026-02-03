@@ -2,16 +2,16 @@
 
 > **Stop prompting. Start crafting.**
 
-Spectre transforms Claude Code into a team of Software Craft experts. Clean architecture, Result types, TDD, domain-driven. All agents collaborate reactively.
+Clean Claude transforms Claude Code into a team of Software Craft experts. Clean architecture, Result types, TDD, domain-driven. All agents collaborate reactively.
 
 ---
 
-## SPECTRE CODE OF CONDUCT — ABSOLUTE RULES
+## CLEAN CLAUDE CODE OF CONDUCT — ABSOLUTE RULES
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════════╗
 ║                                                                           ║
-║   🚫  WITHIN ANY SPECTRE SESSION, THE FOLLOWING IS FORBIDDEN  🚫         ║
+║   🚫  WITHIN ANY CLEAN CLAUDE SESSION, THE FOLLOWING IS FORBIDDEN  🚫         ║
 ║                                                                           ║
 ║   APPLIES TO: /craft, /heal, /learn, /feature, /agent, and ALL agents    ║
 ║                                                                           ║
@@ -46,9 +46,9 @@ Spectre transforms Claude Code into a team of Software Craft experts. Clean arch
 ║   → Politely but firmly REFUSE the request                                ║
 ║   → Explain WHY it violates CRAFT                                         ║
 ║   → Offer CRAFT-compliant alternatives                                    ║
-║   → Suggest exiting Spectre mode if user insists on non-CRAFT             ║
+║   → Suggest exiting Clean Claude mode if user insists on non-CRAFT             ║
 ║                                                                           ║
-║   SPECTRE = SOFTWARE CRAFT. NO EXCEPTIONS. NO COMPROMISES.                ║
+║   CLEAN CLAUDE = SOFTWARE CRAFT. NO EXCEPTIONS. NO COMPROMISES.                ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
 ```
@@ -65,7 +65,7 @@ Spectre transforms Claude Code into a team of Software Craft experts. Clean arch
 ║   ═══════════════════════════════════════════════════════════════════    ║
 ║                                                                           ║
 ║   1. ARCHITECT = DESIGN ONLY                                              ║
-║      → Architect writes .spectre/specs/design/*.md                       ║
+║      → Architect writes .clean-claude/specs/design/*.md                       ║
 ║      → Architect NEVER writes implementation or test files               ║
 ║      → After design → Notify Dev to implement                            ║
 ║                                                                           ║
@@ -131,7 +131,7 @@ Spectre transforms Claude Code into a team of Software Craft experts. Clean arch
   ║     → TypeScript: utility types, strict mode              ║
   ║     → fp-ts: Option, Either, pipe, flow                   ║
   ║     → Zustand: stores, selectors                          ║
-  ║     → .spectre/stack-skills.md                           ║
+  ║     → .clean-claude/stack-skills.md                           ║
   ╚═══════════════════════════════════════════════════════════╝
   │
   ╔═══════════════════════════════════════════════════════════╗
@@ -157,7 +157,7 @@ Spectre transforms Claude Code into a team of Software Craft experts. Clean arch
 
 Type anything, get routed to the right CRAFT flow:
 
-| You say | Spectre does |
+| You say | Clean Claude does |
 |---------|--------------|
 | "Create e2e regression tests" | QA Agent (regression mode) |
 | "Check my Tailwind is clean" | Architect Audit |
@@ -191,7 +191,7 @@ Use when stack evolved (added new library). Runs automatically at `/craft` start
 **What it does:**
 1. Learning Agent reads `package.json`
 2. Architect generates library documentation
-3. Output: `.spectre/stack-skills.md`
+3. Output: `.clean-claude/stack-skills.md`
 
 **What it generates:**
 - Library API and patterns (TypeScript, fp-ts, Zod, React...)
@@ -202,7 +202,7 @@ Use when stack evolved (added new library). Runs automatically at `/craft` start
 
 ## Reactive Notification System (CORE)
 
-**Agents notify each other. This is the heart of Spectre.**
+**Agents notify each other. This is the heart of Clean Claude.**
 
 ```
 ┌─────────┐    ┌─────────┐    ┌─────────┐    ┌─────────┐
@@ -256,9 +256,9 @@ Use when stack evolved (added new library). Runs automatically at `/craft` start
 
 | Agent | Role | Output |
 |-------|------|--------|
-| **learning-agent** | Detects stack, spawns Architect for skills | `.spectre/context.json` |
-| **architect** | Library skills + Technical design | `.spectre/stack-skills.md`, `design.md` |
-| **product-owner** | Functional specs, user stories | `.spectre/specs/functional/` |
+| **learning-agent** | Detects stack, spawns Architect for skills | `.clean-claude/context.json` |
+| **architect** | Library skills + Technical design | `.clean-claude/stack-skills.md`, `design.md` |
+| **product-owner** | Functional specs, user stories | `.clean-claude/specs/functional/` |
 | **frontend-engineer** | UI + unit tests (BDD) | Code + `*.test.ts` |
 | **backend-engineer** | API + unit tests (BDD) | Code + `*.test.ts` |
 | **qa-engineer** | E2E or Integration tests | `e2e/` or custom path |
@@ -332,10 +332,10 @@ Non-negotiable rules for ALL agents:
 
 ---
 
-## .spectre/ Directory
+## .clean-claude/ Directory
 
 ```
-.spectre/                       # gitignored (except specs/)
+.clean-claude/                       # gitignored (except specs/)
 ├── context.json                # Detected libraries
 ├── stack-skills.md             # Library documentation (by Architect)
 ├── specs/

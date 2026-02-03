@@ -1,6 +1,6 @@
 ---
 name: agent
-description: "Start a Spectre agent with optional reactive links. Examples: /agent frontend-engineer, /agent frontend-engineer --link qa-engineer, /agent architect --link frontend-engineer,qa-engineer"
+description: "Start a Clean Claude agent with optional reactive links. Examples: /agent frontend-engineer, /agent frontend-engineer --link qa-engineer, /agent architect --link frontend-engineer,qa-engineer"
 user-invocable: false
 context: conversation
 allowed-tools: Read, Write, Bash, Task
@@ -8,7 +8,7 @@ allowed-tools: Read, Write, Bash, Task
 
 # Agent Skill — Start with Reactive Links
 
-Start any Spectre agent with optional reactive connections to other agents.
+Start any Clean Claude agent with optional reactive connections to other agents.
 
 ## Syntax
 
@@ -243,8 +243,8 @@ Architect designs → Frontend implements → QA verifies → errors route back
 ## How It Works
 
 1. **Parse arguments** from the skill invocation
-2. **Initialize .spectre/** if not exists
-3. **Configure links** in `.spectre/links.json`
+2. **Initialize .clean-claude/** if not exists
+3. **Configure links** in `.clean-claude/links.json`
 4. **Start the agent** with context
 5. **Hooks route** based on configured links
 
@@ -260,13 +260,13 @@ Extract from the user's command:
 - `stack`: Stack context (from --stack, default: "frontend")
 - `task`: Task description (from --task)
 
-### Step 2: Initialize Spectre State
+### Step 2: Initialize Clean Claude State
 
 ```bash
-mkdir -p .spectre
+mkdir -p .clean-claude
 
 # Create links configuration
-cat > .spectre/links.json << EOF
+cat > .clean-claude/links.json << EOF
 {
   "primary": "<agent_name>",
   "links": [<links_array>],
@@ -276,7 +276,7 @@ cat > .spectre/links.json << EOF
 EOF
 
 # Initialize state
-cat > .spectre/state.json << EOF
+cat > .clean-claude/state.json << EOF
 {
   "workflow": "agent",
   "feature": "<task or 'ad-hoc'>",
@@ -308,12 +308,12 @@ Context:
 - Linked agents: <links>
 - When complete, linked agents will be triggered automatically
 
-<Additional context from .spectre/context.json if exists>
+<Additional context from .clean-claude/context.json if exists>
 ```
 
 ### Step 4: Reactive Routing
 
-The hooks will handle routing based on `.spectre/links.json`:
+The hooks will handle routing based on `.clean-claude/links.json`:
 
 When the primary agent completes:
 1. Check if there are linked agents
@@ -374,4 +374,4 @@ This skill complements `/reactive-loop`:
 - `/reactive-loop` — Full workflow (PO → Arch → Dev → QA)
 - `/agent` — Flexible, start any agent with chosen links
 
-Both use the same `.spectre/` state and routing infrastructure.
+Both use the same `.clean-claude/` state and routing infrastructure.

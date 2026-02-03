@@ -1,6 +1,6 @@
 ---
 name: reactive-loop
-description: "Start the Spectre reactive multi-agent loop. Agents collaborate with smart routing: test failures → Dev, design flaws → Architect, spec gaps → PO. Full mesh of reactive links."
+description: "Start the Clean Claude reactive multi-agent loop. Agents collaborate with smart routing: test failures → Dev, design flaws → Architect, spec gaps → PO. Full mesh of reactive links."
 user-invocable: false
 context: fork
 agent: orchestrator
@@ -9,13 +9,13 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task
 
 # Reactive Loop Skill
 
-You are initiating the Spectre Reactive Loop — a self-correcting multi-agent system where agents collaborate automatically to deliver features.
+You are initiating the Clean Claude Reactive Loop — a self-correcting multi-agent system where agents collaborate automatically to deliver features.
 
 ## What Happens
 
 When you invoke `/reactive-loop`:
 
-1. **Initialize** — Set up `.spectre/` shared state
+1. **Initialize** — Set up `.clean-claude/` shared state
 2. **Define** — Product Owner creates user story
 3. **Design** — Architect designs the solution
 4. **Implement** — Frontend Engineer builds the feature
@@ -25,17 +25,17 @@ When you invoke `/reactive-loop`:
 
 ## Setup
 
-First, ensure the project has the Spectre hooks configured:
+First, ensure the project has the Clean Claude hooks configured:
 
 ```bash
-# Check if .spectre exists
-if [ ! -d ".spectre" ]; then
-    mkdir -p .spectre
-    echo '{"workflow":null,"feature":null,"phase":"idle","retryCount":0,"maxRetries":3,"agents":{"lastActive":null,"history":[]},"status":"ready"}' > .spectre/state.json
-    touch .spectre/errors.jsonl
-    touch .spectre/events.jsonl
-    touch .spectre/learnings.jsonl
-    echo '{}' > .spectre/context.json
+# Check if .clean-claude exists
+if [ ! -d .clean-claude ]; then
+    mkdir -p .clean-claude
+    echo '{"workflow":null,"feature":null,"phase":"idle","retryCount":0,"maxRetries":3,"agents":{"lastActive":null,"history":[]},"status":"ready"}' > .clean-claude/state.json
+    touch .clean-claude/errors.jsonl
+    touch .clean-claude/events.jsonl
+    touch .clean-claude/learnings.jsonl
+    echo '{}' > .clean-claude/context.json
 fi
 ```
 
@@ -51,7 +51,7 @@ Ask the user what feature they want to build:
 ### Step 2: Initialize State
 
 ```bash
-cat > .spectre/state.json << EOF
+cat > .clean-claude/state.json << EOF
 {
   "workflow": "feature",
   "feature": "<FEATURE_NAME>",
@@ -63,7 +63,7 @@ cat > .spectre/state.json << EOF
 }
 EOF
 
-cat > .spectre/context.json << EOF
+cat > .clean-claude/context.json << EOF
 {
   "feature": "<FEATURE_NAME>",
   "description": "<FEATURE_DESCRIPTION>",
@@ -97,8 +97,8 @@ Save the user story to: docs/features/<feature-name>/user-story.md
 
 After each agent completes:
 
-1. **Read state**: `cat .spectre/state.json`
-2. **Check for trigger**: `cat .spectre/trigger 2>/dev/null`
+1. **Read state**: `cat .clean-claude/state.json`
+2. **Check for trigger**: `cat .clean-claude/trigger 2>/dev/null`
 3. **Spawn next agent** based on phase
 
 ### Phase Transitions
@@ -134,9 +134,9 @@ After each agent completes:
 Keep the user informed:
 
 ```
-[SPECTRE] Phase: implement (2/5)
-[SPECTRE] Agent: frontend-engineer
-[SPECTRE] Status: Implementing feature...
+[CLEAN CLAUDE] Phase: implement (2/5)
+[CLEAN CLAUDE] Agent: frontend-engineer
+[CLEAN CLAUDE] Status: Implementing feature...
 ```
 
 ### Step 6: Handle Errors (Smart Routing)
@@ -239,14 +239,14 @@ When all tests pass:
 3. Report success to user
 
 ```
-[SPECTRE] ✓ Feature complete!
-[SPECTRE]
-[SPECTRE] Summary:
-[SPECTRE] - User story: docs/features/<feature>/user-story.md
-[SPECTRE] - Design: docs/features/<feature>/technical-design.md
-[SPECTRE] - Tests: All passing
-[SPECTRE] - Retries: <N>
-[SPECTRE] - Learnings: <N> new patterns recorded
+[CLEAN CLAUDE] ✓ Feature complete!
+[CLEAN CLAUDE]
+[CLEAN CLAUDE] Summary:
+[CLEAN CLAUDE] - User story: docs/features/<feature>/user-story.md
+[CLEAN CLAUDE] - Design: docs/features/<feature>/technical-design.md
+[CLEAN CLAUDE] - Tests: All passing
+[CLEAN CLAUDE] - Retries: <N>
+[CLEAN CLAUDE] - Learnings: <N> new patterns recorded
 ```
 
 ## Error Recovery
@@ -254,15 +254,15 @@ When all tests pass:
 If max retries exceeded:
 
 ```
-[SPECTRE] ✗ Max retries (3) exceeded
-[SPECTRE]
-[SPECTRE] Last error:
-[SPECTRE] <ERROR_DETAILS>
-[SPECTRE]
-[SPECTRE] Options:
-[SPECTRE] 1. Manually fix and run: /reactive-loop continue
-[SPECTRE] 2. Reset and start over: /reactive-loop reset
-[SPECTRE] 3. Ask for help with the specific error
+[CLEAN CLAUDE] ✗ Max retries (3) exceeded
+[CLEAN CLAUDE]
+[CLEAN CLAUDE] Last error:
+[CLEAN CLAUDE] <ERROR_DETAILS>
+[CLEAN CLAUDE]
+[CLEAN CLAUDE] Options:
+[CLEAN CLAUDE] 1. Manually fix and run: /reactive-loop continue
+[CLEAN CLAUDE] 2. Reset and start over: /reactive-loop reset
+[CLEAN CLAUDE] 3. Ask for help with the specific error
 ```
 
 ## Commands
@@ -298,7 +298,7 @@ docs/features/<feature-name>/
 ├── technical-design.md  # From architect
 └── qa-report.md         # From qa-engineer
 
-.spectre/
+.clean-claude/
 ├── state.json           # Current state
 ├── errors.jsonl         # Error history
 ├── events.jsonl         # Event log

@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./scripts/spectre/on-agent-stop.sh"
+            "command": "./scripts/clean-claude/on-agent-stop.sh"
           }
         ]
       }
@@ -17,7 +17,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "./scripts/spectre/check-test-results.sh"
+            "command": "./scripts/clean-claude/check-test-results.sh"
           }
         ]
       }

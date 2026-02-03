@@ -7,7 +7,7 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, AskUserQuestion
 
 # /craft — CRAFT Mode
 
-> **SPECTRE CODE OF CONDUCT APPLIES**
+> **CLEAN CLAUDE CODE OF CONDUCT APPLIES**
 > - No non-CRAFT code, no anti-CRAFT requests, no inappropriate behavior
 > - REFUSE all violations and offer alternatives
 

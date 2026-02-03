@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/SPECTRE-AGENTS-blueviolet?style=for-the-badge&logo=ghost&logoColor=white" alt="Spectre Agents"/>
+  <img src="https://img.shields.io/badge/CLEAN-CLAUDE-blueviolet?style=for-the-badge&logo=ghost&logoColor=white" alt="Clean Claude"/>
 </p>
 
 <h1 align="center">Stop prompting. Start crafting.</h1>
 
 <p align="center">
-  <em>Other agent libs give you tools. Spectre gives you <strong>standards</strong>.<br/>
+  <em>Other agent libs give you tools. Clean Claude gives you <strong>standards</strong>.<br/>
   Clean architecture. Result types. TDD. Domain-driven.<br/>
   Code that fixes itself. Code that learns YOUR patterns.</em>
 </p>
@@ -21,9 +21,9 @@
 
 ---
 
-## Why Spectre is Different
+## Why Clean Claude is Different
 
-| Other Agent Libs | Spectre |
+| Other Agent Libs | Clean Claude |
 |------------------|---------|
 | Agents do tasks | Agents **enforce standards** |
 | You fix the bugs | Agents **fix their own bugs** |
@@ -31,7 +31,7 @@
 | No architecture | **Clean Architecture, DDD, Hexagonal** |
 | `any`, `throw`, chaos | **Strict types, Result<T,E>, order** |
 
-**Spectre isn't a tool. It's a philosophy.**
+**Clean Claude isn't a tool. It's a philosophy.**
 
 ---
 
@@ -60,7 +60,7 @@ You: "Build user authentication"
     Bug found? → Dev fixes → QA re-tests → Loop until green.
 ```
 
-That's Spectre.
+That's Clean Claude.
 
 ---
 
@@ -83,14 +83,14 @@ brew install claude-code
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/fredericvilcot/spectre-agents/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/fredericvilcot/clean-claude/main/install.sh | bash
 ```
 
 ---
 
 ## <img src="https://img.shields.io/badge/Software%20Craft-The%20Foundation-8A2BE2?style=flat-square" alt="Software Craft"/>
 
-Spectre is built on **Software Craft** principles — the philosophy that code is a craft, not just a task.
+Clean Claude is built on **Software Craft** principles — the philosophy that code is a craft, not just a task.
 
 > *"Any fool can write code that a computer can understand. Good programmers write code that humans can understand."* — Martin Fowler
 
@@ -98,7 +98,7 @@ Spectre is built on **Software Craft** principles — the philosophy that code i
 
 ### The Masters Behind the Craft
 
-Every Spectre agent embodies the teachings of:
+Every Clean Claude agent embodies the teachings of:
 
 - **Kent Beck** — TDD, XP, "Make it work, make it right, make it fast"
 - **Robert C. Martin (Uncle Bob)** — Clean Code, SOLID, Clean Architecture
@@ -150,7 +150,7 @@ function getUser(id: string): Result<User, NotFoundError> {
 }
 ```
 
-**Spectre agents write code where errors are values, not surprises.**
+**Clean Claude agents write code where errors are values, not surprises.**
 
 ---
 
@@ -295,7 +295,7 @@ Replace `data: any` with `ApiResponse<T>`
 
 ## `/craft` — Your AI Dev Team
 
-Say what you want. Spectre does the rest.
+Say what you want. Clean Claude does the rest.
 
 ```
 > /craft "user authentication with OAuth"
@@ -325,7 +325,7 @@ Say what you want. Spectre does the rest.
 
 ## `/heal` — Re-launch the Agent Loop
 
-Something broken? Spectre relaunches agents to fix it.
+Something broken? Clean Claude relaunches agents to fix it.
 
 ```bash
 /heal        # Diagnose → Route → Fix → Verify → Loop
@@ -374,9 +374,9 @@ When violations are detected:
 
 ---
 
-## Why Spectre?
+## Why Clean Claude?
 
-| Without Spectre | With Spectre |
+| Without Clean Claude | With Clean Claude |
 |-----------------|--------------|
 | You prompt, you debug | Agents collaborate, QA verifies |
 | Generic code | Learns YOUR patterns |
@@ -400,7 +400,7 @@ When violations are detected:
 ---
 
 <p align="center">
-  <strong>Spectre learns. Spectre adapts. Spectre crafts.</strong>
+  <strong>Clean Claude learns. Clean Claude adapts. Clean Claude crafts.</strong>
 </p>
 
 <p align="center">

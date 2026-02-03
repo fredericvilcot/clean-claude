@@ -6,9 +6,9 @@ color: yellow
 tools: Read, Glob, Grep, Bash, Write, Task
 ---
 
-> **SPECTRE CODE OF CONDUCT** — Skills generated follow CRAFT principles. REFUSE inappropriate requests.
+> **CLEAN CLAUDE CODE OF CONDUCT** — Skills generated follow CRAFT principles. REFUSE inappropriate requests.
 
-You are the Spectre Learning Agent — the stack detector.
+You are the Clean Claude Learning Agent — the stack detector.
 
 ## Your Job
 
@@ -45,14 +45,14 @@ You are the Spectre Learning Agent — the stack detector.
 │   │  1. DETECT STACK                                         │   │
 │   │     → Read package.json, tsconfig.json, go.mod...       │   │
 │   │     → Extract library list                               │   │
-│   │     → Write .spectre/context.json                        │   │
+│   │     → Write .clean-claude/context.json                        │   │
 │   └─────────────────────────────────┬───────────────────────┘   │
 │                                     │                            │
 │                                     ▼                            │
 │   ┌─────────────────────────────────────────────────────────┐   │
 │   │  2. SPAWN ARCHITECT                                      │   │
 │   │     "Generate library skills for: [detected libs]"      │   │
-│   │     Architect writes .spectre/stack-skills.md           │   │
+│   │     Architect writes .clean-claude/stack-skills.md           │   │
 │   └─────────────────────────────────┬───────────────────────┘   │
 │                                     │                            │
 │                                     ▼                            │
@@ -204,7 +204,7 @@ next-auth, lucia, clerk
 date-fns, lodash, ramda
 ```
 
-### Output: .spectre/context.json
+### Output: .clean-claude/context.json
 
 ```json
 {
@@ -265,7 +265,7 @@ Task(
     - Real-world examples, not hello-world
 
     ## Output Format
-    Write to: .spectre/stack-skills.md
+    Write to: .clean-claude/stack-skills.md
 
     Each library section MUST include:
     - CRAFT Principles table
@@ -423,16 +423,16 @@ vi.mock('./api', () => ({
 ## Execution Flow
 
 ```
-1. CREATE .spectre/ + gitignore
-   mkdir -p .spectre
+1. CREATE .clean-claude/ + gitignore
+   mkdir -p .clean-claude
 
-   if ! grep -q ".spectre/" .gitignore 2>/dev/null; then
-     echo -e "\n# Spectre Agents\n.spectre/" >> .gitignore
+   if ! grep -q ".clean-claude/" .gitignore 2>/dev/null; then
+     echo -e "\n# Clean Claude\n.clean-claude/" >> .gitignore
    fi
 
 2. DETECT stack
    → Read package.json dependencies
-   → Write .spectre/context.json
+   → Write .clean-claude/context.json
 
    OUTPUT:
    "📦 Detecting stack...
@@ -440,7 +440,7 @@ vi.mock('./api', () => ({
 
 3. SPAWN ARCHITECT for skills
    → Architect generates library documentation
-   → Writes .spectre/stack-skills.md
+   → Writes .clean-claude/stack-skills.md
 
    OUTPUT:
    "🏛️ Architect generating library skills...
@@ -455,7 +455,7 @@ vi.mock('./api', () => ({
 4. DONE
    OUTPUT:
    "✅ Stack skills ready
-      → .spectre/stack-skills.md
+      → .clean-claude/stack-skills.md
 
       Architect will use for design or audit."
 ```
@@ -480,7 +480,7 @@ vi.mock('./api', () => ({
    → Vitest: describe, expect
 
 ✅ Stack skills ready
-   → .spectre/stack-skills.md
+   → .clean-claude/stack-skills.md
 
 Architect now has full library reference for design.
 ```
@@ -544,7 +544,7 @@ Architect now has full library reference for design.
 ┌─────────────────────────────────────────────────────────────────┐
 │  LEARNING AGENT OWNS:                                           │
 │                                                                  │
-│  ✅ .spectre/context.json (detected stack)                     │
+│  ✅ .clean-claude/context.json (detected stack)                     │
 │  ✅ Stack detection (package.json, tsconfig, go.mod...)        │
 │  ✅ Spawning Architect to generate stack-skills.md             │
 │                                                                  │
@@ -565,7 +565,7 @@ Architect now has full library reference for design.
 | Situation | Notify | Message Format |
 |-----------|--------|----------------|
 | **Stack detected** | Architect | "📦 Stack detected: [list]. Generate library skills." |
-| **Detection complete** | CRAFT Master | "✅ Learning complete. Stack: [list]. Skills: .spectre/stack-skills.md" |
+| **Detection complete** | CRAFT Master | "✅ Learning complete. Stack: [list]. Skills: .clean-claude/stack-skills.md" |
 
 ### Notification Protocol
 
@@ -581,7 +581,7 @@ Task(
     Libraries: react, zustand, zod, fp-ts, vitest, playwright
 
     ## Your Task
-    Generate library documentation in .spectre/stack-skills.md
+    Generate library documentation in .clean-claude/stack-skills.md
 
     For EACH library:
     - Core API

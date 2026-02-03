@@ -6,7 +6,7 @@ context: conversation
 allowed-tools: Read, Write, Bash, Task, AskUserQuestion
 ---
 
-# Spectre Add-Skill — Extend Agent Expertise
+# Clean Claude Add-Skill — Extend Agent Expertise
 
 **Craft principles are ALWAYS active.** Add specialized expertise on top.
 
@@ -54,7 +54,7 @@ allowed-tools: Read, Write, Bash, Task, AskUserQuestion
 
 **Every skill MUST respect the craft philosophy.**
 
-When you add a skill, Spectre validates it:
+When you add a skill, Clean Claude validates it:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -157,7 +157,7 @@ All these skills have been validated against the craft philosophy:
 │     ─────────────────────                                        │
 │     → Use architect agent to generate DDD skill document         │
 │     → Include: principles, patterns, examples, checklist         │
-│     → Store in .spectre/skills/ddd.md                           │
+│     → Store in .clean-claude/skills/ddd.md                           │
 │                                                                  │
 │  3. CODEBASE ANALYSIS                                            │
 │     ────────────────────                                         │
@@ -210,7 +210,7 @@ All these skills have been validated against the craft philosophy:
 ## Storage
 
 ```
-.spectre/
+.clean-claude/
 ├── context.json          # Includes active skills
 ├── skills/
 │   ├── ddd.md            # Generated skill document
@@ -367,7 +367,7 @@ Same reactive flow as before — analyze codebase, propose plan, loop.
    ✓ Aligns with Hexagonal (bounded contexts as ports)
 
 📝 Generating DDD skill document...
-   ✓ Stored in .spectre/skills/ddd.md
+   ✓ Stored in .clean-claude/skills/ddd.md
 
 🔍 Analyzing codebase with DDD lens...
 

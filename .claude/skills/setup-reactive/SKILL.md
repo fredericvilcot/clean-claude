@@ -1,6 +1,6 @@
 ---
 name: setup-reactive
-description: "Set up the Spectre Reactive System in the current project. Configures hooks, shared state, and scripts for the multi-agent feedback loop"
+description: "Set up the Clean Claude Reactive System in the current project. Configures hooks, shared state, and scripts for the multi-agent feedback loop"
 user-invocable: false
 context: conversation
 allowed-tools: Read, Write, Bash, Glob
@@ -8,23 +8,23 @@ allowed-tools: Read, Write, Bash, Glob
 
 # Setup Reactive System
 
-You are setting up the Spectre Reactive System in the current project.
+You are setting up the Clean Claude Reactive System in the current project.
 
 ## What This Does
 
-1. Creates `.spectre/` directory for shared agent state
-2. Copies hook scripts to `scripts/spectre/`
+1. Creates `.clean-claude/` directory for shared agent state
+2. Copies hook scripts to `scripts/clean-claude/`
 3. Configures Claude Code hooks in `.claude/settings.json`
 4. Sets up `docs/features/` for output artifacts
 
 ## Setup Steps
 
-### Step 1: Create .spectre Directory
+### Step 1: Create .clean-claude Directory
 
 ```bash
-mkdir -p .spectre
+mkdir -p .clean-claude
 
-cat > .spectre/state.json << 'EOF'
+cat > .clean-claude/state.json << 'EOF'
 {
   "workflow": null,
   "feature": null,
@@ -39,18 +39,18 @@ cat > .spectre/state.json << 'EOF'
 }
 EOF
 
-touch .spectre/errors.jsonl
-touch .spectre/events.jsonl
-touch .spectre/learnings.jsonl
-echo '{}' > .spectre/context.json
+touch .clean-claude/errors.jsonl
+touch .clean-claude/events.jsonl
+touch .clean-claude/learnings.jsonl
+echo '{}' > .clean-claude/context.json
 ```
 
 ### Step 2: Create Hook Scripts
 
-Create `scripts/spectre/spectre-router.sh`:
+Create `scripts/clean-claude/clean-claude-router.sh`:
 
 ```bash
-mkdir -p scripts/spectre
+mkdir -p scripts/clean-claude
 ```
 
 Then create the router script that handles agent communication and routing.
@@ -68,7 +68,7 @@ Add to `.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "./scripts/spectre/on-agent-stop.sh"
+            "command": "./scripts/clean-claude/on-agent-stop.sh"
           }
         ]
       }
@@ -79,7 +79,7 @@ Add to `.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "./scripts/spectre/check-test-results.sh"
+            "command": "./scripts/clean-claude/check-test-results.sh"
           }
         ]
       }
@@ -99,11 +99,11 @@ mkdir -p docs/features
 Add runtime files that shouldn't be committed:
 
 ```
-# Spectre runtime state
-.spectre/state.json
-.spectre/events.jsonl
-.spectre/context.json
-.spectre/trigger
+# Clean Claude runtime state
+.clean-claude/state.json
+.clean-claude/events.jsonl
+.clean-claude/context.json
+.clean-claude/trigger
 ```
 
 Keep `errors.jsonl` and `learnings.jsonl` as they contain valuable history.
@@ -119,14 +119,14 @@ The reactive system is ready. Start with:
 Or check system status:
 
 ```bash
-./scripts/spectre/spectre-router.sh status
+./scripts/clean-claude/clean-claude-router.sh status
 ```
 
 ## Directory Structure Created
 
 ```
 project/
-├── .spectre/
+├── .clean-claude/
 │   ├── state.json        # Current workflow state
 │   ├── errors.jsonl      # Error history (keep in git)
 │   ├── events.jsonl      # Event log
@@ -135,8 +135,8 @@ project/
 ├── .claude/
 │   └── settings.json     # Hooks configuration
 ├── scripts/
-│   └── spectre/
-│       ├── spectre-router.sh      # Main routing logic
+│   └── clean-claude/
+│       ├── clean-claude-router.sh      # Main routing logic
 │       ├── on-agent-stop.sh       # SubagentStop hook
 │       └── check-test-results.sh  # PostToolUse hook
 └── docs/
@@ -149,13 +149,13 @@ After setup, verify with:
 
 ```bash
 # Check state file
-cat .spectre/state.json | jq '.'
+cat .clean-claude/state.json | jq '.'
 
 # Check hooks are configured
 cat .claude/settings.json | jq '.hooks'
 
 # Check scripts are executable
-ls -la scripts/spectre/
+ls -la scripts/clean-claude/
 ```
 
 Setup complete when all checks pass.

@@ -5,9 +5,9 @@ context: conversation
 allowed-tools: Read, Bash, Glob, Grep, Write, Task
 ---
 
-# Spectre Learn — Stack Detection & Skill Generation
+# Clean Claude Learn — Stack Detection & Skill Generation
 
-> **SPECTRE CODE OF CONDUCT APPLIES** — See CLAUDE.md
+> **CLEAN CLAUDE CODE OF CONDUCT APPLIES** — See CLAUDE.md
 > - No non-CRAFT code, no anti-CRAFT requests, no inappropriate behavior
 > - All generated skills follow Software Craft principles
 > - Vulgar/insulting requests are REFUSED
@@ -40,7 +40,7 @@ Use when:
 │   ┌─────────────────────────────────────────────────────────┐   │
 │   │  1. LEARNING AGENT: Detect Stack                         │   │
 │   │     → Read package.json, tsconfig.json, go.mod...       │   │
-│   │     → Write .spectre/context.json                        │   │
+│   │     → Write .clean-claude/context.json                        │   │
 │   └─────────────────────────────────┬───────────────────────┘   │
 │                                     │                            │
 │                                     ▼                            │
@@ -48,7 +48,7 @@ Use when:
 │   │  2. SPAWN ARCHITECT: Generate Library Skills             │   │
 │   │     → For each detected library                         │   │
 │   │     → Write API, patterns, examples                     │   │
-│   │     → Output: .spectre/stack-skills.md                  │   │
+│   │     → Output: .clean-claude/stack-skills.md                  │   │
 │   └─────────────────────────────────┬───────────────────────┘   │
 │                                     │                            │
 │                                     ▼                            │
@@ -110,9 +110,9 @@ Task(
     DETECT STACK AND GENERATE SKILLS
 
     1. Detect libraries from package.json
-    2. Write .spectre/context.json
+    2. Write .clean-claude/context.json
     3. Spawn Architect to generate library skills
-    4. Skills written to .spectre/stack-skills.md
+    4. Skills written to .clean-claude/stack-skills.md
 
     OUTPUT progress to user:
     - "📦 Detecting stack..."
@@ -127,7 +127,7 @@ Task(
 ## Output Files
 
 ```
-.spectre/
+.clean-claude/
 ├── context.json        # Detected libraries (gitignored)
 └── stack-skills.md     # Library documentation (gitignored)
 ```

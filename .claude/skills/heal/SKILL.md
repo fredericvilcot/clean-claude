@@ -5,9 +5,9 @@ context: conversation
 allowed-tools: Read, Bash, Task, AskUserQuestion, Skill
 ---
 
-# Spectre Heal — Re-enter the Reactive Loop
+# Clean Claude Heal — Re-enter the Reactive Loop
 
-> **SPECTRE CODE OF CONDUCT APPLIES** — See CLAUDE.md
+> **CLEAN CLAUDE CODE OF CONDUCT APPLIES** — See CLAUDE.md
 > - No non-CRAFT code, no anti-CRAFT requests, no inappropriate behavior
 > - All fixes MUST follow Software Craft principles
 > - Vulgar/insulting requests are REFUSED
@@ -57,11 +57,11 @@ Use `/heal` to:
 Before diagnosing, ensure stack context exists:
 
 ```bash
-# If .spectre/context.json doesn't exist, detect stack first
-if [ ! -f ".spectre/context.json" ]; then
+# If .clean-claude/context.json doesn't exist, detect stack first
+if [ ! -f ".clean-claude/context.json" ]; then
   # Same detection logic as /craft
   # Detect language, runtime, framework
-  # Store in .spectre/context.json
+  # Store in .clean-claude/context.json
 fi
 ```
 
@@ -94,7 +94,7 @@ This ensures agents know the stack when fixing issues.
 | **Craft the existing** (refacto) | ❌ No | test_failure → Dev, type_error → Architect, NO PO routing |
 
 ```bash
-# Check current mode in .spectre/state.json
+# Check current mode in .clean-claude/state.json
 if mode == "craft-the-existing":
     # Never route to PO — this is pure technical refactoring
     # Regressions go to Dev, design issues to Architect
@@ -131,8 +131,8 @@ npm test && npm run build && npx tsc --noEmit && npm run lint
 # Find spec files
 find . -name "*.spec.md" -o -name "*.story.md" -o -name "PRD*.md"
 
-# Check .spectre/ for context
-cat .spectre/context.json
+# Check .clean-claude/ for context
+cat .clean-claude/context.json
 ```
 
 ### Step 2: Identify Problem Type & Route
@@ -207,7 +207,7 @@ FAIL src/components/Login.test.tsx
 ```
 
 **Recent changes:** (from git diff)
-**Related learnings:** (from .spectre/learnings.jsonl)
+**Related learnings:** (from .clean-claude/learnings.jsonl)
 ```
 
 ### Step 4: Launch Repair Agent
@@ -267,18 +267,18 @@ Use the qa-engineer agent to verify the fix:
 
 ### Key Behavior: Continue Where /craft Left Off
 
-1. **READ EXISTING CONTEXT**: Check `.spectre/failures.md` from previous `/craft` run
+1. **READ EXISTING CONTEXT**: Check `.clean-claude/failures.md` from previous `/craft` run
 2. **CONTINUE WHERE LEFT OFF**: Don't restart from scratch, use existing spec and design
 3. **AUTONOMOUS FIXING**: Dev/Architect fix without asking user
 4. **QA VERIFIES**: Re-run tests after each fix
 5. **LOOP UNTIL GREEN**: Keep fixing until all tests pass
 
 ```
-# When /heal is invoked, it reads existing .spectre/ state:
+# When /heal is invoked, it reads existing .clean-claude/ state:
 
-if exists(".spectre/failures.md"):
+if exists(".clean-claude/failures.md"):
     # Continue fixing from where /craft stopped
-    failures = read(".spectre/failures.md")
+    failures = read(".clean-claude/failures.md")
     for failure in failures:
         route_to_agent(failure)  # Dev or Architect
     qa_verify()
@@ -354,7 +354,7 @@ Starting auto-repair...
 ### 4. Update State
 
 ```json
-// .spectre/state.json
+// .clean-claude/state.json
 {
   "workflow": "heal",
   "phase": "fixing",
@@ -597,7 +597,7 @@ Suggestions:
 
 ---
 
-## Integration with .spectre/
+## Integration with .clean-claude/
 
 ### Read Learnings
 
@@ -605,7 +605,7 @@ Before fixing, check if we've seen this error before:
 
 ```bash
 # Search learnings for similar errors
-grep -i "login" .spectre/learnings.jsonl
+grep -i "login" .clean-claude/learnings.jsonl
 ```
 
 If found, apply the known solution first.
@@ -680,4 +680,4 @@ Determine which dev agent to use:
 |--------------|-------|
 | `*.tsx`, `*.jsx`, `components/*` | `frontend-engineer` |
 | `*.ts` in `api/`, `services/`, `server/` | `backend-engineer` |
-| Mixed or unclear | Check `.spectre/context.json` for stack |
+| Mixed or unclear | Check `.clean-claude/context.json` for stack |
