@@ -1079,16 +1079,18 @@ Total: 6 agent spawns across 2 waves
 
 ---
 
-## AUTO ARCHITECTURE CAPTURE — FIRST APPROVED DESIGN
+## AUTO ARCHITECTURE CAPTURE — AFTER IMPLEMENTATION
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════════╗
 ║                                                                           ║
-║   🏛️ ARCHITECTURE AUTO-CAPTURE FROM FIRST /craft                        ║
+║   🏛️ ARCHITECTURE DOCUMENTATION = AFTER CODE IS IMPLEMENTED             ║
 ║                                                                           ║
-║   When the first feature is approved and implemented:                    ║
-║   → The architecture patterns become the REFERENCE                       ║
-║   → Future features MUST follow the same patterns                        ║
+║   Why AFTER and not BEFORE?                                              ║
+║   → Design doc = theoretical                                             ║
+║   → Implemented code = real                                              ║
+║   → ARCHITECTURE.md should reflect what was ACTUALLY built               ║
+║   → More details = better guide for future devs                          ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
 ```
@@ -1096,72 +1098,83 @@ Total: 6 agent spawns across 2 waves
 ### When to Capture
 
 ```
-IF this is a "New feature" flow
-AND this is the FIRST feature in the project (no existing .clean-claude/architecture-guide.md)
+IF this is a "New feature" or "Bootstrap" flow
 AND implementation is complete (all agents done, tests pass)
+AND no existing .clean-claude/architecture-guide.md
 THEN → Ask user if they want to capture this as the reference architecture
 ```
 
 ### Capture Flow
 
 ```
-After implementation completes:
+AFTER implementation completes (code exists, tests pass):
   │
   ├─ CHECK: Does .clean-claude/architecture-guide.md exist?
   │
-  ├─ IF NO (first feature):
+  ├─ IF NO (first feature/bootstrap):
   │     │
   │     └─ ASK USER:
   │         {
-  │           "question": "First feature complete. Capture as reference architecture?",
+  │           "question": "Implementation complete. Capture as reference architecture for future devs?",
   │           "header": "Architecture",
   │           "options": [
-  │             { "label": "Yes, capture (Recommended)", "description": "Future features will follow this structure" },
-  │             { "label": "No, skip", "description": "Architecture guide will be created later" }
+  │             { "label": "Yes, document it", "description": "Architect will analyze code and create ARCHITECTURE.md" },
+  │             { "label": "No, skip", "description": "I'll do it later" }
   │           ]
   │         }
   │
   │     IF "Yes":
-  │         → Spawn learning-agent in architecture mode
-  │         → Generate .clean-claude/architecture-guide.md
+  │         → SPAWN ARCHITECT to analyze implemented code
+  │         → Architect generates .clean-claude/architecture-guide.md
   │         → COMMIT architecture-guide.md (shared reference!)
-  │         → OUTPUT: "✅ Architecture captured and committed. Future features will follow this structure."
+  │         → OUTPUT: "✅ Architecture documented and committed."
   │
   └─ IF YES (architecture exists):
         → Skip capture
         → Architecture already defined
 ```
 
-### Architecture Capture Task
+### Architecture Documentation Task (ARCHITECT does this)
 
 ```
 Task(
-  subagent_type: "learning-agent",
+  subagent_type: "architect",
   prompt: """
-    CAPTURE ARCHITECTURE FROM FIRST FEATURE
+    📚 DOCUMENT THE IMPLEMENTED ARCHITECTURE
 
-    MODE: architecture
+    The code has been implemented. Now analyze it and create the
+    reference documentation for future developers.
 
-    The first feature has been implemented successfully.
-    Extract the architecture patterns as the REFERENCE for future features.
+    ## ANALYZE the actual implemented code:
+    - Folder structure (what exists)
+    - Naming conventions (from real files)
+    - Layer boundaries (how they're actually separated)
+    - Result<T, E> patterns (real examples from code)
+    - Test organization (where tests actually are)
+    - Config files and their purpose
 
-    1. ANALYZE the implemented feature:
-       → Folder structure
-       → Naming conventions
-       → Layer boundaries (domain, application, infrastructure, ui)
-       → Result<T, E> usage
-       → Test organization
+    ## CREATE .clean-claude/architecture-guide.md
 
-    2. SPAWN ARCHITECT to generate:
-       → .clean-claude/architecture-guide.md
+    Include:
+    1. **Project Structure** — Actual folder tree with descriptions
+    2. **Architecture Pattern** — Hexagonal/Clean/etc. with diagram
+    3. **Naming Conventions** — Table of patterns used
+    4. **Error Handling** — Real Result<T,E> examples from code
+    5. **Testing Strategy** — Where tests are, how to run them
+    6. **Adding New Features** — Step-by-step guide
+    7. **Code Examples** — Real snippets from the codebase
 
-    3. COMMIT the architecture-guide.md
-       → This file is SHARED across the team
-       → It MUST be committed to git
+    ## QUALITY BAR
 
-    This guide becomes MANDATORY for all future features.
+    A new developer reading this should:
+    ✅ Understand the architecture in 5 minutes
+    ✅ Know where to put new code
+    ✅ Know the naming conventions
+    ✅ Have real examples to follow
+    ✅ Never violate the architecture by accident
 
-    OUTPUT progress to user.
+    ## COMMIT the file
+    This is the source of truth. It MUST be committed.
   """
 )
 ```
