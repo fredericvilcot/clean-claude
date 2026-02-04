@@ -187,7 +187,44 @@ Task(
 
 ## STEP 3: Ask User (with stack context)
 
-After learning-agent returns detected stack, ask:
+After learning-agent returns detected stack, ask **CONTEXTUAL** questions:
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🧠 CONTEXTUAL OPTIONS — DON'T OFFER IRRELEVANT CHOICES                 ║
+║                                                                           ║
+║   IF stack is EMPTY (no package.json, no code):                          ║
+║   → Only offer: "Init project" or free text                              ║
+║   → DON'T offer: New feature, Refactor, Fix bug, Add tests               ║
+║                                                                           ║
+║   IF stack EXISTS (libraries detected, code present):                    ║
+║   → Offer full menu: New feature, Refactor, Fix bug, Add tests           ║
+║   → DON'T offer: Init project (already initialized)                      ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+### IF EMPTY PROJECT (no stack detected):
+
+```json
+{
+  "questions": [{
+    "question": "Empty project. What do you want to create?",
+    "header": "Init",
+    "multiSelect": false,
+    "options": [
+      { "label": "Init frontend (Recommended)", "description": "React + Vite + TypeScript + Vitest" },
+      { "label": "Init backend", "description": "Node + TypeScript + Express/Fastify" },
+      { "label": "Init fullstack", "description": "Frontend + Backend monorepo" }
+    ]
+  }]
+}
+```
+
+**After init → Re-run learning to detect new stack → Then ask what to build.**
+
+### IF STACK EXISTS (project initialized):
 
 ```json
 {
