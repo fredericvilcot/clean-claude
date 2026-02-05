@@ -89,10 +89,11 @@ Clean Claude transforms Claude Code into a team of Software Craft experts. Clean
 ║      → Ask: "What is this code's responsibility?"                        ║
 ║      → Works for ANY stack: React, Rust, Go, Python, WASM...            ║
 ║                                                                           ║
-║   3. SPEC APPROVAL = BLOCKING (for new features)                          ║
-║      → PO creates/transforms spec → spec-vN.md                           ║
-║      → USER MUST APPROVE before Architect starts                         ║
-║      → No approval = No Architect = No implementation                    ║
+║   3. PO ROUTING = SMART (not all tasks need specs)                       ║
+║      → New feature, user-facing bug → PO writes spec (approval required) ║
+║      → Refactor, migration, technical bug → SKIP PO → Architect directly ║
+║      → Tests only → SKIP PO + Architect → QA directly                   ║
+║      → PO = functional specs | Architect = technical design              ║
 ║                                                                           ║
 ║   4. QA QUESTION = BLOCKING (always Step 5)                               ║
 ║      → BEFORE spawning Architect: "Do you want QA tests?"                ║

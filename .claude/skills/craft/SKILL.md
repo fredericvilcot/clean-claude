@@ -177,31 +177,17 @@ You: "Within /craft, all code follows the full workflow:
 ## STEP 1: Display Banner + Progress Init
 
 ```
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+┌──────────────────────────────────────────────────────────────────┐
+│                                                                  │
+│                      C L E A N   C L A U D E                     │
+│                                                                  │
+│                        ◆ CRAFT MODE ◆                            │
+│                                                                  │
+│                 Stop prompting. Start crafting.                  │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
 
-    ██████╗██╗     ███████╗ █████╗ ███╗   ██╗
-   ██╔════╝██║     ██╔════╝██╔══██╗████╗  ██║
-   ██║     ██║     █████╗  ███████║██╔██╗ ██║
-   ██║     ██║     ██╔══╝  ██╔══██║██║╚██╗██║
-   ╚██████╗███████╗███████╗██║  ██║██║ ╚████║
-    ╚═════╝╚══════╝╚══════╝╚═╝  ╚═╝╚═╝  ╚═══╝
-
-    ██████╗██╗      █████╗ ██╗   ██╗██████╗ ███████╗
-   ██╔════╝██║     ██╔══██╗██║   ██║██╔══██╗██╔════╝
-   ██║     ██║     ███████║██║   ██║██║  ██║█████╗
-   ██║     ██║     ██╔══██║██║   ██║██║  ██║██╔══╝
-   ╚██████╗███████╗██║  ██║╚██████╔╝██████╔╝███████╗
-    ╚═════╝╚══════╝╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚══════╝
-
-                    C R A F T   M O D E
-
-          Stop prompting. Start crafting.
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-
- [□□□□□□□□□] Starting...
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+[□□□□□□□□□] Starting...
 ```
 
 ---
@@ -786,7 +772,104 @@ Then use AskUserQuestion again with the same options.
 
 ### If VALID request
 
-**AFTER learning-agent completes**, continue to STEP 5 (QA Config).
+**AFTER learning-agent completes**, continue to STEP 4b (Task Type Detection).
+
+---
+
+## STEP 4b: TASK TYPE DETECTION — SMART ROUTING
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🧠 SMART ROUTING — NOT ALL TASKS NEED PO                               ║
+║                                                                           ║
+║   The PO writes FUNCTIONAL specs (user stories, behaviors).              ║
+║   Some tasks are PURELY TECHNICAL and don't need functional specs.       ║
+║                                                                           ║
+║   DETECT TASK TYPE → ROUTE APPROPRIATELY                                 ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+### Task Type Categories
+
+| Task Type | Examples | Needs PO? | Route |
+|-----------|----------|-----------|-------|
+| **New feature** | "Add authentication", "Create dashboard" | ✅ YES | PO → Architect → Dev |
+| **Bug fix** (user-facing) | "Login doesn't work", "Button broken" | ✅ YES | PO → Architect → Dev |
+| **Bug fix** (technical) | "Memory leak", "Race condition" | ❌ NO | Architect → Dev |
+| **Refactor** | "Remove any types", "Migrate to Result" | ❌ NO | Architect → Dev |
+| **Migration** | "Migrate to monorepo", "Upgrade to v2" | ❌ NO | Architect → Dev |
+| **Transformation** | "Convert to Nx", "Add module federation" | ❌ NO | Architect → Dev |
+| **Add tests only** | "Add E2E tests", "Improve coverage" | ❌ NO | QA directly |
+| **Performance** | "Optimize bundle", "Reduce load time" | ❌ NO | Architect → Dev |
+
+### Detection Keywords
+
+```javascript
+// NEEDS PO (functional spec required)
+const needsPO = [
+  "new feature", "add feature", "create feature",
+  "build", "implement", "add capability",
+  "user can", "user should", "as a user"
+];
+
+// SKIP PO (purely technical, no functional spec needed)
+const skipPO = [
+  // Refactoring
+  "refactor", "migrate", "transform", "convert", "upgrade",
+  "restructure", "reorganize", "modularize",
+  // Technical debt
+  "remove any", "fix types", "add types", "strict mode",
+  "result pattern", "error handling",
+  // Architecture
+  "monorepo", "micro-frontend", "hexagonal", "clean architecture",
+  "module federation", "nx", "turborepo", "lerna",
+  // Performance
+  "optimize", "performance", "bundle size", "lazy load",
+  "cache", "memoize",
+  // Technical bugs
+  "memory leak", "race condition", "deadlock", "crash"
+];
+
+// TESTS ONLY (skip PO + Architect)
+const testsOnly = [
+  "add tests", "write tests", "improve coverage",
+  "e2e tests", "integration tests", "regression tests"
+];
+```
+
+### Store Task Type
+
+```
+After detecting task type, store in state:
+
+taskType: "new-feature" | "bug-fix" | "refactor" | "migration" | "tests-only"
+needsPO: boolean
+needsArchitect: boolean
+```
+
+### Display Routing Decision
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 2.5/9 — ROUTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ [■■□□□□□□□] Task analysis
+
+ ┌─ Task Type ──────────────────────────────────────────────────────┐
+ │                                                                   │
+ │  🎯 Detected: MIGRATION / TRANSFORMATION                         │
+ │                                                                   │
+ │  📋 PO (spec): Skipped — no functional spec needed               │
+ │  🏛️ Architect: Required — technical design                       │
+ │  👨‍💻 Dev: Required — implementation                                │
+ │  🧪 QA: Will ask                                                  │
+ │                                                                   │
+ │  Reason: "Migrate to monorepo" is purely architectural           │
+ │                                                                   │
+ └───────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
@@ -864,7 +947,47 @@ Then use AskUserQuestion again with the same options.
 
 ---
 
-## STEP 6: SPEC APPROVAL — BLOCKING CHECKPOINT
+## STEP 6: SPEC APPROVAL — CONDITIONAL (PO ROUTING)
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🧠 CONDITIONAL: BASED ON TASK TYPE FROM STEP 4b                        ║
+║                                                                           ║
+║   IF needsPO == true (new feature, user-facing bug):                     ║
+║      → Execute this step (spawn PO, write spec, approval)               ║
+║                                                                           ║
+║   IF needsPO == false (refactor, migration, technical):                  ║
+║      → SKIP this step entirely                                           ║
+║      → Go directly to STEP 6b (Architecture Reference)                  ║
+║      → Display: "📋 PO: Skipped (technical task, no spec needed)"        ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+### IF needsPO == false → Skip Display
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 4/9 — PRODUCT OWNER ⏭️
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ [■■■■□□□□□] Skipped — technical task
+
+ ┌─ Routing ────────────────────────────────────────────────────────┐
+ │                                                                   │
+ │  📋 PO: SKIPPED                                                   │
+ │                                                                   │
+ │  Task type: Migration / Transformation                           │
+ │  Reason: No functional spec needed for purely technical work     │
+ │                                                                   │
+ │  → Proceeding directly to Architecture Reference                 │
+ │                                                                   │
+ └───────────────────────────────────────────────────────────────────┘
+```
+
+**Then go directly to STEP 6b.**
+
+### IF needsPO == true → Execute PO Step
 
 **Output to user (while PO is working):**
 

@@ -107,13 +107,17 @@ Three commands. That's all you need.
  • No  → Unit tests only (colocated)
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- 4. PRODUCT OWNER
+ 4. PRODUCT OWNER (smart routing)
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
- 📋 Writing spec...
- → .clean-claude/specs/functional/spec-v1.md
+ IF new feature / user-facing bug:
+   📋 Writing spec...
+   → .clean-claude/specs/functional/spec-v1.md
+   ⏸️  APPROVAL REQUIRED
 
- ⏸️  APPROVAL REQUIRED — Review spec before continuing
+ IF refactor / migration / technical:
+   ⏭️  SKIPPED — no functional spec needed
+   → Proceeding directly to Architect
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  5. ARCHITECTURE REFERENCE
@@ -193,14 +197,16 @@ Three commands. That's all you need.
 
 ```
 
-**Free text works too:**
+**Smart routing — free text works:**
 
-| You say | Clean Claude does |
-|---------|-------------------|
-| "Add dark mode" | Full flow: PO → Arch → Dev → QA |
-| "Fix the login bug" | Skip PO, route to Dev |
-| "Migrate to Result types" | Architect refactoring plan |
-| "Add E2E tests" | QA only |
+| You say | Route | Why |
+|---------|-------|-----|
+| "Add dark mode" | PO → Arch → Dev | New feature needs spec |
+| "Login doesn't work" | PO → Arch → Dev | User-facing bug needs spec |
+| "Memory leak in cart" | Arch → Dev | Technical bug, no spec needed |
+| "Migrate to monorepo" | Arch → Dev | Transformation, no spec needed |
+| "Migrate to Result types" | Arch → Dev | Refactor, no spec needed |
+| "Add E2E tests" | QA directly | Tests only |
 
 ### `/heal` — Fix something
 
