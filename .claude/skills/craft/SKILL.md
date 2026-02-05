@@ -248,89 +248,27 @@ Build options from `context.json.monorepo.workspaces`:
 }
 ```
 
-**After scope selected — Save to context and continue:**
+**After scope selected — GO DIRECTLY TO STEP 2:**
 
 ```
-Update context.json:
-{
-  "project": {
-    ...existing,
-    "scope": "[SELECTED_SCOPE]"
-  }
-}
+1. Update context.json with scope
+2. Show: "🟢 Scope: [SELECTED_SCOPE]"
+3. GO TO STEP 2 (Choose) IMMEDIATELY
 ```
 
-> 🟣 **NO skills generation here!**
-> Skills will be generated at Step 7, just before Dev implementation.
-> This keeps Step 1 fast and focused.
+> 🚨 **DO NOT:**
+> - Read package.json again
+> - Analyze the scope's structure
+> - Search for patterns
+> - Display stack details
+>
+> Just save scope and move to Step 2.
 
-**Show scope confirmation:**
+### CRAFT Validation — DEFERRED TO STEP 6
 
-```
-🟢 Step 1/9 ─ Learn                              ✓ Complete
-
-┌─ 🎯 Scope: apps/auth ────────────────────────────────────────┐
-│                                                              │
-│  📦 Stack     typescript, react, zustand, tanstack-query     │
-│  🏛️ Skills    .clean-claude/stack-skills.md                 │
-│  📐 Arch      apps/auth/ARCHITECTURE.md (v1)                 │
-│  ✅ CRAFT     compliant                                       │
-│                                                              │
-└──────────────────────────────────────────────────────────────┘
-```
-
-### IF CRAFT VIOLATIONS DETECTED — Ask user
-
-After scope selection (or for single app), if `craftValidation` shows violations:
-
-```
-⬡ Step 1/9 ─ Learn
-
-  ⚠️  CRAFT violations detected in apps/legacy-auth
-
-┌─ 🔍 Validation ─────────────────────────────────────────────┐
-│                                                              │
-│  🔴 any types       47 occurrences                           │
-│  🔴 throw/catch     23 statements (no Result pattern)        │
-│  🟡 hexagonal       partial (missing domain/)                │
-│  🔴 test coverage   none                                     │
-│                                                              │
-└──────────────────────────────────────────────────────────────┘
-
-  This scope needs cleaning. What do you want to do?
-```
-
-**Ask user:**
-
-```json
-{
-  "questions": [{
-    "question": "This scope has CRAFT violations. What do you want to do?",
-    "header": "Violations",
-    "multiSelect": false,
-    "options": [
-      { "label": "🧹 Fix first (Recommended)", "description": "Run /heal to clean violations" },
-      { "label": "🔄 Refactor mode", "description": "Continue — Architect designs cleanup plan" },
-      { "label": "🔙 Choose another scope", "description": "Go back to scope selection" },
-      { "label": "⚡ Continue anyway", "description": "Proceed — agents still follow CRAFT" }
-    ]
-  }]
-}
-```
-
-**Routing:**
-- "Fix first" → Tell user to run `/heal` on this scope, then restart
-- "Refactor mode" → Set `workflow.mode = "refactor"` → Architect MUST include cleanup
-- "Another scope" → Back to scope selection
-- "Continue anyway" → Proceed normally (but warn in design phase)
-
-### Scope Change Mid-Session
-
-> 🔄 **If user changes scope mid-session:**
-> 1. Acknowledge: "Switching to apps/billing"
-> 2. Read new scope's package.json
-> 3. Re-spawn Architect → new stack-skills.md
-> 4. Continue from STEP 3 (CHOOSE)
+> ⚠️ **NO validation at Step 1.**
+> CRAFT validation happens at Step 6 (Skills Generation), just before dev.
+> This keeps Step 1 fast.
 
 ### IF SINGLE APP — Show results directly (no scope question)
 
