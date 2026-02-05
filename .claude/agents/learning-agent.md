@@ -459,6 +459,164 @@ The `/craft` command uses these fields to show RELEVANT refactor options only.
 
 ---
 
+## Monorepo Detection (BEFORE Stack Detection)
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🔍 MONOREPO VS SINGLE APP — DETECT FIRST, ASK ONLY IF NEEDED           ║
+║                                                                           ║
+║   CHECK ORDER:                                                            ║
+║   1. package.json has "workspaces" field?                                ║
+║   2. pnpm-workspace.yaml exists?                                          ║
+║   3. lerna.json exists?                                                   ║
+║   4. Multiple package.json files in subdirectories?                       ║
+║   5. nx.json exists?                                                      ║
+║   6. turbo.json exists?                                                   ║
+║                                                                           ║
+║   IF ANY = true → Monorepo mode                                          ║
+║   IF ALL = false → Single app mode (NO scope question)                   ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+### Monorepo Detection Steps
+
+```
+1. READ package.json at root
+   → Check for "workspaces" field
+
+2. CHECK for workspace config files
+   → pnpm-workspace.yaml
+   → lerna.json
+   → nx.json
+   → turbo.json
+
+3. IF monorepo detected:
+   → List all workspaces (apps/, packages/, libs/)
+   → Count total workspaces
+   → Set context.json monorepo field
+
+4. IF single app:
+   → Skip monorepo section entirely
+   → Proceed directly to stack detection
+```
+
+### context.json — Monorepo Field
+
+```json
+{
+  "monorepo": {
+    "detected": true,
+    "type": "npm-workspaces",
+    "workspaces": {
+      "apps": ["auth", "dashboard", "billing", "settings"],
+      "packages": ["shared", "ui-kit", "utils"]
+    },
+    "count": 7,
+    "scope": null
+  }
+}
+```
+
+**IF single app → `monorepo` field is `null` (not present)**
+
+```json
+{
+  "monorepo": null,
+  "stack": { ... }
+}
+```
+
+### Scope Selection (Only if Monorepo)
+
+**Output to user (ONLY if monorepo detected):**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 1/9 — LEARN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ 🔍 Monorepo detected (7 workspaces)
+
+ ┌─ Workspaces ──────────────────────────────────────────────────────┐
+ │  apps/     auth, dashboard, billing, settings                     │
+ │  packages/ shared, ui-kit, utils                                  │
+ └───────────────────────────────────────────────────────────────────┘
+
+ Which scope do you want to work on?
+```
+
+**AskUserQuestion (ONLY if monorepo):**
+
+```json
+{
+  "questions": [{
+    "question": "Which workspace do you want to work on?",
+    "header": "Scope",
+    "multiSelect": false,
+    "options": [
+      { "label": "apps/auth", "description": "Authentication micro-frontend" },
+      { "label": "apps/dashboard", "description": "Main dashboard" },
+      { "label": "packages/shared", "description": "Shared library" },
+      { "label": "Root level", "description": "Monorepo config, CI, shared tooling" }
+    ]
+  }]
+}
+```
+
+**After scope selection → Update context.json:**
+
+```json
+{
+  "monorepo": {
+    "detected": true,
+    "scope": "apps/auth",
+    "rootArchitecture": "docs/monorepo-architecture.md"
+  },
+  "stack": {
+    "language": "typescript",
+    "libraries": ["react", "zustand"]
+  }
+}
+```
+
+### Architecture Hierarchy (Monorepo)
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   📐 ARCHITECTURE REFERENCE IN MONOREPO                                   ║
+║                                                                           ║
+║   TWO LEVELS:                                                             ║
+║   1. ROOT architecture (applies to ALL workspaces)                        ║
+║      → docs/monorepo-architecture.md                                     ║
+║      → Shared patterns, conventions, tooling                             ║
+║                                                                           ║
+║   2. LOCAL architecture (specific to ONE workspace)                       ║
+║      → apps/auth/ARCHITECTURE.md                                         ║
+║      → Can override/extend root patterns                                 ║
+║                                                                           ║
+║   ARCHITECT MUST READ BOTH (if both exist)                               ║
+║   LOCAL inherits from ROOT, can override                                 ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+**Local architecture frontmatter:**
+
+```yaml
+---
+clean-claude: architecture-reference
+id: abc123...
+version: 1
+scope: apps/auth
+inherits: docs/monorepo-architecture.md
+---
+```
+
+---
+
 ## Stack Detection Matrix
 
 | File | What to Check |

@@ -231,7 +231,93 @@ Task(
 )
 ```
 
-**After learning-agent completes, show results:**
+**After learning-agent completes, check context.json for monorepo:**
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🧠 SMART PROMPTING — MONOREPO VS SINGLE APP                            ║
+║                                                                           ║
+║   READ context.json.monorepo:                                            ║
+║                                                                           ║
+║   IF monorepo.detected == true:                                          ║
+║      → Show monorepo results + ask scope question                        ║
+║      → THEN show stack for selected scope                                ║
+║                                                                           ║
+║   IF monorepo == null:                                                   ║
+║      → Show single app results directly                                  ║
+║      → NO scope question (skip entirely)                                 ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+### IF MONOREPO DETECTED — Show scope selection
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 1/9 — LEARN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ [■□□□□□□□□] Monorepo detected — Select scope
+
+ ┌─ Monorepo ────────────────────────────────────────────────────────┐
+ │                                                                   │
+ │  🗂️ Type: npm workspaces (7 packages)                            │
+ │                                                                   │
+ │  apps/                                                            │
+ │     auth, dashboard, billing, settings                            │
+ │                                                                   │
+ │  packages/                                                        │
+ │     shared, ui-kit, utils                                         │
+ │                                                                   │
+ │  📐 Root architecture: docs/monorepo-architecture.md             │
+ │                                                                   │
+ └───────────────────────────────────────────────────────────────────┘
+
+ Which workspace do you want to work on?
+```
+
+**Ask scope (ONLY if monorepo):**
+```json
+{
+  "questions": [{
+    "question": "Which workspace?",
+    "header": "Scope",
+    "multiSelect": false,
+    "options": [
+      { "label": "apps/auth", "description": "Authentication" },
+      { "label": "apps/dashboard", "description": "Main dashboard" },
+      { "label": "packages/shared", "description": "Shared library" },
+      { "label": "Root level", "description": "Monorepo config" }
+    ]
+  }]
+}
+```
+
+**After scope selected — Show scoped results:**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 1/9 — LEARN ✅
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ [■□□□□□□□□] Scope: apps/auth
+
+ ┌─ Detection Results ───────────────────────────────────────────────┐
+ │                                                                   │
+ │  🎯 Scope: apps/auth                                              │
+ │                                                                   │
+ │  📦 Stack                                                         │
+ │     typescript, react, zustand, tanstack-query                   │
+ │                                                                   │
+ │  📐 Architecture                                                  │
+ │     Local:  apps/auth/ARCHITECTURE.md (v1)                       │
+ │     Root:   docs/monorepo-architecture.md (inherited)            │
+ │                                                                   │
+ │  ✅ CRAFT: compliant                                              │
+ │                                                                   │
+ └───────────────────────────────────────────────────────────────────┘
+```
+
+### IF SINGLE APP — Show results directly (no scope question)
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -246,18 +332,8 @@ Task(
  │                                                                   │
  │  📐 Architecture Reference                                        │
  │     Found: docs/arch.md (v2, id: f8a3...b2c1)                    │
- │     — OR —                                                        │
- │     None detected                                                 │
  │                                                                   │
- │  ✅ CRAFT Validation                                              │
- │     • No `any` types         ✅                                   │
- │     • Result pattern         ✅                                   │
- │     • Hexagonal structure    ✅                                   │
- │     • Test coverage          65% ✅                               │
- │     — OR —                                                        │
- │  ⚠️ CRAFT Violations                                              │
- │     • `any` types found      12 occurrences                      │
- │     • Missing Result pattern                                      │
+ │  ✅ CRAFT: compliant                                              │
  │                                                                   │
  └───────────────────────────────────────────────────────────────────┘
 ```
@@ -265,6 +341,7 @@ Task(
 **DO NOT:**
 - ❌ Use Explore agent
 - ❌ Read files directly
+- ❌ Ask scope question for single apps
 - ❌ Ask user before learning
 
 **WAIT for learning-agent to complete before continuing.**
