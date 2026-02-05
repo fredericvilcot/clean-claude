@@ -709,6 +709,34 @@ IF ARCH_REF == "ERROR:MULTIPLE":
 
 **CRITICAL: If `architectureRef` is set in context.json, Architect MUST read it.**
 
+### Empty Folders Check
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   ⚠️ EMPTY FOLDERS = NOT HEXAGONAL                                        ║
+║                                                                           ║
+║   A folder existing ≠ Architecture implemented                           ║
+║                                                                           ║
+║   BEFORE saying "hasHexagonalStructure = true":                          ║
+║                                                                           ║
+║   CHECK EACH FOLDER HAS FILES:                                            ║
+║   Glob("src/domain/**/*.ts") → count > 0?                                ║
+║   Glob("src/application/**/*.ts") → count > 0?                           ║
+║   Glob("src/infrastructure/**/*.ts") → count > 0?                        ║
+║                                                                           ║
+║   IF folder exists but has 0 files:                                       ║
+║   → hasHexagonalStructure = false                                        ║
+║   → Note: "Empty domain/ folder detected (scaffolded but not used)"      ║
+║                                                                           ║
+║   EXAMPLE:                                                                ║
+║   ❌ domain/ exists but empty → NOT hexagonal                            ║
+║   ❌ domain/ has only index.ts with 0 exports → NOT hexagonal            ║
+║   ✅ domain/ has Order.ts, OrderError.ts, etc. → hexagonal               ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
 ### Validation Result
 
 ```
@@ -716,7 +744,9 @@ AFTER running all checks, set context.json craftValidation fields:
 
 hasAnyTypes = (ANY_COUNT > 0)
 usesResultPattern = (RESULT_COUNT > 0 || THROW_COUNT == 0)
-hasHexagonalStructure = (domain/ or core/ or layers exist)
+hasHexagonalStructure = (domain/ or core/ or layers exist WITH FILES)
+                        ⚠️ EMPTY FOLDERS DON'T COUNT!
+                        Check: Glob("domain/**/*.ts") → count > 0?
 testCoverage =
   - "none" if RATIO < 10
   - "partial" if RATIO 10-50
@@ -787,18 +817,29 @@ The `/craft` command uses these fields to show RELEVANT refactor options only.
 ```
 ╔═══════════════════════════════════════════════════════════════════════════╗
 ║                                                                           ║
-║   🔬 CRAFT VALIDATION ON SELECTED SCOPE — MANDATORY                      ║
+║   🔬 SCOPE SCAN — FULL STACK + CRAFT + ARCHITECT                         ║
 ║                                                                           ║
-║   AFTER scope selection in monorepo:                                      ║
-║   learning-agent is called AGAIN with the selected scope path             ║
-║   → MUST run full CRAFT validation (not just stack detection)            ║
+║   When called with a SCOPE PATH (e.g., "apps/pci-gateway"):              ║
+║   This is the SECOND call after monorepo detection.                       ║
+║   You MUST do the FULL scan.                                              ║
 ║                                                                           ║
-║   RUN ON SCOPE:                                                           ║
-║   1. Stack detection (libraries in that scope)                           ║
+║   MANDATORY STEPS:                                                        ║
+║   1. Stack detection (libraries in scope's package.json)                 ║
 ║   2. CRAFT validation (any, throw, hexagonal, tests)                     ║
 ║   3. Architecture reference lookup (scope-local + root)                  ║
+║   4. 🚨 SPAWN ARCHITECT for stack-skills.md ← MANDATORY                  ║
+║   5. Wait for Architect to complete                                      ║
+║   6. Return with full context.json                                       ║
 ║                                                                           ║
-║   OUTPUT: context.json with craftValidation fields populated             ║
+║   ⚠️ IF YOU SKIP STEP 4 → SKILLS NOT GENERATED → AGENTS UNINFORMED       ║
+║                                                                           ║
+║   HOW TO KNOW IF THIS IS A SCOPE SCAN:                                   ║
+║   - Prompt mentions a specific path (apps/X, packages/Y, etc.)           ║
+║   - OR context.json already has monorepo.detected = true                 ║
+║   - OR you're called with "scope" or specific app name                   ║
+║                                                                           ║
+║   OUTPUT after Architect completes:                                      ║
+║   "🏛️ Stack skills generated → .clean-claude/stack-skills.md"           ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
 ```
