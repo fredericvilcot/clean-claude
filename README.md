@@ -348,6 +348,59 @@ If you accept, it creates an **architecture-reference** file that:
 
 ---
 
+## Monorepo Support
+
+Clean Claude detects monorepos automatically and adapts:
+
+```
+Single app?  → Direct stack detection, no extra questions
+Monorepo?    → Ask which workspace to work on first
+```
+
+**Smart detection:**
+- `package.json` workspaces
+- `pnpm-workspace.yaml`
+- `lerna.json`, `nx.json`, `turbo.json`
+
+**Example flow (monorepo with 50 micro-frontends):**
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 1/9 — LEARN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ 🔍 Monorepo detected (50 workspaces)
+
+ ┌─ Workspaces ──────────────────────────────────────────────────────┐
+ │  apps/     auth, dashboard, billing, settings, admin...          │
+ │  packages/ shared, ui-kit, utils                                  │
+ └───────────────────────────────────────────────────────────────────┘
+
+ Which workspace do you want to work on?
+ • apps/auth
+ • apps/dashboard
+ • packages/shared
+ • Root level
+```
+
+**Architecture hierarchy:**
+
+```
+monorepo/
+├── docs/
+│   └── architecture.md          ← ROOT (shared patterns)
+│
+└── apps/
+    └── auth/
+        └── ARCHITECTURE.md      ← LOCAL (inherits root, can override)
+```
+
+- **Root architecture**: Patterns shared across ALL workspaces
+- **Local architecture**: Workspace-specific patterns (inherits from root)
+- Architect reads BOTH when designing
+
+---
+
 ## Documentation
 
 | Document | Description |
