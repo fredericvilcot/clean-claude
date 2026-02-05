@@ -659,44 +659,132 @@ Then use AskUserQuestion again with the same options.
 ## PARALLEL EXECUTION — MAXIMIZE THROUGHPUT
 
 ```
-╔═══════════════════════════════════════════════════════════════════╗
-║                                                                   ║
-║   🚀 PARALLELIZATION = SPEED                                     ║
-║                                                                   ║
-║   Multiple Task() calls in ONE message = PARALLEL execution      ║
-║   Spawn as many agents as independent tasks allow                ║
-║                                                                   ║
-╚═══════════════════════════════════════════════════════════════════╝
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🚀 PARALLELIZATION = SPEED + PERFORMANCE                               ║
+║                                                                           ║
+║   RULE: If tasks are INDEPENDENT → run them in PARALLEL                  ║
+║   Multiple Task() calls in ONE message = PARALLEL execution              ║
+║                                                                           ║
+║   ALWAYS ask: "Can these run at the same time?"                          ║
+║   If YES → Same message, multiple Task() calls                           ║
+║   If NO (dependency) → Sequential                                         ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
 ```
 
-### Rule 1: Dev + QA Always Parallel
+### PARALLELIZATION MAP — All Opportunities
 
 ```
-// CORRECT — Dev and QA in parallel
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│   PHASE 1: SETUP                                                            │
+│   ─────────────────                                                         │
+│   Learning-agent runs automatically (no parallelization needed)            │
+│                                                                             │
+│   PHASE 2: SPEC + CONFIG (Sequential - needs user input)                   │
+│   ───────────────────────                                                   │
+│   User choices → PO spec → User approval                                   │
+│                                                                             │
+│   PHASE 3: DESIGN (Sequential - needs spec)                                │
+│   ──────────────────                                                        │
+│   Architect designs → User approval                                        │
+│                                                                             │
+│   PHASE 4: IMPLEMENTATION ← 🚀 MAXIMUM PARALLELIZATION                     │
+│   ─────────────────────────                                                 │
+│   ┌─────────────────────────────────────────────────────────────────────┐  │
+│   │  PARALLEL WAVE 1:                                                    │  │
+│   │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐ ┌─────────────┐   │  │
+│   │  │ Dev Agent 1 │ │ Dev Agent 2 │ │ Dev Agent 3 │ │  QA Agent   │   │  │
+│   │  │ (types/)    │ │ (hooks/)    │ │ (pages/)    │ │ (e2e tests) │   │  │
+│   │  └─────────────┘ └─────────────┘ └─────────────┘ └─────────────┘   │  │
+│   └─────────────────────────────────────────────────────────────────────┘  │
+│                              │                                              │
+│                              ▼                                              │
+│   ┌─────────────────────────────────────────────────────────────────────┐  │
+│   │  PARALLEL WAVE 2 (if dependencies):                                  │  │
+│   │  ┌─────────────┐ ┌─────────────┐                                    │  │
+│   │  │ Dev Agent 4 │ │ Dev Agent 5 │  (tasks that needed Wave 1)       │  │
+│   │  │ (services/) │ │ (App.tsx)   │                                    │  │
+│   │  └─────────────┘ └─────────────┘                                    │  │
+│   └─────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│   PHASE 5: VERIFICATION                                                     │
+│   ──────────────────────                                                    │
+│   Claude runs checks → If errors:                                          │
+│   ┌─────────────────────────────────────────────────────────────────────┐  │
+│   │  PARALLEL ERROR FIXING:                                              │  │
+│   │  ┌─────────────┐ ┌─────────────┐ ┌─────────────┐                    │  │
+│   │  │ Dev (type   │ │ Dev (test   │ │ QA (e2e     │                    │  │
+│   │  │ error in X) │ │ fail in Y)  │ │ fail in Z)  │                    │  │
+│   │  └─────────────┘ └─────────────┘ └─────────────┘                    │  │
+│   └─────────────────────────────────────────────────────────────────────┘  │
+│                                                                             │
+│   PHASE 6: DOCUMENTATION                                                    │
+│   ───────────────────────                                                   │
+│   Architect documents architecture (sequential - needs complete code)      │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Rule 1: Dev + QA ALWAYS Parallel
+
+```
+// ALWAYS spawn Dev and QA together after design approval
 Task(subagent_type: "frontend-engineer", prompt: "Implement...")
 Task(subagent_type: "qa-engineer", prompt: "Write E2E tests...")
-// Both in SAME message = parallel
+// SAME message = parallel execution
 ```
 
 ### Rule 2: Multiple Dev Agents for Independent Tasks
 
-**If tasks don't touch the same files, spawn multiple dev agents:**
+**Parse Architect's design → Group by folder → Spawn parallel agents:**
 
 ```
-// CORRECT — 3 independent tasks = 3 parallel agents
-Task(subagent_type: "frontend-engineer", prompt: "Create Result type in src/types/")
-Task(subagent_type: "frontend-engineer", prompt: "Add error boundaries in src/pages/")
-Task(subagent_type: "frontend-engineer", prompt: "Refactor hooks in src/hooks/")
-// All in SAME message = 3 agents working simultaneously
+// Architect's design has 8 tasks across 4 folders:
+// → Group A: src/types/ (2 tasks)
+// → Group B: src/hooks/ (2 tasks)
+// → Group C: src/components/ (2 tasks)
+// → Group D: src/pages/ (2 tasks)
+
+// SPAWN 4 DEV AGENTS + 1 QA IN PARALLEL:
+Task(subagent_type: "frontend-engineer", prompt: "Implement Group A: types/...")
+Task(subagent_type: "frontend-engineer", prompt: "Implement Group B: hooks/...")
+Task(subagent_type: "frontend-engineer", prompt: "Implement Group C: components/...")
+Task(subagent_type: "frontend-engineer", prompt: "Implement Group D: pages/...")
+Task(subagent_type: "qa-engineer", prompt: "Write E2E tests...")
+// ALL 5 in SAME message = 5 agents working simultaneously
 ```
 
-### Rule 3: Sequential When Dependencies Exist
+### Rule 3: Parallel Error Fixing
+
+**If verification finds multiple errors in different areas:**
 
 ```
-// WRONG — These conflict (same file)
+// Errors found:
+// - Type error in src/types/Result.ts
+// - Test failure in src/hooks/useAuth.test.ts
+// - E2E failure in e2e/login.spec.ts
+
+// SPAWN 3 AGENTS IN PARALLEL:
+Task(subagent_type: "frontend-engineer", prompt: "Fix type error in src/types/Result.ts...")
+Task(subagent_type: "frontend-engineer", prompt: "Fix test failure in src/hooks/useAuth.test.ts...")
+Task(subagent_type: "qa-engineer", prompt: "Fix E2E failure in e2e/login.spec.ts...")
+// SAME message = parallel fixing
+```
+
+### Rule 4: Sequential ONLY When Dependencies Exist
+
+```
+// WRONG — Same file conflict
 Task(frontend-engineer, "Add feature X to src/App.tsx")
 Task(frontend-engineer, "Add feature Y to src/App.tsx")
-// CONFLICT! Same file = must be sequential
+// CONFLICT! Same file = SEQUENTIAL
+
+// WRONG — Task B needs Task A's output
+Task(frontend-engineer, "Create Result type in types/")
+Task(frontend-engineer, "Use Result type in services/")  // needs types/ first!
+// DEPENDENCY! = SEQUENTIAL (Wave 1, then Wave 2)
 
 // WRONG — Task B needs Task A's output
 Task(frontend-engineer, "Create Result type")
@@ -743,6 +831,140 @@ ARCHITECT produces design with N tasks
 - **Recommended:** 3-5 dev agents + 1 QA agent
 - **Why limit?** Too many agents = context fragmentation
 - **Sweet spot:** Group related files into logical units
+
+---
+
+## NOTIFICATION LOOP — PARALLEL AGENTS MUST COMMUNICATE
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🔔 PARALLEL AGENTS = NOTIFICATION LOOP MANDATORY                       ║
+║                                                                           ║
+║   When multiple agents work in parallel, they MUST:                      ║
+║   1. Notify CLAUDE when done (for orchestration)                         ║
+║   2. Notify OTHER AGENTS if issue affects them                           ║
+║   3. Route problems to the RIGHT agent                                   ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+### Notification Flow for Parallel Execution
+
+```
+                    ┌─────────────────────────────────────┐
+                    │         CLAUDE ORCHESTRATOR          │
+                    │   (receives all agent completions)   │
+                    └──────────────────┬──────────────────┘
+                                       │
+           ┌───────────────────────────┼───────────────────────────┐
+           │                           │                           │
+           ▼                           ▼                           ▼
+    ┌─────────────┐             ┌─────────────┐             ┌─────────────┐
+    │ Dev Agent 1 │◄───────────►│ Dev Agent 2 │◄───────────►│  QA Agent   │
+    │  (types/)   │  notify if  │  (hooks/)   │  notify if  │   (e2e/)    │
+    └─────────────┘  conflict   └─────────────┘  conflict   └─────────────┘
+           │                           │                           │
+           └───────────────────────────┴───────────────────────────┘
+                         INTER-AGENT NOTIFICATIONS
+```
+
+### What Agents Must Notify
+
+| Situation | Who Notifies | Who Gets Notified | Message |
+|-----------|--------------|-------------------|---------|
+| Task complete | Dev/QA | Claude | "✅ Done: [files changed]" |
+| Found bug in other's code | Dev | Other Dev | "🔴 Bug in your file: X" |
+| Test fails on other's code | QA | Dev who owns file | "🔴 Test fail: [file:line]" |
+| Need type/interface from other | Dev | Other Dev | "⏳ Need Result type from types/" |
+| Design unclear | Dev | Architect | "❓ Design question: [question]" |
+| Spec unclear | Dev/QA | PO | "❓ Spec unclear: [question]" |
+
+### Parallel Spawn Template
+
+**When spawning parallel agents, include notification instructions:**
+
+```
+// PARALLEL SPAWN — All in ONE message
+Task(
+  subagent_type: "frontend-engineer",
+  prompt: """
+    Implement: src/types/
+
+    NOTIFICATION RULES:
+    - When DONE → Return list of files created/modified
+    - If you find a bug in hooks/ or pages/ → Note it for routing
+    - If you need something from another folder → Note the dependency
+  """
+)
+Task(
+  subagent_type: "frontend-engineer",
+  prompt: """
+    Implement: src/hooks/
+
+    NOTIFICATION RULES:
+    - When DONE → Return list of files created/modified
+    - If types/ doesn't have what you need → Note it
+    - If you find a bug in other code → Note it for routing
+  """
+)
+Task(
+  subagent_type: "qa-engineer",
+  prompt: """
+    Write E2E tests for: [feature]
+
+    NOTIFICATION RULES:
+    - When DONE → Return list of test files
+    - If test fails → Include file:line and which code caused it
+    - Route failures to the right Dev (based on file ownership)
+  """
+)
+```
+
+### Post-Parallel Orchestration
+
+**After all parallel agents complete, Claude:**
+
+```
+1. COLLECT all agent outputs
+   │
+   ├─ Agent 1: "✅ Done: types/Result.ts, types/Error.ts"
+   ├─ Agent 2: "✅ Done: hooks/useAuth.ts — Note: needs Result type"
+   ├─ Agent 3: "✅ Done: pages/Login.tsx"
+   └─ QA: "✅ Tests written. 1 failure in hooks/useAuth.ts:45"
+   │
+   ▼
+2. IDENTIFY issues that need routing
+   │
+   ├─ Dependency issue: hooks/ needed types/ → Check if resolved
+   └─ Test failure: hooks/useAuth.ts:45 → Route to Dev Agent 2
+   │
+   ▼
+3. SPAWN fix agents IN PARALLEL (if multiple issues)
+   │
+   Task(frontend-engineer, "Fix test failure in hooks/useAuth.ts:45...")
+   Task(frontend-engineer, "Fix type issue in pages/Login.tsx...")
+   │
+   ▼
+4. RE-RUN verification
+```
+
+### File Ownership for Routing
+
+**When multiple agents work in parallel, track who owns what:**
+
+| Agent | Owns | Routes issues to |
+|-------|------|------------------|
+| Dev 1 | src/types/** | Dev 1 |
+| Dev 2 | src/hooks/** | Dev 2 |
+| Dev 3 | src/pages/** | Dev 3 |
+| Dev 4 | src/components/** | Dev 4 |
+| QA | e2e/** | QA |
+| Architect | design docs | Architect |
+
+**Bug in types/? → Route to Dev 1**
+**Test fail in e2e/? → Route to QA**
+**Design flaw? → Route to Architect**
 
 ---
 
