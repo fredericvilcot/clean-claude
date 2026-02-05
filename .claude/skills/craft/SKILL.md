@@ -1706,6 +1706,233 @@ Total: 6 agent spawns across 2 waves
 
 ---
 
+## DESIGN COVERAGE TRACKING — MANDATORY
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🚨 IMPLEMENTATION CHECKLIST = CONTRACT                                  ║
+║                                                                           ║
+║   Architect's design contains "Implementation Checklist" table.           ║
+║   This is the ONLY source of truth for completion.                        ║
+║                                                                           ║
+║   BEFORE declaring "Complete":                                            ║
+║   → Parse checklist from design.md                                        ║
+║   → Check EVERY file exists on disk                                       ║
+║   → If ANY file missing → NOT COMPLETE → Continue implementation          ║
+║                                                                           ║
+║   "Tests passing" ≠ "Complete"                                            ║
+║   "Some files created" ≠ "Complete"                                       ║
+║   "100% of checklist implemented" = "Complete"                            ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+### Step 1: Parse Checklist After Design Approval
+
+```
+AFTER user approves design:
+  │
+  ├─ READ design.md "Implementation Checklist" section
+  │
+  ├─ EXTRACT all entries from:
+  │   • "Files to CREATE" table → checklist.create[]
+  │   • "Files to MODIFY" table → checklist.modify[]
+  │   • "Files to MOVE" table → checklist.move[]
+  │
+  └─ STORE in memory for tracking
+```
+
+### Step 2: Track Per-Wave Completion
+
+```
+AFTER each Wave completes:
+  │
+  ├─ For each file in that Wave's checklist:
+  │   └─ CHECK: Does file exist? (Glob/Read)
+  │
+  ├─ UPDATE status:
+  │   checklist.create[file].done = true/false
+  │
+  └─ SHOW progress:
+      📊 Wave 2 complete: 8/12 files (67%)
+      Missing: GatewayId.ts, NetworkRepository.ts, ...
+```
+
+### Step 3: Final Verification BEFORE Complete
+
+```
+BEFORE showing "✅ Implementation Complete":
+  │
+  ├─ COUNT total files in checklist
+  │
+  ├─ CHECK each file exists:
+  │   for file in checklist.create:
+  │     if NOT exists(file.path):
+  │       missing.push(file)
+  │
+  │   for file in checklist.modify:
+  │     if NOT contains_expected_changes(file.path):
+  │       missing.push(file)
+  │
+  ├─ IF missing.length > 0:
+  │   │
+  │   │  ┌─ ⚠️ Implementation Incomplete ─────────────────────────────┐
+  │   │  │                                                            │
+  │   │  │  📊 Progress: 24/47 files (51%)                            │
+  │   │  │                                                            │
+  │   │  │  Missing files (23):                                       │
+  │   │  │  • src/domain/gateway/GatewayId.ts                        │
+  │   │  │  • src/domain/gateway/GatewayModel.ts                     │
+  │   │  │  • src/domain/network/Network.ts                          │
+  │   │  │  • src/domain/network/NetworkError.ts                     │
+  │   │  │  • src/application/ports/NetworkRepository.ts             │
+  │   │  │  • ... (18 more)                                          │
+  │   │  │                                                            │
+  │   │  └────────────────────────────────────────────────────────────┘
+  │   │
+  │   └─ CONTINUE IMPLEMENTATION (spawn more dev agents for missing files)
+  │
+  └─ IF missing.length == 0:
+      │
+      └─ ✅ Implementation Complete (100% of design implemented)
+```
+
+### Display Format
+
+```
+📊 DESIGN COVERAGE
+
+┌─ Implementation Progress ──────────────────────────────────────┐
+│                                                                │
+│  ████████████████████░░░░░░░░░░░░░░░░░░░░  51% (12/23)        │
+│                                                                │
+│  ✅ Created    12 files                                        │
+│  ❌ Missing    11 files                                        │
+│  📝 Modified   0/4 files                                       │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+
+┌─ Missing Files (must complete) ────────────────────────────────┐
+│                                                                │
+│  Wave 2 (application):                                         │
+│  • ❌ src/application/use-cases/createOrder.ts                │
+│  • ❌ src/application/use-cases/updateOrder.ts                │
+│  • ❌ src/application/ports/PaymentGateway.ts                 │
+│                                                                │
+│  Wave 3 (infrastructure):                                      │
+│  • ❌ src/infrastructure/stripe/stripePaymentGateway.ts       │
+│  • ❌ src/infrastructure/http/orderHttpRepository.ts          │
+│                                                                │
+│  ... (6 more)                                                  │
+│                                                                │
+└────────────────────────────────────────────────────────────────┘
+
+→ 🔵 Continuing implementation for missing files...
+```
+
+### Force Continue Until 100%
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🚫 NEVER DECLARE COMPLETE IF COVERAGE < 100%                           ║
+║                                                                           ║
+║   Loop:                                                                   ║
+║   1. Check design coverage                                                ║
+║   2. If < 100% → Group missing files by Wave                             ║
+║   3. Spawn dev agents for missing files (parallel if independent)        ║
+║   4. After agents complete → Re-check coverage                           ║
+║   5. Repeat until 100%                                                   ║
+║                                                                           ║
+║   ONLY after 100% → Run test verification                                ║
+║   ONLY after tests pass → Declare "Complete"                             ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+---
+
+## PARALLEL DEV SPAWNING — MAXIMIZE THROUGHPUT
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🚀 SPAWN MULTIPLE DEVS IN SAME WAVE IF FILES ARE INDEPENDENT           ║
+║                                                                           ║
+║   Same Wave + Different folders = PARALLEL                                ║
+║   Same Wave + Same folder but different files = PARALLEL                  ║
+║   Same file = SEQUENTIAL (one dev at a time)                             ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+### Parallelization Rules
+
+```
+Wave 1 has 6 files to create:
+  • src/domain/common/Result.ts
+  • src/domain/common/Result.test.ts
+  • src/domain/order/Order.ts
+  • src/domain/order/Order.test.ts
+  • src/domain/order/OrderError.ts
+  • src/domain/order/OrderError.test.ts
+
+ANALYSIS:
+  • Result.ts + Result.test.ts → same module, 1 agent
+  • Order.ts + Order.test.ts → same module, 1 agent
+  • OrderError.ts + OrderError.test.ts → same module, 1 agent
+
+SPAWN (parallel, same message):
+  Task(frontend-engineer, "Create Result type + tests")
+  Task(frontend-engineer, "Create Order entity + tests")
+  Task(frontend-engineer, "Create OrderError + tests")
+```
+
+### Example: Maximum Parallelization
+
+```
+Wave 1: 3 independent modules
+  └─ 3 devs in parallel (one per module)
+
+Wave 2: 4 use cases (all need domain types from Wave 1)
+  └─ WAIT for Wave 1
+  └─ 4 devs in parallel (one per use case)
+
+Wave 3: 2 repositories (need ports from Wave 2)
+  └─ WAIT for Wave 2
+  └─ 2 devs in parallel
+
+Wave 4: UI migration (needs infrastructure from Wave 3)
+  └─ WAIT for Wave 3
+  └─ 3 devs in parallel (pages are independent)
+
+Wave 5: QA tests
+  └─ Can run in parallel with Wave 4 (e2e doesn't need full impl)
+```
+
+### Task() Call Format for Parallel Spawning
+
+```javascript
+// ONE MESSAGE with MULTIPLE Task() calls = PARALLEL EXECUTION
+// This is CRITICAL — don't send separate messages
+
+// ✅ CORRECT: All in one message
+Task(frontend-engineer, "Wave 1: Create Result module...")
+Task(frontend-engineer, "Wave 1: Create Gateway module...")
+Task(frontend-engineer, "Wave 1: Create GatewayError module...")
+// → 3 agents spawn simultaneously
+
+// ❌ WRONG: Separate messages (sequential)
+Task(frontend-engineer, "Wave 1: Create Result module...")
+// wait...
+Task(frontend-engineer, "Wave 1: Create Gateway module...")
+// wait...
+// → Agents run one after another
+```
+
+---
+
 ## AUTO ARCHITECTURE CAPTURE — AFTER IMPLEMENTATION
 
 > 🏛️ **Architecture doc = AFTER implementation (reflects reality, not theory)**

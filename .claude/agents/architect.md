@@ -1466,6 +1466,87 @@ Dev and QA implement these EXACT tests:
 - [ ] `[Component].test.tsx`: "renders initial state"
 - [ ] `[Component].test.tsx`: "handles user interaction"
 
+## Implementation Checklist (MANDATORY)
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   📋 IMPLEMENTATION CHECKLIST = CONTRACT                                  ║
+║                                                                           ║
+║   This section is MANDATORY. It lists EVERY file to create/modify.       ║
+║   Orchestrator uses this to verify 100% completion.                       ║
+║   Dev agents MUST implement ALL files listed here.                        ║
+║                                                                           ║
+║   NO FILE IN CHECKLIST = NOT IN DESIGN = WON'T BE IMPLEMENTED            ║
+║   MISSING FROM CHECKLIST = BUG IN YOUR DESIGN                            ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+### Format (EXACT — machine-readable)
+
+```markdown
+## Implementation Checklist
+
+### Files to CREATE (new files)
+
+| File | Wave | Type | Description |
+|------|------|------|-------------|
+| `src/domain/common/Result.ts` | 1 | domain | Result<T,E> type |
+| `src/domain/common/Result.test.ts` | 1 | test | Result tests |
+| `src/domain/order/Order.ts` | 1 | domain | Order entity |
+| `src/domain/order/Order.test.ts` | 1 | test | Order tests |
+| `src/domain/order/OrderError.ts` | 1 | domain | Error types |
+| `src/domain/order/OrderError.test.ts` | 1 | test | Error tests |
+| `src/domain/order/OrderId.ts` | 1 | domain | Branded ID type |
+| `src/application/ports/OrderRepository.ts` | 2 | port | Repository interface |
+| `src/application/use-cases/createOrder.ts` | 2 | use-case | Create use case |
+| `src/application/use-cases/createOrder.test.ts` | 2 | test | Create tests |
+| `src/application/use-cases/cancelOrder.ts` | 2 | use-case | Cancel use case |
+| `src/application/use-cases/cancelOrder.test.ts` | 2 | test | Cancel tests |
+| `src/infrastructure/http/orderHttpRepository.ts` | 3 | adapter | HTTP implementation |
+| `src/infrastructure/http/orderHttpRepository.test.ts` | 3 | test | HTTP tests |
+| ... | ... | ... | ... |
+
+### Files to MODIFY (existing files)
+
+| File | Wave | Changes |
+|------|------|---------|
+| `src/pages/orders/OrderDetails.page.tsx` | 4 | Use V2 hook with Result |
+| `src/pages/orders/OrderList.page.tsx` | 4 | Use Order entity methods |
+| `src/components/orders/OrderActions.component.tsx` | 4 | Use canCancel() from entity |
+| ... | ... | ... |
+
+### Files to MOVE (restructure)
+
+| From | To | Wave |
+|------|-----|------|
+| `src/components/` | `src/ui/components/` | 5 |
+| `src/pages/` | `src/ui/pages/` | 5 |
+| `src/hooks/` | `src/ui/hooks/` | 5 |
+| ... | ... | ... |
+
+### Summary
+
+| Category | Count |
+|----------|-------|
+| Files to CREATE | 24 |
+| Files to MODIFY | 8 |
+| Files to MOVE | 15 |
+| **TOTAL** | **47** |
+```
+
+### Rules
+
+```
+1. EVERY file mentioned in "File Structure" MUST appear in checklist
+2. EVERY file mentioned in "Implementation Details" MUST appear in checklist
+3. EVERY test file MUST appear in checklist
+4. Wave number MUST match Execution Plan
+5. No file can be implemented if not in checklist
+6. Checklist = Source of truth for completion verification
+```
+
 ## Execution Strategy
 
 > 🧠 **SMART PARALLELIZATION — Analyze dependencies, maximize throughput**
