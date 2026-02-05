@@ -40,6 +40,210 @@ MODE: external       → External source analysis (/learn <url|path>)
 
 ---
 
+## SMART SCANNING — Automatic Optimization
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🧠 SMART MODE — ZERO CONFIG, AUTOMATIC DECISIONS                       ║
+║                                                                           ║
+║   The learning-agent decides EVERYTHING automatically:                   ║
+║                                                                           ║
+║   • Cache valid?       → Skip scan entirely                              ║
+║   • Monorepo?          → Structure first, scope scan after               ║
+║   • Large project?     → Sampling (10 files max)                         ║
+║   • Small project?     → Full scan (it's fast anyway)                    ║
+║   • Need deep scan?    → Only when capturing architecture                ║
+║                                                                           ║
+║   USER SEES NONE OF THIS                                                 ║
+║   They just see: "Stack detected" in ~2 seconds                          ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+### Smart Scanning Flow
+
+```
+START
+  │
+  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ STEP 1: CHECK CACHE                                                 │
+│                                                                     │
+│ Read .clean-claude/context.json                                    │
+│                                                                     │
+│ IF exists AND cache.lastScan < 5 minutes ago                       │
+│    AND cache.packageJsonHash == current hash                       │
+│ THEN:                                                               │
+│    OUTPUT: "✅ Using cached scan (2 min ago)"                      │
+│    RETURN cached results                                            │
+│    SKIP all other steps                                             │
+└─────────────────────────────────────────────────────────────────────┘
+  │ (cache invalid or missing)
+  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ STEP 2: STRUCTURE SCAN (always fast, ~1 second)                     │
+│                                                                     │
+│ Commands:                                                           │
+│   find . -name "package.json" -maxdepth 3 -not -path "*/node_*"   │
+│   cat package.json | jq '.workspaces // empty'                     │
+│   ls -d apps/* packages/* 2>/dev/null                              │
+│                                                                     │
+│ Detect:                                                             │
+│   - Is monorepo? (workspaces field or multiple package.json)       │
+│   - Workspace count                                                 │
+│   - Workspace names                                                 │
+└─────────────────────────────────────────────────────────────────────┘
+  │
+  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ STEP 3: SCOPE SELECTION (only if monorepo)                          │
+│                                                                     │
+│ IF monorepo.detected == true:                                       │
+│    → Ask user which workspace                                       │
+│    → Set scope = selected workspace                                 │
+│                                                                     │
+│ IF single app:                                                      │
+│    → scope = "." (root)                                            │
+│    → NO question asked                                              │
+└─────────────────────────────────────────────────────────────────────┘
+  │
+  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ STEP 4: SMART SCOPE SCAN (adapts to project size)                   │
+│                                                                     │
+│ Count files first:                                                  │
+│   FILE_COUNT=$(find ${scope}/src -name "*.ts" | wc -l)             │
+│                                                                     │
+│ ┌─────────────────────────────────────────────────────────────────┐ │
+│ │ IF FILE_COUNT < 50:                                             │ │
+│ │    → FULL SCAN (read all files, it's fast)                      │ │
+│ │    → Full CRAFT validation                                       │ │
+│ │                                                                  │ │
+│ │ IF FILE_COUNT 50-500:                                           │ │
+│ │    → SAMPLING SCAN                                               │ │
+│ │    → Read package.json + tsconfig.json (always)                 │ │
+│ │    → Sample 10 random .ts files for CRAFT validation            │ │
+│ │    → Extrapolate results                                         │ │
+│ │                                                                  │ │
+│ │ IF FILE_COUNT > 500:                                            │ │
+│ │    → MINIMAL SCAN                                                │ │
+│ │    → Read package.json + tsconfig.json only                     │ │
+│ │    → Sample 10 random files for CRAFT validation                │ │
+│ │    → Skip architecture extraction (too large)                   │ │
+│ └─────────────────────────────────────────────────────────────────┘ │
+└─────────────────────────────────────────────────────────────────────┘
+  │
+  ▼
+┌─────────────────────────────────────────────────────────────────────┐
+│ STEP 5: SAVE TO CACHE                                               │
+│                                                                     │
+│ Write .clean-claude/context.json:                                  │
+│ {                                                                   │
+│   "lastScan": "2026-02-05T10:30:00Z",                              │
+│   "packageJsonHash": "abc123...",                                  │
+│   "scanMode": "sampling",  // or "full" or "minimal"               │
+│   "fileCount": 150,                                                 │
+│   "scope": "apps/auth",    // or "." for single app                │
+│   "stack": { ... },                                                 │
+│   "craftValidation": { ... }                                       │
+│ }                                                                   │
+└─────────────────────────────────────────────────────────────────────┘
+```
+
+### Sampling Algorithm
+
+```bash
+# CRAFT Validation by Sampling (when > 50 files)
+
+# 1. Count total files
+TOTAL=$(find ${SCOPE}/src -name "*.ts" -not -name "*.test.ts" | wc -l)
+
+# 2. Get 10 random files
+SAMPLES=$(find ${SCOPE}/src -name "*.ts" -not -name "*.test.ts" | shuf -n 10)
+
+# 3. Check each sample
+ANY_COUNT=0
+THROW_COUNT=0
+for file in $SAMPLES; do
+  ANY_COUNT=$((ANY_COUNT + $(grep -c ": any" "$file" 2>/dev/null || echo 0)))
+  THROW_COUNT=$((THROW_COUNT + $(grep -c "throw " "$file" 2>/dev/null || echo 0)))
+done
+
+# 4. Extrapolate (sample represents ~5% of codebase)
+ESTIMATED_ANY=$((ANY_COUNT * TOTAL / 10))
+ESTIMATED_THROW=$((THROW_COUNT * TOTAL / 10))
+
+# 5. Report
+OUTPUT: "CRAFT validation (sampled 10/${TOTAL} files):
+  • any types: ~${ESTIMATED_ANY} estimated
+  • throw statements: ~${ESTIMATED_THROW} estimated"
+```
+
+### Cache Invalidation Rules
+
+```
+CACHE IS VALID IF:
+  ✓ context.json exists
+  ✓ lastScan < 5 minutes ago
+  ✓ packageJsonHash matches current package.json
+  ✓ scope matches (for monorepo)
+
+CACHE IS INVALID IF:
+  ✗ context.json missing
+  ✗ lastScan > 5 minutes ago
+  ✗ package.json changed (hash mismatch)
+  ✗ Different scope requested
+  ✗ tsconfig.json changed
+```
+
+### Hash Calculation
+
+```bash
+# Generate hash of key config files
+HASH=$(cat package.json tsconfig.json 2>/dev/null | md5sum | cut -d' ' -f1)
+```
+
+### Output to User (Always Simple)
+
+```
+# User sees this (regardless of scan mode used):
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ STEP 1/9 — LEARN ✅
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+ 📦 Stack: typescript, react, zustand, fp-ts
+ 📐 Architecture: docs/arch.md (v2)
+ ✅ CRAFT: compliant
+
+# Internal note (not shown to user):
+# [scan: sampling, 10/150 files, cache saved]
+```
+
+### Deep Scan Trigger (Automatic)
+
+```
+DEEP SCAN is triggered ONLY when:
+
+1. User selects "Capture as architecture reference" at end of /craft
+   → Need to analyze actual patterns for documentation
+
+2. User runs /learn architecture explicitly
+   → Wants full architecture extraction
+
+3. First time creating architecture-guide.md
+   → Need to establish patterns
+
+DEEP SCAN is NOT triggered for:
+  ✗ Normal /craft flow
+  ✗ Bug fixes
+  ✗ Refactors (uses existing reference)
+  ✗ Adding features (follows existing reference)
+```
+
+---
+
 ## MODE: full (Default)
 
 **Detect stack AND analyze architecture (if code exists).**
@@ -674,6 +878,22 @@ date-fns, lodash, ramda
 
 ```json
 {
+  "cache": {
+    "lastScan": "2026-02-05T10:30:00Z",
+    "packageJsonHash": "a1b2c3d4e5f6...",
+    "tsconfigHash": "f6e5d4c3b2a1...",
+    "scanMode": "sampling",
+    "fileCount": 150,
+    "sampledFiles": 10,
+    "validUntil": "2026-02-05T10:35:00Z"
+  },
+  "monorepo": {
+    "detected": true,
+    "type": "npm-workspaces",
+    "workspaces": ["apps/auth", "apps/dashboard", "packages/shared"],
+    "count": 3,
+    "scope": "apps/auth"
+  },
   "stack": {
     "language": "typescript",
     "libraries": [
@@ -690,7 +910,8 @@ date-fns, lodash, ramda
     "path": "docs/architecture.md",
     "id": "f8a3b2c1-4d5e-6789-abcd-ef0123456789",
     "version": 2,
-    "hasFlag": true
+    "hasFlag": true,
+    "rootRef": "docs/monorepo-architecture.md"
   },
   "craftValidation": {
     "compliant": true,
@@ -698,14 +919,15 @@ date-fns, lodash, ramda
     "usesResultPattern": true,
     "hasHexagonalStructure": true,
     "testCoverage": "good",
+    "sampled": true,
     "details": {
       "anyCount": 0,
       "throwCount": 2,
       "resultCount": 15,
-      "testRatio": 65
+      "testRatio": 65,
+      "estimatedFromSample": true
     }
-  },
-  "detectedAt": "2024-01-15T10:30:00Z"
+  }
 }
 ```
 
