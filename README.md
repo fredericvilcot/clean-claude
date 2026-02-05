@@ -5,108 +5,170 @@
 <h1 align="center">Stop prompting. Start crafting.</h1>
 
 <p align="center">
-  <em>Other agent libs give you tools. Clean Claude gives you <strong>standards</strong>.<br/>
+  <em>Clean Claude transforms Claude Code into a team of Software Craft experts.<br/>
   Clean architecture. Result types. TDD. Domain-driven.<br/>
-  Code that fixes itself. Code that learns YOUR patterns.</em>
+  All agents collaborate reactively.</em>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/🛠️_CRAFT-Clean_Code_&_DDD-8A2BE2?style=for-the-badge" alt="Craft"/>
-  <img src="https://img.shields.io/badge/⚡_REACTIVE-Agents_route_errors-9400D3?style=for-the-badge" alt="Reactive"/>
-</p>
-<p align="center">
-  <img src="https://img.shields.io/badge/🔄_SELF--HEALING-Auto--fix_loop-9932CC?style=for-the-badge" alt="Self-healing"/>
-  <img src="https://img.shields.io/badge/🧠_ADAPTIVE-Learns_YOUR_code-8A2BE2?style=for-the-badge" alt="Adaptive"/>
+  <a href="#philosophy">Philosophy</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#commands">Commands</a> •
+  <a href="#agents">Agents</a> •
+  <a href="#documentation">Documentation</a>
 </p>
 
 ---
 
-## Why Clean Claude is Different
-
-| Other Agent Libs | Clean Claude |
-|------------------|---------|
-| Agents do tasks | Agents **enforce standards** |
-| You fix the bugs | Agents **fix their own bugs** |
-| Generic output | **Learns YOUR patterns** |
-| No architecture | **Clean Architecture, DDD, Hexagonal** |
-| `any`, `throw`, chaos | **Strict types, Result<T,E>, order** |
+## Philosophy
 
 **Clean Claude isn't a tool. It's a philosophy.**
 
----
+We believe code is a **craft**, not just a task. Every agent embodies the teachings of the masters:
 
-## The Problem
+| Master | Teaching |
+|--------|----------|
+| **Kent Beck** | TDD — *"Make it work, make it right, make it fast"* |
+| **Uncle Bob** | Clean Code, SOLID, Clean Architecture |
+| **Martin Fowler** | Refactoring — *"Good programmers write code humans understand"* |
+| **Eric Evans** | Domain-Driven Design |
+| **Alistair Cockburn** | Hexagonal Architecture (Ports & Adapters) |
 
-You prompt. AI dumps code. You debug it.
-
-No architecture. No tests. No standards. Just... code.
-
-**You became the QA for an AI.**
-
----
-
-## The Solution
-
-What if Claude Code worked like a **real dev team**?
+### The Non-Negotiables
 
 ```
-You: "Build user authentication"
-
-    Product Owner    →  Writes the spec
-    Architect        →  Designs the solution
-    Developer        →  Implements it
-    QA Engineer      →  Tests it
-
-    Bug found? → Dev fixes → QA re-tests → Loop until green.
+No any          → Types are documentation
+No throw        → Result<T, E> — errors are values
+No god classes  → Single responsibility
+No untested     → Tests are specs that run
+No cowboy code  → Spec → Design → Implement
 ```
-
-That's Clean Claude.
 
 ---
 
-## Prerequisites
+## Quick Start
 
-**Claude Code CLI** must be installed first:
+### Prerequisites
+
+[Claude Code CLI](https://docs.anthropic.com/claude-code) must be installed:
 
 ```bash
-# macOS / Linux
 npm install -g @anthropic-ai/claude-code
-
-# Or via Homebrew
-brew install claude-code
 ```
 
-> 📖 [Claude Code Documentation](https://docs.anthropic.com/claude-code)
-
----
-
-## Install
+### Installation
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/fredericvilcot/clean-claude/main/install.sh | bash
 ```
 
+That's it. Start with `/craft`.
+
 ---
 
-## <img src="https://img.shields.io/badge/Software%20Craft-The%20Foundation-8A2BE2?style=flat-square" alt="Software Craft"/>
+## Commands
 
-Clean Claude is built on **Software Craft** principles — the philosophy that code is a craft, not just a task.
+Three commands. That's all you need.
 
-> *"Any fool can write code that a computer can understand. Good programmers write code that humans can understand."* — Martin Fowler
+### `/craft` — Build something
 
-> *"The only way to go fast is to go well."* — Robert C. Martin
+```bash
+/craft
+```
 
-### The Masters Behind the Craft
+Your AI dev team activates:
 
-Every Clean Claude agent embodies the teachings of:
+```
+You: "Build user authentication"
 
-- **Kent Beck** — TDD, XP, "Make it work, make it right, make it fast"
-- **Robert C. Martin (Uncle Bob)** — Clean Code, SOLID, Clean Architecture
-- **Martin Fowler** — Refactoring, Enterprise Patterns
-- **Eric Evans** — Domain-Driven Design
-- **Alistair Cockburn** — Hexagonal Architecture (Ports & Adapters)
+    Product Owner  →  Writes the spec
+    Architect      →  Designs the solution
+    Developer      →  Implements it
+    QA Engineer    →  Tests it
 
-### Architecture: Domain at the Center
+    Bug found? → Dev fixes → QA re-tests → Loop until green.
+```
+
+### `/heal` — Fix something
+
+```bash
+/heal           # Full diagnostic
+/heal tests     # Focus on test failures
+/heal types     # Focus on TypeScript errors
+```
+
+Routes each problem to the right expert:
+- Test failing → Developer
+- Type error → Architect
+- Spec unclear → Product Owner
+
+### `/learn` — Adapt to your codebase
+
+```bash
+/learn                    # Detect stack + validate CRAFT
+/learn stack              # Stack detection only
+/learn architecture       # Extract patterns from code
+/learn <url|path>         # Analyze external source
+```
+
+---
+
+## Agents
+
+| Agent | Role | Output |
+|-------|------|--------|
+| **Learning Agent** | Detects stack, validates CRAFT compliance | `.clean-claude/context.json` |
+| **Product Owner** | Turns ideas into specs | `.clean-claude/specs/functional/` |
+| **Architect** | Designs clean solutions | `.clean-claude/specs/design/` |
+| **Frontend Engineer** | UI + unit tests (BDD) | Code + `*.test.ts` |
+| **Backend Engineer** | API + unit tests (BDD) | Code + `*.test.ts` |
+| **QA Engineer** | E2E / Integration tests | `e2e/` |
+
+### Reactive Loop
+
+Agents don't work in isolation. They **notify each other**:
+
+```
+QA finds bug       →  Dev fixes automatically
+Dev needs clarity  →  Architect explains
+Design flaw        →  Architect updates
+Spec unclear       →  PO clarifies
+```
+
+**Zero manual intervention. The right agent handles it.**
+
+---
+
+## How It Works
+
+```
+/craft "add dark mode"
+     │
+     ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│   LEARNING  │────▶│     PO      │────▶│  ARCHITECT  │
+│   (stack)   │     │   (spec)    │     │  (design)   │
+└─────────────┘     └─────────────┘     └─────────────┘
+                                               │
+                    ┌──────────────────────────┤
+                    │                          │
+                    ▼                          ▼
+             ┌─────────────┐           ┌─────────────┐
+             │     DEV     │           │     QA      │
+             │   (code)    │◀─────────▶│  (tests)    │
+             └─────────────┘  notify   └─────────────┘
+                    │                          │
+                    └──────────────────────────┘
+                                │
+                                ▼
+                         ✅ All green
+```
+
+---
+
+## Architecture
+
+Clean Claude enforces **Hexagonal Architecture**:
 
 ```
 ┌─────────────────────────────────────────────┐
@@ -125,283 +187,56 @@ Every Clean Claude agent embodies the teachings of:
          Dependencies point INWARD →
 ```
 
-### Craft Principles — Non-Negotiable
-
-| Principle | Why |
-|-----------|-----|
-| **No `any`** | Types are documentation. `any` is lying. |
-| **No `throw`** | Use `Result<T, E>`. Errors are values, not surprises. |
-| **No god classes** | Single responsibility. Small, focused units. |
-| **No code without tests** | TDD mindset. Tests are specs that run. |
-| **No implementation without spec** | Contracts first. PO spec → Architect design → Dev implements. |
-| **Domain is sacred** | No framework contamination. Pure business logic. |
-
-### Error Handling: Explicit, Not Exceptional
+### Error Handling
 
 ```typescript
-// BAD — Caller doesn't know this can fail
+// ❌ BAD — Caller doesn't know this can fail
 function getUser(id: string): User {
   throw new Error('Not found');
 }
 
-// GOOD — Error is explicit in the type
+// ✅ GOOD — Error is explicit in the type
 function getUser(id: string): Result<User, NotFoundError> {
   return err(new NotFoundError(id));
 }
 ```
 
-**Clean Claude agents write code where errors are values, not surprises.**
-
 ---
 
-## ⚡ Reactive — Agents Talk to Each Other
+## Documentation
 
-<table>
-<tr>
-<td width="120" align="center">
+| Document | Description |
+|----------|-------------|
+| [CLAUDE.md](./CLAUDE.md) | Full operational rules and workflow |
+| [Agents](./.claude/agents/) | Individual agent definitions |
+| [Skills](./.claude/skills/) | Command implementations |
 
-```
-   🔴
-  ERROR
-   │
-   ▼
-```
-
-</td>
-<td>
-
-**Errors don't stop the flow. They route it.**
+### Project Structure
 
 ```
-Test fails     → Dev fixes automatically
-Type error     → Architect redesigns
-Spec unclear   → PO clarifies
+.clean-claude/                  # Clean Claude working directory
+├── context.json                # Detected stack + CRAFT validation
+├── stack-skills.md             # Library documentation
+├── architecture-guide.md       # Project patterns (if captured)
+└── specs/
+    ├── functional/             # PO specs
+    └── design/                 # Architect designs
 ```
-
-No manual intervention. The right agent handles it.
-
-</td>
-</tr>
-</table>
-
----
-
-## 🔄 Self-Healing — Bugs Fix Themselves
-
-<table>
-<tr>
-<td>
-
-```
-  ┌─────────────────────────────────────┐
-  │                                     │
-  │   QA finds bug                      │
-  │        │                            │
-  │        ▼                            │
-  │   Dev fixes (auto)                  │
-  │        │                            │
-  │        ▼                            │
-  │   QA re-tests                       │
-  │        │                            │
-  │   ┌────┴────┐                       │
-  │   │         │                       │
-  │  ✅ Pass   🔄 Loop (max 3x)         │
-  │                                     │
-  └─────────────────────────────────────┘
-```
-
-</td>
-<td width="300">
-
-**You don't debug AI code.**
-
-The agents debug themselves.
-
-- QA catches the bug
-- Dev fixes without asking
-- QA verifies the fix
-- Loop until green
-
-**Zero human intervention.**
-
-</td>
-</tr>
-</table>
-
----
-
-## 🧠 Adaptive — Real-Time CRAFT Guardian
-
-<table>
-<tr>
-<td width="300">
-
-**Always watching. Always learning.**
-
-The Learning Agent monitors your code **in real-time**:
-
-- 👁️ Watches every code change
-- 🔴 Detects CRAFT violations instantly
-- 🏗️ Triggers Architect immediately
-- 💬 Prompts you for approval
-
-**Auto-learning is ON by default.**
-
-</td>
-<td>
-
-```
-Code saved...
-
-⚠️ CRAFT VIOLATION DETECTED
-
-File: src/api/client.ts:45
-Issue: `any` type found
-
-🏗️ Architect suggests:
-Replace `data: any` with `ApiResponse<T>`
-
-[ 💜 Fix now ]  [ ⏭️ Later ]
-```
-
-</td>
-</tr>
-</table>
-
-### What Gets Watched
-
-| 🔴 Critical | 🟠 Warning | 🟡 Smells |
-|-------------|------------|-----------|
-| `any` types | God class (>300 lines) | Feature Envy |
-| `throw` in domain | Long methods (>20 lines) | Data Clumps |
-| Framework in domain | Long params (>4) | Primitive Obsession |
-| No tests for business | Poor naming | Shotgun Surgery |
-| Dependency Rule violation | Missing strict mode | |
-| Hidden coupling | | |
-
-**+ All SOLID principles monitored.**
-
----
-
-## Three Commands. That's It.
-
-```bash
-/craft    # Build something
-/heal     # Fix something
-/learn    # Adapt to your codebase
-```
-
----
-
-## `/craft` — Your AI Dev Team
-
-Say what you want. Clean Claude does the rest.
-
-```
-> /craft "user authentication with OAuth"
-
-🔍 Detected: TypeScript + React + Node
-
-👤 PO → spec.md
-   ✓ User story
-   ✓ 6 acceptance criteria
-
-🏗️ Architect → design.md
-   ✓ 8 files planned
-   ✓ CRAFT patterns
-
-💻 Dev + 🧪 QA (parallel)
-   ✓ Implementing...
-   ✗ Test failed: OAuth callback
-   🔧 Dev fixing... (auto)
-   ✓ 6/6 tests passing
-
-✨ Done.
-```
-
-**All agents. Always. No shortcuts. Autonomous fixing.**
-
----
-
-## `/heal` — Re-launch the Agent Loop
-
-Something broken? Clean Claude relaunches agents to fix it.
-
-```bash
-/heal        # Diagnose → Route → Fix → Verify → Loop
-/heal tests  # Focus on test failures
-/heal types  # Focus on TypeScript errors
-```
-
-**`/heal` is NOT `npm test`.** It relaunches the full agent loop:
-
-1. **Diagnose** — What's broken?
-2. **Route** — Send to the right agent
-3. **Fix** — Agent fixes autonomously
-4. **Verify** — QA re-runs tests
-5. **Loop** — Until all green
-
-| Problem | Agent fixes it |
-|---------|----------------|
-| Test failing | Developer |
-| Type error | Architect |
-| Spec gap | Product Owner |
-
----
-
-## `/learn` — Real-Time Guardian
-
-**Auto-learning is ON by default.** The Learning Agent watches your code continuously.
-
-```bash
-/learn              # Force re-scan now
-/learn --off        # Disable auto-learning (not recommended)
-/learn --from <x>   # Learn from external source (repo, folder, URL)
-```
-
-When violations are detected:
-
-```
-⚠️ CRAFT violation in src/services/auth.ts
-
-🏗️ Architect proposes fix:
-   Replace `throw new Error` with `Result<User, AuthError>`
-
-[ 💜 Approve & Fix ]  [ ⏭️ Later ]
-```
-
-**Violation → Architect → User approval → Dev fixes → QA verifies**
 
 ---
 
 ## Why Clean Claude?
 
-| Without Clean Claude | With Clean Claude |
-|-----------------|--------------|
+| Without | With Clean Claude |
+|---------|-------------------|
 | You prompt, you debug | Agents collaborate, QA verifies |
 | Generic code | Learns YOUR patterns |
 | `any` everywhere | Strict TypeScript |
 | `throw new Error` | `Result<T, E>` |
-| No tests | Tests included |
+| No architecture | Hexagonal, DDD, Clean |
 | You are the QA | QA agent catches bugs |
 
 ---
-
-## The Team
-
-| Agent | Superpower |
-|-------|------------|
-| **Product Owner** | Turns vague ideas into clear specs |
-| **Architect** | Designs clean, maintainable solutions |
-| **Developer** | Implements with craft principles |
-| **QA Engineer** | Catches bugs before you do |
-| **Learning Agent** | Adapts everything to YOUR codebase |
-
----
-
-<p align="center">
-  <strong>Clean Claude learns. Clean Claude adapts. Clean Claude crafts.</strong>
-</p>
 
 <p align="center">
   <img src="https://img.shields.io/badge//%20craft-8A2BE2?style=for-the-badge" alt="/craft"/>
@@ -409,7 +244,9 @@ When violations are detected:
   <img src="https://img.shields.io/badge//%20learn-9932CC?style=for-the-badge" alt="/learn"/>
 </p>
 
----
+<p align="center">
+  <strong>Clean Claude learns. Clean Claude adapts. Clean Claude crafts.</strong>
+</p>
 
 <p align="center">
   <sub>BSD 3-Clause License</sub>
