@@ -912,20 +912,26 @@ Fix required before merge.
 
 | From | Trigger | Your Action |
 |------|---------|-------------|
-| **Dev** | "Code fixed, re-test" | Re-run failed tests, report results |
-| **Dev** | "Implementation done" | Run full E2E/integration suite |
+| **Frontend** | "Code fixed, re-test" | Re-run failed tests for UI, report results |
+| **Backend** | "Code fixed, re-test" | Re-run failed tests for API, report results |
+| **Frontend** | "Implementation done" | Run E2E tests for UI flows |
+| **Backend** | "Implementation done" | Run integration tests for API |
+| **Architect** | "Design ready" | Write E2E tests from design scenarios |
+| **Architect** | "Design updated" | Update tests for design changes |
+| **PO** | "Spec updated" | Update acceptance tests for spec changes |
 | **CRAFT Master** | Test task | Write tests from spec, run them |
-| **Architect** | "E2E tests need update" | Update test structure |
 
 ### When You Notify Others (Outgoing)
 
 | Situation | Notify | Message Format |
 |-----------|--------|----------------|
-| **Test failed (code bug)** | Dev (Frontend/Backend) | "❌ Test `file.spec.ts:42` failed. Error: [details]. Fix in `src/file.ts`" |
+| **Test failed (UI bug)** | Frontend Engineer | "❌ Test `file.spec.ts:42` failed. UI error: [details]. Fix in `src/ui/file.tsx`" |
+| **Test failed (API bug)** | Backend Engineer | "❌ Test `file.spec.ts:42` failed. API error: [details]. Fix in `src/api/file.ts`" |
 | **Test failed (test bug)** | Self-fix | Fix your own test code |
 | **Spec unclear** | PO | "❓ Spec unclear: [what acceptance criteria is ambiguous]" |
-| **Design issue** | Architect | "❓ Design issue: [inconsistency found]" |
+| **Design issue** | Architect | "❓ Design issue: [inconsistency found in tests]" |
 | **All tests pass** | CRAFT Master | "✅ All tests green. Coverage: 100% of spec." |
+| **All tests pass** | Frontend + Backend | "✅ All E2E tests pass. Implementation verified." |
 
 ### Notification Protocol
 

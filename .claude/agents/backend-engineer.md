@@ -510,8 +510,10 @@ describe('PostgresUserRepository', () => {
 |------|---------|-------------|
 | **QA** | Test failed on your code | Fix the bug, notify QA when done |
 | **Architect** | Design updated | Re-implement according to new design |
-| **CRAFT Master** | Implementation task | Implement feature + unit tests |
 | **Frontend** | Need API endpoint | Implement endpoint, notify Frontend |
+| **Frontend** | Found bug in API | Fix it, notify Frontend when done |
+| **PO** | Spec clarified | Adjust implementation if needed |
+| **CRAFT Master** | Implementation task | Implement feature + unit tests |
 
 ### When You Notify Others (Outgoing)
 
@@ -520,8 +522,10 @@ describe('PostgresUserRepository', () => {
 | **Code fixed** | QA | "✅ Fixed `src/file.ts`. Ready for re-test." |
 | **API ready** | Frontend | "✅ API `POST /users` ready. Schema: {...}" |
 | **Design unclear** | Architect | "❓ Design question: [specific question]" |
-| **Spec unclear** | PO (via Architect) | "❓ Spec unclear: [what's missing]" |
+| **Spec unclear** | PO | "❓ Spec unclear: [what's missing]" |
+| **Found frontend bug** | Frontend Engineer | "🔴 Bug in UI: [component] sends wrong data" |
 | **Done implementing** | QA | "✅ Implementation done. Ready for integration tests." |
+| **Done implementing** | Architect | "✅ Backend implemented. [files list]" |
 
 ### Notification Protocol
 

@@ -869,16 +869,70 @@ ARCHITECT produces design with N tasks
                          INTER-AGENT NOTIFICATIONS
 ```
 
+### FULL NOTIFICATION MESH — All Agents Connected
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                                                             │
+│                        CLAUDE ORCHESTRATOR                                  │
+│                    (central hub for all agents)                             │
+│                                                                             │
+└────────────────────────────────┬────────────────────────────────────────────┘
+                                 │
+         ┌───────────────────────┼───────────────────────┐
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│                 │     │                 │     │                 │
+│       PO        │◄───►│   ARCHITECT     │◄───►│      QA         │
+│   (specs)       │     │   (design)      │     │   (tests)       │
+│                 │     │                 │     │                 │
+└────────┬────────┘     └────────┬────────┘     └────────┬────────┘
+         │                       │                       │
+         │    ┌──────────────────┼──────────────────┐    │
+         │    │                  │                  │    │
+         ▼    ▼                  ▼                  ▼    ▼
+┌─────────────────┐                           ┌─────────────────┐
+│                 │◄─────────────────────────►│                 │
+│    FRONTEND     │     (cross-notify on      │    BACKEND      │
+│   ENGINEER      │      API contracts,       │   ENGINEER      │
+│                 │      shared types)        │                 │
+└─────────────────┘                           └─────────────────┘
+
+LEGEND:
+◄───► = Bidirectional notifications
+   ▼  = Can notify / be notified by
+```
+
+### Notification Matrix — WHO notifies WHO
+
+```
+FROM ↓ / TO →    │ PO │ ARCH │ FE │ BE │ QA │ CLAUDE │
+─────────────────┼────┼──────┼────┼────┼────┼────────┤
+PO               │ -  │  ✓   │ ✓  │ ✓  │ ✓  │   ✓    │
+ARCHITECT        │ ✓  │  -   │ ✓  │ ✓  │ ✓  │   ✓    │
+FRONTEND         │ ✓  │  ✓   │ -  │ ✓  │ ✓  │   ✓    │
+BACKEND          │ ✓  │  ✓   │ ✓  │ -  │ ✓  │   ✓    │
+QA               │ ✓  │  ✓   │ ✓  │ ✓  │ -  │   ✓    │
+─────────────────┴────┴──────┴────┴────┴────┴────────┘
+
+✓ = Can notify this agent
+```
+
 ### What Agents Must Notify
 
 | Situation | Who Notifies | Who Gets Notified | Message |
 |-----------|--------------|-------------------|---------|
-| Task complete | Dev/QA | Claude | "✅ Done: [files changed]" |
+| Task complete | Any Agent | Claude | "✅ Done: [files changed]" |
 | Found bug in other's code | Dev | Other Dev | "🔴 Bug in your file: X" |
-| Test fails on other's code | QA | Dev who owns file | "🔴 Test fail: [file:line]" |
-| Need type/interface from other | Dev | Other Dev | "⏳ Need Result type from types/" |
-| Design unclear | Dev | Architect | "❓ Design question: [question]" |
-| Spec unclear | Dev/QA | PO | "❓ Spec unclear: [question]" |
+| Test fails on UI code | QA | Frontend | "🔴 UI test fail: [file:line]" |
+| Test fails on API code | QA | Backend | "🔴 API test fail: [file:line]" |
+| Need API endpoint | Frontend | Backend | "🔗 Need API: [endpoint]" |
+| API ready | Backend | Frontend | "✅ API ready: [endpoint]" |
+| Design unclear | Dev/QA | Architect | "❓ Design question: [question]" |
+| Design ready | Architect | Dev + QA | "✅ Design ready, implement/test" |
+| Spec unclear | Any Agent | PO | "❓ Spec unclear: [question]" |
+| Spec updated | PO | Architect + Dev + QA | "📋 Spec updated: [changes]" |
 
 ### Parallel Spawn Template
 

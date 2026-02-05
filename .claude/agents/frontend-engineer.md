@@ -460,6 +460,9 @@ import { addDays } from 'date-fns/addDays';
 |------|---------|-------------|
 | **QA** | Test failed on your code | Fix the bug, notify QA when done |
 | **Architect** | Design updated | Re-implement according to new design |
+| **Backend** | API ready | Integrate the API, notify Backend if issues |
+| **Backend** | Found issue in your code | Fix it, notify Backend when done |
+| **PO** | Spec clarified | Adjust implementation if needed |
 | **CRAFT Master** | Implementation task | Implement feature + unit tests |
 
 ### When You Notify Others (Outgoing)
@@ -468,9 +471,11 @@ import { addDays } from 'date-fns/addDays';
 |-----------|--------|----------------|
 | **Code fixed** | QA | "✅ Fixed `src/file.ts`. Ready for re-test." |
 | **Design unclear** | Architect | "❓ Design question: [specific question]" |
-| **Spec unclear** | PO (via Architect) | "❓ Spec unclear: [what's missing]" |
+| **Spec unclear** | PO | "❓ Spec unclear: [what's missing]" |
 | **Need backend** | Backend Engineer | "🔗 Need API: [endpoint description]" |
+| **Found backend bug** | Backend Engineer | "🔴 Bug in API: [endpoint] returns [issue]" |
 | **Done implementing** | QA | "✅ Implementation done. Ready for E2E." |
+| **Done implementing** | Architect | "✅ UI implemented. [files list]" |
 
 ### Notification Protocol
 

@@ -1392,10 +1392,13 @@ That's the bar. Hit it every time.
 
 | Situation | Notify | Message Format |
 |-----------|--------|----------------|
-| **Design ready** | Dev | "✅ Design ready: `.clean-claude/specs/design/design-v1.md`. Implement exactly as specified." |
-| **Design updated** | Dev | "📐 Design updated to v2. Re-implement: [specific changes]" |
+| **Design ready** | Frontend + Backend | "✅ Design ready: `.clean-claude/specs/design/design-v1.md`. Implement exactly as specified." |
+| **Design ready** | QA | "✅ Design ready. Test scenarios in design doc. Write E2E tests." |
+| **Design updated** | Frontend + Backend | "📐 Design updated to v2. Re-implement: [specific changes]" |
+| **Design updated** | QA | "📐 Design updated. Update tests for: [changes]" |
 | **Spec unclear** | PO | "❓ Spec question: [what functional requirement is ambiguous]" |
 | **Spec contradiction** | PO | "⚠️ Spec contradiction: [details]. Please clarify." |
+| **Architecture documented** | CRAFT Master | "✅ Architecture guide ready: `.clean-claude/architecture-guide.md`" |
 
 ### Notification Protocol
 

@@ -835,7 +835,9 @@ Do you want to:
 |-----------|--------|----------------|
 | **Spec ready** | Architect | "✅ Spec ready: `spec-v2.md`. User approved. Proceed to design." |
 | **Spec updated** | Architect | "📋 Spec updated to v3. Changes: [list]. Please update design." |
-| **Clarification done** | Requester | "✅ Clarified in spec-v3.md, section [X]." |
+| **Spec updated** | Frontend + Backend | "📋 Spec updated. Functional changes: [list]. Check your implementation." |
+| **Spec updated** | QA | "📋 Spec updated. Update acceptance tests for: [changes]" |
+| **Clarification done** | Requester (Dev/QA) | "✅ Clarified in spec-v3.md, section [X]." |
 
 ### Notification Protocol
 
