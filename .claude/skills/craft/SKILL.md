@@ -559,6 +559,100 @@ Task(
 
 **Step 8: Verification loop until green**
 
+**Step 8b: Architect AUDIT — Verify implementation matches design**
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🔍 ARCHITECT AUDIT = MANDATORY BEFORE DECLARING COMPLETE               ║
+║                                                                           ║
+║   After dev agents finish and tests pass:                                 ║
+║   → Spawn Architect to AUDIT the implementation                          ║
+║   → Architect verifies code matches design                               ║
+║   → Only if AUDIT passes → Ask about architecture reference              ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+```
+Task(
+  subagent_type: "architect",
+  prompt: """
+    🔍 AUDIT IMPLEMENTATION vs DESIGN
+
+    You designed this feature. Now VERIFY the implementation matches.
+
+    ## YOUR CHECKLIST
+
+    1. READ your design: .clean-claude/specs/design/[design-file].md
+
+    2. VERIFY each file in Implementation Checklist exists:
+       - Use Glob/Read to check files
+       - Each file exists? ✅ or ❌
+       - Each test file exists? ✅ or ❌
+
+    3. VERIFY code structure matches design:
+       - Folder structure correct?
+       - File naming conventions followed?
+       - Layer boundaries respected (domain ≠ infrastructure)?
+
+    4. VERIFY CRAFT principles applied:
+       - No `any` types?
+       - Result<T,E> used (no throw)?
+       - Tests colocated?
+
+    ## MANDATORY OUTPUT
+
+    ---
+    ## 🔍 ARCHITECT AUDIT REPORT
+
+    ### Design Coverage
+    | Category | Expected | Found | Status |
+    |----------|----------|-------|--------|
+    | Files to CREATE | 23 | 23 | ✅ 100% |
+    | Files to MODIFY | 4 | 4 | ✅ 100% |
+    | Test files | 12 | 12 | ✅ 100% |
+
+    ### Structure Verification
+    - [x] Folder structure matches design
+    - [x] Naming conventions followed
+    - [x] Layer boundaries respected
+
+    ### CRAFT Compliance
+    - [x] No `any` types found
+    - [x] Result<T,E> pattern used
+    - [x] Tests colocated with source
+
+    ### Missing or Incorrect (if any)
+    | File | Issue |
+    |------|-------|
+    | src/domain/order/OrderId.ts | ❌ Missing |
+    | src/application/use-cases/updateOrder.ts | ❌ Missing |
+
+    ## 📊 AUDIT RESULT: ✅ PASSED / ❌ FAILED
+
+    If FAILED: List what needs to be fixed.
+    ---
+
+    IF AUDIT FAILED → Return issues, orchestrator spawns devs to fix
+    IF AUDIT PASSED → Proceed to architecture reference question
+  """
+)
+```
+
+**After Architect AUDIT:**
+
+```
+IF audit.result == "PASSED":
+  → Proceed to Step 9 (ask about architecture reference)
+
+IF audit.result == "FAILED":
+  → Show missing/incorrect files to user
+  → Spawn dev agents to fix
+  → Re-run audit
+  → Loop until PASSED
+```
+
 **Step 9: Architect documents and asks about reference**
 
 ```
@@ -567,7 +661,9 @@ Task(
   prompt: """
     📚 DOCUMENT ARCHITECTURE & ASK ABOUT REFERENCE
 
-    Implementation is complete. Now:
+    ✅ AUDIT PASSED — Implementation matches design.
+
+    Now:
 
     1. ANALYZE the implemented code
     2. CREATE .clean-claude/architecture-guide.md
@@ -2214,6 +2310,12 @@ IF Architect needs to deviate:
   │           → Run build/tests/lint
   │           → Route errors to agents
   │           → Loop until green
+  │
+  ├─ STEP 8b: Architect AUDIT
+  │     → Architect verifies implementation matches design
+  │     → Checks: files exist, structure correct, CRAFT compliant
+  │     → If FAILED → spawn devs to fix → re-audit
+  │     → If PASSED → proceed to Step 9
   │
   └─ STEP 9: Architecture capture (if no reference existed)
         → "Capture as reference for future features?"
