@@ -731,6 +731,61 @@ The `/craft` command uses these fields to show RELEVANT refactor options only.
 ╚═══════════════════════════════════════════════════════════════════════════╝
 ```
 
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🔬 CRAFT VALIDATION ON SELECTED SCOPE — MANDATORY                      ║
+║                                                                           ║
+║   AFTER scope selection in monorepo:                                      ║
+║   learning-agent is called AGAIN with the selected scope path             ║
+║   → MUST run full CRAFT validation (not just stack detection)            ║
+║                                                                           ║
+║   RUN ON SCOPE:                                                           ║
+║   1. Stack detection (libraries in that scope)                           ║
+║   2. CRAFT validation (any, throw, hexagonal, tests)                     ║
+║   3. Architecture reference lookup (scope-local + root)                  ║
+║                                                                           ║
+║   OUTPUT: context.json with craftValidation fields populated             ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🚨 CODE SMELL DETECTED ON SCOPE — SMART ROUTING                        ║
+║                                                                           ║
+║   IF scope has CRAFT violations (any, throw, no tests, no structure):    ║
+║                                                                           ║
+║   SHOW WARNING:                                                           ║
+║   ┌─────────────────────────────────────────────────────────────────────┐ ║
+║   │ ⚠️  CRAFT violations detected in [scope]                            │ ║
+║   │                                                                     │ ║
+║   │ 🔴 hasAnyTypes: 47 occurrences                                     │ ║
+║   │ 🔴 usesResultPattern: false (23 throw statements)                  │ ║
+║   │ 🟡 hasHexagonalStructure: partial                                  │ ║
+║   │ 🔴 testCoverage: none                                              │ ║
+║   └─────────────────────────────────────────────────────────────────────┘ ║
+║                                                                           ║
+║   THEN ASK:                                                               ║
+║   "This scope needs cleaning. What do you want to do?"                   ║
+║                                                                           ║
+║   OPTIONS:                                                                ║
+║   1. "🧹 Fix first (/heal)" → Route to /heal on this scope              ║
+║   2. "🔄 Refactor mode" → Continue but force refactor-first design      ║
+║   3. "🔙 Choose another scope" → Back to scope selection                ║
+║   4. "⚡ Continue anyway" → Proceed (agents still follow CRAFT)         ║
+║                                                                           ║
+║   DEFAULT = "Fix first" (recommended)                                    ║
+║                                                                           ║
+║   IMPORTANT:                                                              ║
+║   - NEVER silently skip violations                                       ║
+║   - ALWAYS inform user of current state                                  ║
+║   - If user continues → Architect designs WITH cleanup plan              ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
 ### Monorepo Detection Steps
 
 ```

@@ -265,20 +265,58 @@ Build options from `context.json.monorepo.workspaces`:
 └──────────────────────────────────────────────────────────────┘
 ```
 
+### IF CRAFT VIOLATIONS DETECTED — Ask user
+
+After scope selection (or for single app), if `craftValidation` shows violations:
+
+```
+⬡ Step 1/9 ─ Learn
+
+  ⚠️  CRAFT violations detected in apps/legacy-auth
+
+┌─ 🔍 Validation ─────────────────────────────────────────────┐
+│                                                              │
+│  🔴 any types       47 occurrences                           │
+│  🔴 throw/catch     23 statements (no Result pattern)        │
+│  🟡 hexagonal       partial (missing domain/)                │
+│  🔴 test coverage   none                                     │
+│                                                              │
+└──────────────────────────────────────────────────────────────┘
+
+  This scope needs cleaning. What do you want to do?
+```
+
+**Ask user:**
+
+```json
+{
+  "questions": [{
+    "question": "This scope has CRAFT violations. What do you want to do?",
+    "header": "Violations",
+    "multiSelect": false,
+    "options": [
+      { "label": "🧹 Fix first (Recommended)", "description": "Run /heal to clean violations" },
+      { "label": "🔄 Refactor mode", "description": "Continue — Architect designs cleanup plan" },
+      { "label": "🔙 Choose another scope", "description": "Go back to scope selection" },
+      { "label": "⚡ Continue anyway", "description": "Proceed — agents still follow CRAFT" }
+    ]
+  }]
+}
+```
+
+**Routing:**
+- "Fix first" → Tell user to run `/heal` on this scope, then restart
+- "Refactor mode" → Set `workflow.mode = "refactor"` → Architect MUST include cleanup
+- "Another scope" → Back to scope selection
+- "Continue anyway" → Proceed normally (but warn in design phase)
+
 ### Scope Change Mid-Session
 
 > 🔄 **If user changes scope mid-session:**
 > 1. Acknowledge: "Switching to apps/billing"
 > 2. Read new scope's package.json
-║   3. Re-spawn Architect → new stack-skills.md                           ║
-║   4. Continue from STEP 3 (CHOOSE)                                       ║
-║                                                                           ║
-║   OUTPUT:                                                                 ║
-║   "🔄 Scope changed to apps/billing                                      ║
-║      → Regenerating skills for new stack..."                             ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
-```
+> 3. Re-spawn Architect → new stack-skills.md
+> 4. Continue from STEP 3 (CHOOSE)
 
 ### IF SINGLE APP — Show results directly (no scope question)
 
