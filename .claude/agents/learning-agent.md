@@ -529,7 +529,8 @@ date-fns, lodash, ramda
     ]
   },
   "architectureRef": {
-    "path": ".clean-claude/architecture-guide.md",
+    "path": "docs/architecture.md",
+    "id": "f8a3b2c1-4d5e-6789-abcd-ef0123456789",
     "version": 2,
     "hasFlag": true
   },
@@ -552,13 +553,44 @@ date-fns, lodash, ramda
 
 **CRITICAL FIELD: `architectureRef`**
 
-| Value | Meaning |
-|-------|---------|
-| `".clean-claude/architecture-guide.md"` | Standard location |
-| `"ARCHITECTURE.md"` | Root level file |
-| `"docs/ARCHITECTURE.md"` | Docs folder |
-| `"README.md#architecture"` | Section in README |
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   architectureRef DETECTION RULES                                         ║
+║                                                                           ║
+║   1. Scan ALL .md files for frontmatter:                                 ║
+║      clean-claude: architecture-reference                                 ║
+║                                                                           ║
+║   2. IF found ONE file:                                                   ║
+║      → Extract: path, id (UUID), version                                 ║
+║      → Set architectureRef in context.json                               ║
+║                                                                           ║
+║   3. IF found MULTIPLE files:                                             ║
+║      → Set path to "ERROR:MULTIPLE"                                      ║
+║      → List all conflicting files                                        ║
+║      → /craft will prompt user to resolve                                ║
+║                                                                           ║
+║   4. IF found NONE:                                                       ║
+║      → Set architectureRef to null                                       ║
+║      → Architect designs freely                                          ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+| `architectureRef` Value | Meaning |
+|-------------------------|---------|
+| `{ path: "...", id: "uuid", version: N }` | Reference found with UUID |
+| `{ path: "ERROR:MULTIPLE", files: [...] }` | Conflict: multiple files with flag |
 | `null` | No reference found → Architect designs freely |
+
+**UUID is MANDATORY in architecture reference files:**
+```yaml
+---
+clean-claude: architecture-reference
+id: f8a3b2c1-4d5e-6789-abcd-ef0123456789   # Required, generated once
+version: 1
+---
+```
 
 **When `architectureRef` is NOT null → Architect MUST read and follow it.**
 

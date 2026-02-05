@@ -724,6 +724,188 @@ Then use AskUserQuestion again with the same options.
 
 ---
 
+## STEP 6b: ARCHITECTURE REFERENCE — EXPLICIT PROMPT (BEFORE ARCHITECT)
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🏛️ ARCHITECTURE REFERENCE = ALWAYS EXPLICIT BEFORE ARCHITECT          ║
+║                                                                           ║
+║   BEFORE spawning Architect, you MUST:                                   ║
+║   1. Check if a flagged architecture reference exists                    ║
+║   2. EXPLICITLY ask user which reference to use                          ║
+║   3. Validate CRAFT compliance if external source                        ║
+║                                                                           ║
+║   USER MUST ALWAYS KNOW WHAT REFERENCE IS BEING USED                     ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+### Check for Existing Reference
+
+```
+Read .clean-claude/context.json → architectureRef
+
+IF architectureRef.path exists AND != "ERROR:MULTIPLE":
+  → Flagged file found
+
+IF architectureRef.path == "ERROR:MULTIPLE":
+  → Conflict! Multiple files with flag (resolve first)
+
+IF architectureRef is null:
+  → No flagged file exists
+```
+
+### Prompt User (ALWAYS)
+
+**IF flagged file found:**
+
+```json
+{
+  "questions": [{
+    "question": "📐 Architecture reference detected. Use it?",
+    "header": "Architecture",
+    "multiSelect": false,
+    "options": [
+      { "label": "Use this reference", "description": "[path] (v[version], id: [uuid])" },
+      { "label": "Choose another source", "description": "Local file, remote repo, or code folder" },
+      { "label": "Design freely", "description": "No reference (Architect decides)" }
+    ]
+  }]
+}
+```
+
+**IF no flagged file:**
+
+```json
+{
+  "questions": [{
+    "question": "📐 No architecture reference found. Want to use one?",
+    "header": "Architecture",
+    "multiSelect": false,
+    "options": [
+      { "label": "Local file", "description": "Path to an existing .md file" },
+      { "label": "Remote repo", "description": "GitHub URL to analyze" },
+      { "label": "Code folder", "description": "Analyze existing code patterns" },
+      { "label": "Design freely", "description": "First feature = new reference" }
+    ]
+  }]
+}
+```
+
+### Handle User Choice
+
+**"Use this reference":**
+```
+→ Pass reference path to Architect
+→ Architect MUST read and follow it
+→ Architect MUST confirm: "Architecture Reference: [path] (v[N]) ✅"
+```
+
+**"Choose another source" or "Local file":**
+```
+→ Ask for path/URL
+→ VALIDATE CRAFT compliance (mandatory)
+→ If non-compliant → WARN with violations list
+→ User decides: use anyway or choose different
+→ Pass to Architect
+```
+
+**"Remote repo":**
+```
+→ Ask for GitHub URL
+→ Spawn learning-agent to analyze (CRAFT validation)
+→ If non-compliant → WARN with violations
+→ Extract patterns into temporary reference
+→ Pass to Architect
+```
+
+**"Code folder":**
+```
+→ Ask for folder path
+→ Spawn learning-agent to analyze (CRAFT validation)
+→ Extract patterns into temporary reference
+→ Pass to Architect
+```
+
+**"Design freely":**
+```
+→ No reference passed to Architect
+→ After implementation → Propose capturing as new reference
+```
+
+### Architecture Reference File Format (with UUID)
+
+```yaml
+---
+clean-claude: architecture-reference
+id: f8a3b2c1-4d5e-6789-abcd-ef0123456789   # Generated once, NEVER changes
+version: 2                                   # Incremented on updates
+created: 2026-02-05
+updated: 2026-02-05
+approved-by: user
+---
+
+# Architecture Reference
+
+[content...]
+```
+
+**UUID rules:**
+- Generated ONCE when file is created (uuid v4)
+- NEVER changes, even if file is moved/renamed
+- Used to track identity across renames
+- Displayed to user in prompts for transparency
+
+### CRAFT Validation for External Sources
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🚫 EXTERNAL SOURCES = CRAFT VALIDATION MANDATORY                       ║
+║                                                                           ║
+║   Before accepting any external source as reference:                     ║
+║   1. Analyze for CRAFT compliance                                        ║
+║   2. Check for: any types, throw without Result, no tests, god classes   ║
+║   3. If violations found → WARN user explicitly                          ║
+║   4. User can: accept with warnings, reject, or choose different         ║
+║                                                                           ║
+║   NEVER silently accept non-CRAFT patterns as reference                  ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+**Validation prompt if violations found:**
+
+```json
+{
+  "questions": [{
+    "question": "⚠️ CRAFT violations found in source. Use anyway?",
+    "header": "Warning",
+    "multiSelect": false,
+    "options": [
+      { "label": "Use anyway", "description": "I understand the risks" },
+      { "label": "Choose different", "description": "Pick another source" },
+      { "label": "Design freely", "description": "Architect decides" }
+    ]
+  }]
+}
+```
+
+**Show violations list:**
+```
+⚠️ CRAFT VIOLATIONS DETECTED:
+
+  ❌ `any` types found (12 occurrences)
+  ❌ `throw` without Result (8 occurrences)
+  ❌ No test files detected
+  ⚠️ No clear layer separation
+
+Using this as reference may introduce anti-patterns.
+```
+
+---
+
 ## STEP 7: Route to Agents
 
 **Now route based on user choice:**
@@ -1872,7 +2054,7 @@ IF Architect needs to deviate:
   │
   ├─ STEP 2: Learning (auto)
   │     → Stack detection
-  │     → Architecture detection (if exists)
+  │     → Architecture detection (if flagged file exists)
   │     → CRAFT validation
   │
   ├─ STEP 3: User choice (New/Refactor/Bug/Tests)
@@ -1883,16 +2065,22 @@ IF Architect needs to deviate:
   │
   ├─ STEP 6: Spec approval (for new features, BLOCKING)
   │
+  ├─ STEP 6b: ARCHITECTURE REFERENCE (EXPLICIT, BLOCKING)
+  │     → "📐 Which architecture reference?"
+  │     → Options: flagged file / local file / remote repo / code folder / design freely
+  │     → External source? CRAFT validation mandatory
+  │     → User ALWAYS knows what reference is used
+  │
   ├─ STEP 7: Agent routing
-  │     → PO → Architect → Dev + QA (parallel)
+  │     → Architect (with reference context) → Dev + QA (parallel)
   │
   ├─ STEP 8: Verification loop
   │     → Claude runs checks
   │     → Routes errors to agents
   │     → Loop until green
   │
-  └─ STEP 9: Architecture capture (first feature only)
-        → If first feature complete
-        → Ask user if capture as reference
-        → Generate architecture-guide.md
+  └─ STEP 9: Architecture capture (if no reference existed)
+        → "Capture as reference for future features?"
+        → Generate file with UUID + frontmatter flag
+        → Commit for team consistency
 ```
