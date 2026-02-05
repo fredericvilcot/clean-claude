@@ -1781,13 +1781,13 @@ BEFORE showing "✅ Implementation Complete":
   │   │  │                                                            │
   │   │  │  📊 Progress: 24/47 files (51%)                            │
   │   │  │                                                            │
-  │   │  │  Missing files (23):                                       │
-  │   │  │  • src/domain/gateway/GatewayId.ts                        │
-  │   │  │  • src/domain/gateway/GatewayModel.ts                     │
-  │   │  │  • src/domain/network/Network.ts                          │
-  │   │  │  • src/domain/network/NetworkError.ts                     │
-  │   │  │  • src/application/ports/NetworkRepository.ts             │
-  │   │  │  • ... (18 more)                                          │
+  │   │  │  Missing files (11):                                       │
+  │   │  │  • src/domain/order/OrderId.ts                            │
+  │   │  │  • src/domain/order/OrderStatus.ts                        │
+  │   │  │  • src/application/use-cases/createOrder.ts               │
+  │   │  │  • src/application/use-cases/updateOrder.ts               │
+  │   │  │  • src/infrastructure/http/orderHttpRepository.ts         │
+  │   │  │  • ... (6 more)                                           │
   │   │  │                                                            │
   │   │  └────────────────────────────────────────────────────────────┘
   │   │
@@ -1919,14 +1919,14 @@ Wave 5: QA tests
 
 // ✅ CORRECT: All in one message
 Task(frontend-engineer, "Wave 1: Create Result module...")
-Task(frontend-engineer, "Wave 1: Create Gateway module...")
-Task(frontend-engineer, "Wave 1: Create GatewayError module...")
+Task(frontend-engineer, "Wave 1: Create Order module...")
+Task(frontend-engineer, "Wave 1: Create OrderError module...")
 // → 3 agents spawn simultaneously
 
 // ❌ WRONG: Separate messages (sequential)
 Task(frontend-engineer, "Wave 1: Create Result module...")
 // wait...
-Task(frontend-engineer, "Wave 1: Create Gateway module...")
+Task(frontend-engineer, "Wave 1: Create Order module...")
 // wait...
 // → Agents run one after another
 ```
@@ -2113,10 +2113,17 @@ IF Architect needs to deviate:
   ├─ STEP 7: Agent routing
   │     → Architect (with reference context) → Dev + QA (parallel)
   │
-  ├─ STEP 8: Verification loop
-  │     → Claude runs checks
-  │     → Routes errors to agents
-  │     → Loop until green
+  ├─ STEP 8: Verification loop (TWO PHASES)
+  │     │
+  │     ├─ PHASE A: Design Coverage (FIRST)
+  │     │     → Check ALL files in Implementation Checklist exist
+  │     │     → If missing files → spawn devs for missing files → re-check
+  │     │     → Loop until 100% coverage
+  │     │
+  │     └─ PHASE B: Tests (AFTER 100% coverage)
+  │           → Run build/tests/lint
+  │           → Route errors to agents
+  │           → Loop until green
   │
   └─ STEP 9: Architecture capture (if no reference existed)
         → "Capture as reference for future features?"
