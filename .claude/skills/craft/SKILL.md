@@ -22,8 +22,8 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, AskUserQuestion
 │                                                              │
 ╰──────────────────────────────────────────────────────────────╯
 
-⬡ Step 1/9 ─ Learn
-  ◌ Analyzing project...
+⬡ Step 1/9 ─ Detect
+  ◌ Detecting project type...
 ```
 
 **Then spawn the learning-agent. THIS IS MANDATORY.**
@@ -53,13 +53,13 @@ HEADER STYLE — Rounded box for banner only
 STEP PROGRESS — Colored indicators
 ═══════════════════════════════════════════════════════════════
 
-🟢 Step 1/9 ─ Learn                    typescript, react, fp-ts
+🟢 Step 1/9 ─ Detect                   project type, monorepo?
 🔵 Step 2/9 ─ Choose                   ← current
 ⚪ Step 3/9 ─ QA Config
 ⚪ Step 4/9 ─ Spec
 ⚪ Step 5/9 ─ Design
-⚪ Step 6/9 ─ Implement
-⚪ Step 7/9 ─ Test
+⚪ Step 6/9 ─ Skills                   stack-skills.md (before dev)
+⚪ Step 7/9 ─ Implement
 ⚪ Step 8/9 ─ Verify
 ⚪ Step 9/9 ─ Complete
 
@@ -145,22 +145,27 @@ ERROR STATE
 
 ---
 
-## STEP 1 — Learn
+## STEP 1 — Project Detection (FAST)
 
-**Spawn learning-agent:**
+**Spawn learning-agent in DETECT mode (< 5 seconds):**
 
 ```
 Task(
   subagent_type: "learning-agent",
-  prompt: "Detect stack and generate skills for this project. Output detected libraries."
+  prompt: "Detect project type and structure. Output project info."
 )
 ```
 
-**After learning-agent completes, check context.json for monorepo:**
+**⚠️ NO skills generation here. Just detect:**
+- Project type (monorepo, frontend, backend, fullstack, library)
+- Language (typescript, go, rust, etc.)
+- Workspaces (if monorepo)
+
+**After learning-agent completes, check context.json:**
 
 **LOGIC:**
-- IF `monorepo.detected == true` → Show monorepo info + ask scope
-- IF `monorepo == null` → Show single app results directly, skip scope question
+- IF `project.monorepo.detected == true` → Show monorepo info + ask scope
+- IF `project.monorepo == null` → Single app, skip scope question
 
 ### IF MONOREPO DETECTED — Show scope selection
 
@@ -243,21 +248,23 @@ Build options from `context.json.monorepo.workspaces`:
 }
 ```
 
-**After scope selected — Spawn learning-agent for SCOPE SCAN:**
+**After scope selected — Save to context and continue:**
 
 ```
-Task(
-  subagent_type: "learning-agent",
-  prompt: "Full scan of [SELECTED_SCOPE]. Detect stack, validate CRAFT, spawn Architect for skills."
-)
+Update context.json:
+{
+  "project": {
+    ...existing,
+    "scope": "[SELECTED_SCOPE]"
+  }
+}
 ```
 
-> 🟣 **RULE: Monorepo skills are scope-specific**
-> - The prompt MUST include the scope path (e.g., "packages/manager")
-> - learning-agent will detect stack + spawn Architect for stack-skills.md
-> - If user changes scope later → regenerate skills
+> 🟣 **NO skills generation here!**
+> Skills will be generated at Step 7, just before Dev implementation.
+> This keeps Step 1 fast and focused.
 
-**Show results:**
+**Show scope confirmation:**
 
 ```
 🟢 Step 1/9 ─ Learn                              ✓ Complete
@@ -509,7 +516,42 @@ Task(
 
 **USER APPROVES DESIGN** (blocking checkpoint)
 
-**Step 7: Dev implements**
+---
+
+## STEP 7: SKILLS GENERATION (before Dev)
+
+> 🟣 **Generate skills NOW, just before implementation.**
+> This is when we need them — not at the beginning.
+
+**Spawn learning-agent in SKILLS mode:**
+
+```
+Task(
+  subagent_type: "learning-agent",
+  prompt: "Generate skills for [SCOPE]. Output stack-skills.md."
+)
+```
+
+**What happens:**
+1. learning-agent reads `[SCOPE]/package.json`
+2. Spawns Architect to generate `stack-skills.md`
+3. Returns when complete
+
+**Show progress:**
+```
+🔵 Step 7/9 ─ Skills
+  ◌ Generating stack skills...
+  🟢 Stack: typescript, react, zustand, fp-ts
+  🟢 Output: .clean-claude/stack-skills.md
+```
+
+**⚠️ Dev agents will automatically read stack-skills.md during implementation.**
+
+---
+
+## STEP 8: DEV IMPLEMENTATION
+
+**Step 8: Dev implements**
 
 ```
 Task(

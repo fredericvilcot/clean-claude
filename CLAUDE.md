@@ -83,10 +83,10 @@ Clean Claude transforms Claude Code into a team of Software Craft experts. Clean
 ║      → NO CONFIRMATION = DESIGN REJECTED                                 ║
 ║      → After implementation → Architect proposes updates (versioned)     ║
 ║                                                                           ║
-║   1c. STACK SKILLS = MANDATORY                                            ║
-║      → learning-agent detects stack → MUST spawn Architect               ║
-║      → Architect generates .clean-claude/stack-skills.md                 ║
-║      → This is NOT optional — skills inform all subsequent agents        ║
+║   1c. STACK SKILLS = BEFORE DEV (not at start!)                          ║
+║      → Skills generated at Step 6, JUST BEFORE dev implementation        ║
+║      → learning-agent spawns Architect for stack-skills.md               ║
+║      → This keeps Step 1 fast (project detection only)                   ║
 ║      → Output: "🏛️ Stack skills generated → stack-skills.md"            ║
 ║                                                                           ║
 ║   2. DEV ROUTING = ANALYZE WHAT THE CODE DOES                             ║
@@ -137,28 +137,31 @@ Clean Claude transforms Claude Code into a team of Software Craft experts. Clean
 
 ## `/craft` — Learn First, Smart Choices
 
-**Stack detection first. Then intelligent options based on what's detected.**
+**Fast project detection. Skills generated later, just before dev.**
 
 ```
 /craft
   │
   ╔═══════════════════════════════════════════════════════════╗
-  ║  1. LEARNING (IMMEDIATE)                                  ║
+  ║  1. PROJECT DETECTION (< 5 sec)                           ║
   ║                                                           ║
-  ║  📦 Detecting stack...                                    ║
-  ║     → typescript, react, fp-ts, zustand, zod, vitest     ║
+  ║  🔍 Detecting project...                                  ║
+  ║     → Type: monorepo | frontend | backend | fullstack     ║
+  ║     → Language: typescript                                ║
+  ║     → Workspaces: apps/, packages/ (if monorepo)         ║
   ║                                                           ║
-  ║  🏛️ Architect generating library skills...                ║
-  ║     → TypeScript: utility types, strict mode              ║
-  ║     → fp-ts: Option, Either, pipe, flow                   ║
-  ║     → Zustand: stores, selectors                          ║
-  ║     → .clean-claude/stack-skills.md                           ║
+  ║  ⚡ NO skills yet — generated before dev (Step 6)         ║
   ╚═══════════════════════════════════════════════════════════╝
   │
   ╔═══════════════════════════════════════════════════════════╗
-  ║  2. SMART CHOICES (contextual)                            ║
+  ║  2. SCOPE (if monorepo)                                   ║
+  ║     → Which workspace?                                    ║
+  ╚═══════════════════════════════════════════════════════════╝
+  │
+  ╔═══════════════════════════════════════════════════════════╗
+  ║  3. SMART CHOICES (contextual)                            ║
   ║                                                           ║
-  ║  "I detected: TypeScript + React + fp-ts"                ║
+  ║  "Project type: frontend (React + TypeScript)"           ║
   ║                                                           ║
   ║  • ✨ New feature                                         ║
   ║  • 🐛 Fix a bug                                           ║
@@ -305,7 +308,7 @@ Generates a report:
 
 | Agent | Role | Output |
 |-------|------|--------|
-| **learning-agent** | Detects stack, spawns Architect for skills | `.clean-claude/context.json` |
+| **learning-agent** | Project detection (fast) + Skills generation (before dev) | `.clean-claude/context.json` |
 | **architect** | Library skills + Technical design | `.clean-claude/stack-skills.md`, `design.md` |
 | **product-owner** | Functional specs, user stories | `.clean-claude/specs/functional/` |
 | **frontend-engineer** | UI + unit tests (BDD) | Code + `*.test.ts` |
