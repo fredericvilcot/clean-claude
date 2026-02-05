@@ -795,7 +795,7 @@ IF architectureRef is null:
 
 ### Handle User Choice
 
-**"Use this reference":**
+**"Use this reference" (flagged file exists):**
 ```
 → Pass reference path to Architect
 → Architect MUST read and follow it
@@ -804,10 +804,13 @@ IF architectureRef is null:
 
 **"Choose another source" or "Local file":**
 ```
-→ Ask for path/URL
-→ VALIDATE CRAFT compliance (mandatory)
+→ Ask for path
+→ CHECK: Does file have frontmatter flag?
+→ IF NO FLAG → Add frontmatter (see "Flagging Unflagged Files" below)
+→ VALIDATE CRAFT compliance
 → If non-compliant → WARN with violations list
 → User decides: use anyway or choose different
+→ Update context.json with new architectureRef
 → Pass to Architect
 ```
 
@@ -832,6 +835,109 @@ IF architectureRef is null:
 ```
 → No reference passed to Architect
 → After implementation → Propose capturing as new reference
+```
+
+### Flagging Unflagged Files (Orchestrator Responsibility)
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🏷️ WHEN USER SELECTS AN UNFLAGGED FILE AS REFERENCE                    ║
+║                                                                           ║
+║   The Orchestrator (Claude in /craft) MUST:                              ║
+║                                                                           ║
+║   1. READ the file content                                               ║
+║   2. CHECK if frontmatter exists with flag                               ║
+║   3. IF NO FLAG:                                                         ║
+║      a. Generate UUID (uuid v4)                                          ║
+║      b. Prepend frontmatter to file:                                     ║
+║         ---                                                              ║
+║         clean-claude: architecture-reference                             ║
+║         id: [generated-uuid]                                             ║
+║         version: 1                                                       ║
+║         created: [today]                                                 ║
+║         updated: [today]                                                 ║
+║         ---                                                              ║
+║      c. Write updated file                                               ║
+║      d. Update context.json:                                             ║
+║         architectureRef: { path, id, version: 1, hasFlag: true }         ║
+║      e. OUTPUT: "📐 Added architecture reference flag to [path]"         ║
+║   4. THEN spawn Architect                                                ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+**Implementation (pseudo-code):**
+
+```javascript
+async function ensureArchitectureFlag(filePath) {
+  const content = await readFile(filePath);
+
+  // Check for existing frontmatter with flag
+  const hasFrontmatter = content.startsWith('---');
+  const hasFlag = content.includes('clean-claude: architecture-reference');
+
+  if (hasFlag) {
+    // Already flagged, extract UUID and version
+    const id = extractFromFrontmatter(content, 'id');
+    const version = extractFromFrontmatter(content, 'version');
+    return { path: filePath, id, version, alreadyFlagged: true };
+  }
+
+  // Generate new UUID
+  const uuid = generateUUIDv4();
+  const today = new Date().toISOString().split('T')[0];
+
+  // Create frontmatter
+  const frontmatter = `---
+clean-claude: architecture-reference
+id: ${uuid}
+version: 1
+created: ${today}
+updated: ${today}
+---
+
+`;
+
+  // Prepend to existing content (preserve existing frontmatter if any)
+  let newContent;
+  if (hasFrontmatter) {
+    // Insert flag into existing frontmatter
+    newContent = content.replace('---\n', `---\nclean-claude: architecture-reference\nid: ${uuid}\nversion: 1\ncreated: ${today}\nupdated: ${today}\n`);
+  } else {
+    // Prepend new frontmatter
+    newContent = frontmatter + content;
+  }
+
+  // Write file
+  await writeFile(filePath, newContent);
+
+  // Update context.json
+  await updateContextJson({
+    architectureRef: {
+      path: filePath,
+      id: uuid,
+      version: 1,
+      hasFlag: true
+    }
+  });
+
+  return { path: filePath, id: uuid, version: 1, alreadyFlagged: false };
+}
+```
+
+**Output to user:**
+
+```
+IF file was flagged:
+  "📐 Architecture reference: [path] (v[N], id: [uuid])"
+
+IF file was NOT flagged (just added):
+  "📐 Added architecture reference flag to [path]
+      ID: [uuid] (generated)
+      Version: 1 (initial)
+
+   This file is now THE architecture reference for this project."
 ```
 
 ### Architecture Reference File Format (with UUID)
