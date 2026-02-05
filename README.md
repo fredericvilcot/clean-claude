@@ -37,11 +37,12 @@ We believe code is a **craft**, not just a task. Every agent embodies the teachi
 ### The Non-Negotiables
 
 ```
-No any          → Types are documentation
-No throw        → Result<T, E> — errors are values
-No god classes  → Single responsibility
-No untested     → Tests are specs that run
-No cowboy code  → Spec → Design → Implement
+Explicit types     → Types document intent
+Explicit errors    → Errors are values, not surprises
+Single purpose     → Small, focused units
+Always tested      → Tests are specs that run
+Spec first         → Think before you code
+Domain isolation   → Business logic stays pure
 ```
 
 ---
@@ -189,17 +190,17 @@ Clean Claude enforces **Hexagonal Architecture**:
 
 ### Error Handling
 
-```typescript
-// ❌ BAD — Caller doesn't know this can fail
-function getUser(id: string): User {
-  throw new Error('Not found');
-}
+Errors are **values**, not exceptions:
 
-// ✅ GOOD — Error is explicit in the type
-function getUser(id: string): Result<User, NotFoundError> {
-  return err(new NotFoundError(id));
-}
 ```
+❌ BAD  — Caller doesn't know this can fail
+   getUser(id) → User | throws
+
+✅ GOOD — Error is explicit in the return type
+   getUser(id) → Result<User, NotFoundError>
+```
+
+Works with any language: `Result<T,E>`, `Either`, `Option`, `Maybe`, `error` return values...
 
 ---
 
