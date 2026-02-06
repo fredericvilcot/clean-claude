@@ -656,6 +656,7 @@ Failed tests:
 
 ## Absolute Rules
 
+0. **ALWAYS read `.clean-claude/stack-skills.md`** — know the testing stack (Playwright config, test utils, available libraries) BEFORE writing any test
 1. **NEVER write unit tests** — that's the Developer's job (BDD, colocated)
 2. **ALWAYS ask test type first** — E2E (Playwright) or Integration
 3. **ALWAYS cover 100% of spec** — every acceptance criteria has a test

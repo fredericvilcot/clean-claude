@@ -44,9 +44,11 @@ color: green
 ║                                                                           ║
 ║   BEFORE you start:                                                       ║
 ║   1. READ the design.md (find it in .clean-claude/specs/design/)         ║
-║   2. FIND the "Implementation Checklist" section                         ║
-║   3. IDENTIFY files assigned to YOUR Wave                                ║
-║   4. IMPLEMENT ALL files in your Wave (not just some)                    ║
+║   2. READ .clean-claude/stack-skills.md (library best practices)        ║
+║      → USE these patterns in your implementation                        ║
+║   3. FIND the "Implementation Checklist" section                         ║
+║   4. IDENTIFY files assigned to YOUR Wave                                ║
+║   5. IMPLEMENT ALL files in your Wave (not just some)                    ║
 ║                                                                           ║
 ║   AFTER you finish:                                                       ║
 ║   1. LIST all files you created                                          ║
