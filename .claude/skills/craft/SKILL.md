@@ -759,12 +759,31 @@ IF failures → ROUTE to appropriate agent
 
 ## Fix Loop Routing
 
-| Error Type | Route To |
-|------------|----------|
-| Test failure in src/ | Dev (frontend or backend) |
-| Test failure in e2e/ | QA |
-| Type error | Architect (design issue) |
-| Spec unclear | PO |
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   ROUTING TABLE — EVERY ERROR TYPE HAS AN OWNER                          ║
+║                                                                           ║
+║   Error Type                   │ Route To                                ║
+║   ─────────────────────────────┼──────────────────────────────           ║
+║   Test failure in src/         │ Dev (frontend or backend)               ║
+║   Test failure in e2e/         │ QA                                      ║
+║   Test failure in tests/       │ QA                                      ║
+║   Runtime error (undefined,    │ Dev who owns the file                   ║
+║     null ref, React warnings)  │ (UI → frontend, logic → backend)       ║
+║   TypeScript type error        │ Architect (design issue)                ║
+║   Build error (not types)      │ Dev who owns the failing file           ║
+║   Lint error                   │ Dev who owns the file                   ║
+║   Spec unclear / ambiguous     │ PO                                      ║
+║   Design conflict              │ Architect                               ║
+║                                                                           ║
+║   🧠 HOW TO DECIDE Dev TYPE:                                             ║
+║      → UI component, hook, page, i18n? → frontend-engineer              ║
+║      → Domain, service, API, repository? → backend-engineer              ║
+║      → Look at the FILE PATH, not the error message                      ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
 
 **Show during fix loop:**
 ```
@@ -777,11 +796,11 @@ IF failures → ROUTE to appropriate agent
 **Claude MUST use the 🔔 NOTIFICATION format when routing errors:**
 
 ```
-// Test failure in src/ → Dev fixes
+// Test failure in src/ → Dev fixes (frontend-engineer or backend-engineer)
 Task(
-  subagent_type: "frontend-engineer",  // or backend-engineer
+  subagent_type: "frontend-engineer",  // or backend-engineer — based on file ownership
   prompt: """
-    🔔 NOTIFICATION FROM QA / VERIFY STEP
+    🔔 NOTIFICATION FROM VERIFY STEP
 
     ## Test Failed
     File: [test-file:line]
@@ -804,6 +823,56 @@ Task(
 ```
 
 ```
+// Test failure in e2e/ or tests/ → QA fixes
+Task(
+  subagent_type: "qa-engineer",
+  prompt: """
+    🔔 NOTIFICATION FROM VERIFY STEP
+
+    ## Test Failed
+    File: [test-file:line]
+    Test: "[test name]"
+
+    ## Error
+    [error message / expected vs received]
+
+    ## Context
+    - Design: {SCOPE}/.clean-claude/specs/design/design-v1.md
+    - Stack skills: {SCOPE}/.clean-claude/stack-skills.md
+
+    ## Action Required
+    Fix YOUR test code. The implementation is correct (tests in src/ pass).
+    Run tests to confirm. Report what you changed.
+  """
+)
+```
+
+```
+// Runtime error (undefined, null, React warning) → Dev fixes
+Task(
+  subagent_type: "frontend-engineer",  // or backend-engineer — based on file path
+  prompt: """
+    🔔 NOTIFICATION FROM VERIFY STEP
+
+    ## Runtime Error
+    Component/File: [file:line]
+    Error: [error message — e.g. "can't access property X, state is undefined"]
+
+    ## Context
+    [React warning, console error, or browser error — paste full message]
+
+    ## Action Required
+    Fix the runtime bug. Likely causes: missing null check, incorrect state init,
+    missing key prop, undefined data. Fix and add a test covering this case.
+
+    ## CRAFT RULES STILL APPLY
+    - NO `any`, NO `throw`, Result<T,E> only
+    - Read .clean-claude/stack-skills.md for patterns
+  """
+)
+```
+
+```
 // Type error → Architect fixes design
 Task(
   subagent_type: "architect",
@@ -817,6 +886,31 @@ Task(
     ## Action Required
     Review your design. Update type definitions in design-v[N+1].md.
     Notify Dev when design is updated.
+  """
+)
+```
+
+```
+// Build error (not type) → Dev fixes
+Task(
+  subagent_type: "frontend-engineer",  // or backend-engineer — based on file path
+  prompt: """
+    🔔 NOTIFICATION FROM VERIFY STEP
+
+    ## Build Error
+    File: [file:line]
+    Error: [build error message]
+
+    ## Context
+    Build command: [npm run build / vite build / etc.]
+    This is NOT a type error — it's a bundler/build configuration issue.
+
+    ## Action Required
+    Fix the build error. Run build to confirm. Report what you changed.
+
+    ## CRAFT RULES STILL APPLY
+    - NO `any`, NO `throw`, Result<T,E> only
+    - Read .clean-claude/stack-skills.md for patterns
   """
 )
 ```
@@ -956,13 +1050,16 @@ Task(
 
 | From | To | Trigger in output | Claude's action |
 |------|-----|-------------------|-----------------|
+| Verify | Dev | Test failure in src/, runtime error, build error | Spawn Dev with `🔔 NOTIFICATION FROM VERIFY` |
+| Verify | QA | Test failure in e2e/ or tests/ | Spawn QA with `🔔 NOTIFICATION FROM VERIFY` |
+| Verify | Architect | TypeScript type error, design conflict | Spawn Architect with `🔔 NOTIFICATION FROM VERIFY` |
 | QA | Dev | "🔴 Test failed: [file:line]" | Spawn Dev with `🔔 NOTIFICATION FROM QA` |
 | Dev | QA | "✅ Fixed [file]" | Spawn QA with `🔔 NOTIFICATION FROM DEV` |
 | Dev | Architect | "❓ Design unclear: [question]" | Spawn Architect with `🔔 NOTIFICATION FROM DEV` |
 | Architect | Dev | "📐 Design updated: [change]" | Spawn Dev with `🔔 NOTIFICATION FROM ARCHITECT` |
 | Any | PO | "❓ Spec unclear: [question]" | Spawn PO with `🔔 NOTIFICATION FROM [AGENT]` |
 
-**You wrote it? You fix it. Claude routes.**
+**You wrote it? You fix it. Claude routes. EVERY error type has an owner.**
 
 ---
 
