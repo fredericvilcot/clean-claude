@@ -1,7 +1,7 @@
 ---
 name: orchestrator
 description: "Use this agent to coordinate the reactive multi-agent loop. It manages the flow between product-owner, architect, frontend-engineer, and qa-engineer agents, handling errors and retries automatically. Use when starting a feature workflow or when you need agents to collaborate reactively."
-model: sonnet
+model: opus
 color: cyan
 tools: Read, Write, Edit, Bash, Glob, Grep, Task
 ---
