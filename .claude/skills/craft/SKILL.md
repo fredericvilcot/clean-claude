@@ -244,35 +244,72 @@ Task(
 ## 5b. ARCHITECT
 
 ```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   ARCHITECT PROMPT MUST INCLUDE:                                         ║
+║                                                                           ║
+║   1. ALL inputs (spec, legacy, context.json)                             ║
+║   2. CRAFT PRINCIPLES reminder (hexagonal, Result<T,E>, no any/throw)   ║
+║   3. Request for FULL design (not just file list)                        ║
+║   4. Explicit ask for stack-skills.md BEFORE design                     ║
+║                                                                           ║
+║   WITHOUT THIS → Architect produces generic "Claude classic" design      ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+```
 Task(
   subagent_type: "architect",
   prompt: """
-    Design implementation for: [REQUEST]
+    Design CRAFT implementation for: [REQUEST]
 
     ## YOUR INPUTS
     - Functional spec: .clean-claude/specs/functional/spec-v[N].md
+    - API endpoints spec: .clean-claude/specs/functional/api-endpoints.md (if exists)
     - Legacy code: [LEGACY_PATH from context.json inputs] (if exists)
     - context.json: .clean-claude/context.json
 
-    ## YOUR TASKS
+    ## CRAFT PRINCIPLES — MANDATORY
+    - Architecture: HEXAGONAL (domain → application → infrastructure)
+    - Error handling: Result<T, E> — NO throw, NO try/catch for business errors
+    - Types: STRICT TypeScript — NO `any`, NO `unknown` casts
+    - Domain: PURE — zero framework imports in domain layer
+    - Tests: BDD style, colocated *.test.ts, test domain in isolation
+    - Patterns: Use your FEATURE Design section (hexagonal), NOT bootstrap
+
+    ## YOUR TASKS (IN ORDER)
     1. Check context.json for architectureRef
-       → IF exists: Read it and FOLLOW its patterns
+       → IF exists: Read it and FOLLOW its patterns exactly
        → Confirm: "Architecture Reference: [path] (v[N]) ✅"
 
     2. IF legacy code exists:
        → Read it to extract API endpoints, data models, routes
        → These become the technical contract for the new app
 
-    3. Read [SCOPE]/package.json for stack
-    4. Write .clean-claude/stack-skills.md (library skills for devs)
-    5. Write .clean-claude/specs/design/design-v1.md with:
-       - Architecture decisions
-       - File structure
-       - API endpoints / routes (extracted from legacy or spec)
-       - Data models / types
-       - Implementation Checklist (MANDATORY — every file to create/modify)
-       - Execution Plan (waves for parallelization)
-    6. Ask user approval
+    3. Read [SCOPE]/package.json for stack detection
+
+    4. Write .clean-claude/stack-skills.md
+       → Follow your "MANDATORY: GENERATE STACK SKILLS" section
+       → CRAFT patterns for EACH library (do's, don'ts, code examples)
+
+    5. Write .clean-claude/specs/design/design-v1.md with FULL design:
+       → Architecture Decision (ADR style — why hexagonal, why these patterns)
+       → CRAFT Principles Applied (checklist: no any, Result<T,E>, etc.)
+       → File Structure (hexagonal: domain/ → application/ → infrastructure/)
+       → Domain Types (entities, value objects, error types with Result<T,E>)
+       → API Endpoints / routes (extracted from inputs, not invented)
+       → Port interfaces (driving + driven)
+       → Use cases (application layer)
+       → Code examples for key patterns (Result handling, port usage)
+       → Implementation Checklist (MANDATORY — EVERY file with Wave number)
+       → Execution Plan (waves for parallelization)
+
+    6. Ask user approval BEFORE finalizing
+
+    ## QUALITY BAR
+    "If this design is complete, Dev can implement WITHOUT asking questions."
+    Every file, every type, every interface must be specified.
   """
 )
 ```
@@ -289,12 +326,27 @@ Task(
 
 ```
 Task(
-  subagent_type: "frontend-engineer",  // or backend-engineer
+  subagent_type: "frontend-engineer",  // or backend-engineer based on code responsibility
   prompt: """
-    Implement from design: .clean-claude/specs/design/design-v1.md
-    Read stack-skills: .clean-claude/stack-skills.md
-    Follow Implementation Checklist EXACTLY.
-    Output: FILES CREATED table.
+    Implement Wave [N] from design: .clean-claude/specs/design/design-v1.md
+
+    ## BEFORE YOU START
+    1. Read .clean-claude/specs/design/design-v1.md
+    2. Read .clean-claude/stack-skills.md — USE these patterns
+    3. Find the Implementation Checklist section
+    4. Identify ALL files in Wave [N]
+
+    ## CRAFT RULES — MANDATORY
+    - NO `any` types — strict TypeScript everywhere
+    - NO `throw` — use Result<T, E> for all error handling
+    - Domain layer = PURE (zero framework imports)
+    - Every file gets a colocated *.test.ts (BDD style)
+    - Follow the design EXACTLY — don't invent structure
+
+    ## OUTPUT
+    - ALL files in Wave [N] implemented + tested
+    - FILES CREATED table (file path | status | test status)
+    - Run tests to verify they pass
   """
 )
 
@@ -302,7 +354,21 @@ Task(
   subagent_type: "qa-engineer",  // only if QA enabled
   prompt: """
     Write tests from spec: .clean-claude/specs/functional/spec-v[N].md
-    Cover ALL acceptance criteria.
+
+    ## BEFORE YOU START
+    1. Read .clean-claude/stack-skills.md — know the testing stack
+    2. Read .clean-claude/specs/functional/spec-v[N].md — ALL acceptance criteria
+    3. Read .clean-claude/specs/design/design-v1.md — understand the architecture
+
+    ## YOUR JOB
+    - Cover 100% of acceptance criteria (Given/When/Then)
+    - E2E or Integration tests (NOT unit tests — that's Dev's job)
+    - Test from user's perspective, not implementation details
+
+    ## OUTPUT
+    - Test files created
+    - All tests passing
+    - Coverage report: which spec items are covered
   """
 )
 ```
