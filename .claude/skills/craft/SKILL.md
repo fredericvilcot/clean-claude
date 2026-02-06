@@ -175,20 +175,35 @@ Step 8: ITERATE      CRAFT session stays active — bugs/changes routed to agent
 ## 1a. CHECK FOR EXISTING SESSION
 
 ```
-Read("{SCOPE}/.clean-claude/state.json")
+Glob("**/.clean-claude/state.json")
 ```
 
-**IF state.json EXISTS and has `status: "iteration"` or `status: "in_progress"`:**
+**This finds state.json at ANY level:**
+- `.clean-claude/state.json` → standalone app at root
+- `apps/my-app/.clean-claude/state.json` → monorepo scope
+- `packages/foo/apps/bar/.clean-claude/state.json` → nested monorepo scope
 
+**IF one or more state.json found with `status: "iteration"` or `status: "in_progress"`:**
+
+**IF multiple sessions found → ask which one:**
+```
+AskUserQuestion:
+  "Found multiple CRAFT sessions:"
+  Options:
+  - [path1] — [description] (step [N])
+  - [path2] — [description] (step [N])
+  - Start fresh
+```
+
+**IF single session found → show it:**
 ```
 ╭──────────────────────────────────────────────────────────────╮
 │                                                              │
 │   🟣 CRAFT SESSION FOUND                                     │
 │                                                              │
-│   Scope: [SCOPE]                                             │
+│   Location: [path to .clean-claude/]                         │
 │   Last step: [STEP]                                          │
 │   Task: [description from state]                             │
-│   Design: [design path]                                      │
 │   Status: [iteration / in_progress at step X]                │
 │                                                              │
 ╰──────────────────────────────────────────────────────────────╯
@@ -198,18 +213,19 @@ AskUserQuestion:
   Options:
   - Resume this session (continue where I left off)
   - Start fresh (new task, same scope)
-  - Start fresh (different scope)
+  - Start fresh (different scope / project)
 ```
 
 **IF "Resume":**
-- Read context.json, state.json, design, spec
+- Resolve {SCOPE} from the state.json path (parent of `.clean-claude/`)
+- Read context.json, state.json, design, spec from that scope
 - IF `status: "iteration"` → GO DIRECTLY TO STEP 8 (iteration mode)
 - IF `status: "in_progress"` → GO TO the step saved in state.json
 
 **IF "Start fresh (same scope)":**
-- Keep scope, reset state → GO TO STEP 3
+- Keep scope from found session, reset state → GO TO STEP 3
 
-**IF "Start fresh (different scope)":**
+**IF "Start fresh (different scope / project)":**
 - Reset everything → Continue to Step 1b below
 
 ## 1b. FRESH DETECTION (no session or user chose fresh)
