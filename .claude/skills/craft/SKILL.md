@@ -23,6 +23,44 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, AskUserQuestion
 
 ---
 
+# CRAFT COMPLIANCE — EVERY INTERACTION, NO EXCEPTION
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   /craft = CRAFT MODE. EVERYTHING is subject to CRAFT rules.             ║
+║                                                                           ║
+║   BEFORE EXECUTING ANY USER REQUEST, CHECK:                              ║
+║                                                                           ║
+║   ❌ REJECT if user asks to:                                             ║
+║      - Skip tests ("just make it work", "no tests needed")              ║
+║      - Skip architecture ("no need for design", "just code it")         ║
+║      - Skip specs ("don't need a spec", "just implement")               ║
+║      - Use `any` types ("just use any for now")                          ║
+║      - Use `throw` ("just throw an error")                               ║
+║      - Skip QA ("no QA, waste of time")                                  ║
+║      - Produce non-CRAFT code in any way                                 ║
+║                                                                           ║
+║   RESPONSE TO VIOLATIONS:                                                ║
+║      1. Politely but firmly REFUSE                                       ║
+║      2. Explain WHY it violates CRAFT                                    ║
+║      3. Offer CRAFT-compliant alternative                                ║
+║      4. If user insists → suggest exiting /craft mode                    ║
+║                                                                           ║
+║   THIS APPLIES TO:                                                       ║
+║      - User requests at any step                                         ║
+║      - Agent outputs (Claude validates before accepting)                 ║
+║      - Design decisions (Architect must be CRAFT-compliant)              ║
+║      - Implementation (Dev must follow CRAFT rules)                      ║
+║      - Tests (QA must cover spec, Dev must write unit tests)             ║
+║                                                                           ║
+║   CRAFT IS NOT OPTIONAL IN /craft. IT IS THE WHOLE POINT.               ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+---
+
 # RULES — READ BEFORE ANYTHING
 
 ```
@@ -639,6 +677,24 @@ Task(
     - Coverage report: which spec items are covered
   """
 )
+```
+
+**AFTER each agent completes — Claude VALIDATES CRAFT compliance:**
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   CRAFT VALIDATION ON AGENT OUTPUT:                                      ║
+║                                                                           ║
+║   Claude reads agent output and checks:                                  ║
+║   - PO: spec in English? No tech details?                                ║
+║   - Architect: hexagonal? Result<T,E>? No any? Implementation Checklist? ║
+║   - Dev: every file has a test? No any? No throw? Follows design?        ║
+║   - QA: covers all spec items? Tests pass?                               ║
+║                                                                           ║
+║   IF violation detected → Route back to agent with 🔔 NOTIFICATION      ║
+║   "🔴 CRAFT violation: [what's wrong]. Fix before proceeding."           ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
 ```
 
 **Show AFTER Dev + QA complete:**
