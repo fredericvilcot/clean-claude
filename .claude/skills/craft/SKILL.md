@@ -851,6 +851,23 @@ Task(
 
 # STEP 7: ARCHITECTURE CAPTURE (if no reference existed)
 
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🚨 STEP 7 IS MANDATORY — DO NOT SKIP                                  ║
+║                                                                           ║
+║   Claude MUST go through Step 7 before declaring complete.               ║
+║                                                                           ║
+║   ❌ DO NOT write to memory or notes                                     ║
+║   ❌ DO NOT declare "Migration Complete" or "Done" yourself              ║
+║   ❌ DO NOT skip the architecture capture question                       ║
+║                                                                           ║
+║   ONLY the CRAFT COMPLETE banner (below) marks the end of /craft.       ║
+║   Everything else = the flow is NOT finished.                            ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
 **Only if `architectureRef` was null at start:**
 
 ```
@@ -861,9 +878,34 @@ AskUserQuestion:
   - No, skip
 ```
 
-**If YES → Architect captures patterns into ARCHITECTURE.md**
+**If YES → spawn Architect to capture patterns:**
+```
+Task(
+  subagent_type: "architect",
+  prompt: """
+    🔔 ARCHITECTURE CAPTURE
 
-**Show FINAL RECAP:**
+    Implementation is complete. Capture the patterns used into
+    an architecture reference document.
+
+    ## YOUR TASK
+    1. Read the design: {SCOPE}/.clean-claude/specs/design/design-v1.md
+    2. Read key implemented files to confirm patterns
+    3. Write {SCOPE}/ARCHITECTURE.md with:
+       - Architecture pattern (hexagonal, layers)
+       - Folder structure convention
+       - Naming conventions
+       - Error handling patterns (Result<T,E>)
+       - Testing patterns
+       - Key decisions (ADR style)
+    4. Add frontmatter: `clean-claude: architecture-reference`
+
+    This becomes the reference for ALL future features in this project.
+  """
+)
+```
+
+**Show FINAL RECAP (this is the ONLY valid end of /craft):**
 ```
 ╭──────────────────────────────────────────────────────────────╮
 │                                                              │
