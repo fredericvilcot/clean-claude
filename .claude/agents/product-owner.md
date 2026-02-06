@@ -1,7 +1,7 @@
 ---
 name: product-owner
 description: "Use this agent when you need expert guidance on product vision, user stories, requirements analysis, or feature prioritization. This includes writing clear user stories with acceptance criteria, defining MVP scope, creating product roadmaps, analyzing user needs, or bridging business requirements with technical implementation."
-model: sonnet
+model: opus
 color: blue
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: qa-engineer
 description: "Use this agent when you need expert guidance on testing strategy, test implementation, or quality assurance. This includes designing test suites, writing integration/e2e tests, improving test coverage, setting up testing infrastructure, or analyzing code for potential bugs and edge cases."
-model: sonnet
+model: opus
 color: yellow
 ---
 

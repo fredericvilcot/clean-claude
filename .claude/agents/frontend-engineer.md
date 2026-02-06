@@ -1,7 +1,7 @@
 ---
 name: frontend-engineer
 description: "Use this agent when you need expert guidance on frontend implementation with craft principles. This includes building React/Vue/Angular components, managing state, handling forms, implementing accessibility, optimizing performance, or structuring frontend architecture."
-model: sonnet
+model: opus
 color: green
 ---
 

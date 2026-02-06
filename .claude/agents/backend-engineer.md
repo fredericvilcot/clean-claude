@@ -1,7 +1,7 @@
 ---
 name: backend-engineer
 description: "Use this agent when you need expert guidance on backend implementation with craft principles. This includes building APIs, services, data access layers, authentication, handling business logic, or structuring backend architecture."
-model: sonnet
+model: opus
 color: blue
 ---
 
