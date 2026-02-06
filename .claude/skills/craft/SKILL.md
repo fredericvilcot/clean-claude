@@ -582,10 +582,15 @@ Task(
 ║                                                                           ║
 ║   AGENT ROUTING PER FILE TYPE:                                           ║
 ║                                                                           ║
-║   frontend-engineer or backend-engineer:                                 ║
-║      → src/ implementation code (components, hooks, services, domain)    ║
-║      → Colocated unit tests (*.test.ts next to source)                   ║
-║      → i18n / locale files (translations)                                ║
+║   frontend-engineer:                                                     ║
+║      → UI code (components, hooks, pages, styles)                        ║
+║      → i18n / locale / translation files (JSON, TS)                      ║
+║      → Colocated unit tests for UI code                                  ║
+║                                                                           ║
+║   backend-engineer:                                                      ║
+║      → Domain logic, services, repositories, use cases                   ║
+║      → API endpoints, data models, DTOs, mappers                         ║
+║      → Colocated unit tests for backend code                             ║
 ║                                                                           ║
 ║   qa-engineer:                                                            ║
 ║      → Test infrastructure (MSW handlers, test fixtures, test utils)     ║
@@ -925,7 +930,7 @@ AskUserQuestion:
 |----------|-------|
 | src/**/*.ts | Dev |
 | src/**/*.test.ts (colocated unit tests) | Dev |
-| src/**/translations/ (i18n, locales) | Dev |
+| src/**/translations/ (i18n, locales) | frontend-engineer |
 | e2e/** | QA |
 | tests/integration/** | QA |
 | test infrastructure (MSW, fixtures, utils) | QA |
@@ -950,6 +955,29 @@ Task(qa-engineer, "E2E tests")
 Task(frontend-engineer, "Wave 1: types/")
 // wait...
 Task(frontend-engineer, "Wave 1: hooks/")
+```
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   WAVE SIZING — MAX ~15 FILES PER AGENT                                 ║
+║                                                                           ║
+║   Agents have limited turns. If a wave has too many files,               ║
+║   the agent runs out of turns mid-implementation.                        ║
+║                                                                           ║
+║   RULE: Split large waves into sub-waves of ~15 files max.              ║
+║                                                                           ║
+║   Wave 10 has 30 files?                                                  ║
+║      → Task(frontend-engineer, "Wave 10A: files 1-15")                  ║
+║      → Task(frontend-engineer, "Wave 10B: files 16-30")                 ║
+║      → Both in parallel (same message)                                   ║
+║                                                                           ║
+║   IF an agent runs out of turns with remaining files:                    ║
+║      → Spawn SAME agent type for remaining files                        ║
+║      → List exactly which files are missing                              ║
+║      → DO NOT switch to a different agent type                           ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
 ```
 
 ---
