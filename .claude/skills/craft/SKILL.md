@@ -30,13 +30,17 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, AskUserQuestion
 ║                                                                           ║
 ║   🚫 FORBIDDEN IN /craft:                                                ║
 ║                                                                           ║
+║   ❌ Claude writing implementation code (src/, components, hooks...)     ║
+║      → ALL code is written by Dev agents via Task()                      ║
+║      → Claude ORCHESTRATES. Agents EXECUTE. No exceptions.              ║
 ║   ❌ Bash for file exploration (use Read, Glob, Grep ONLY)              ║
-║   ❌ Explore agent (NEVER spawn Explore — Claude explores directly)      ║
+║   ❌ Explore agent (NEVER spawn Explore)                                ║
 ║   ❌ Skipping steps or reordering the flow                              ║
 ║   ❌ Analyzing code before asking the user what they want               ║
 ║   ❌ Making assumptions about the feature without asking                ║
 ║                                                                           ║
-║   ✅ ONLY USE: Read, Glob, Grep, Write, Task, AskUserQuestion           ║
+║   ✅ Claude ONLY does: Read, Glob, Grep, Write (context.json only),     ║
+║      Task (spawn agents), AskUserQuestion, Bash (npm test/build only)   ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
 ```
@@ -523,12 +527,14 @@ Task(
 ║   After a wave completes:                                                ║
 ║   1. Re-read the design ({SCOPE}/.clean-claude/specs/design/design-v1.md)║
 ║   2. Identify next wave's files from Implementation Checklist            ║
-║   3. Launch next wave agents immediately                                 ║
+║   3. Spawn dev agents via Task() for next wave                           ║
 ║                                                                           ║
+║   ❌ DO NOT implement files yourself — spawn Task() agents              ║
 ║   ❌ DO NOT use Bash(find ...) to explore src/                          ║
+║   ❌ DO NOT use Explore agent                                           ║
 ║   ❌ DO NOT "reconstruct the wave plan from the codebase"               ║
 ║   ❌ DO NOT read existing files to "understand context"                  ║
-║   The design IS the context. Trust the design.                           ║
+║   The design IS the context. Trust the design. Delegate to agents.       ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
 ```
