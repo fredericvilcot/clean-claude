@@ -156,20 +156,63 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, AskUserQuestion
 # FLOW OVERVIEW
 
 ```
-Step 1: DETECT       Claude: Read + Glob → context.json
+Step 1: DETECT       Claude: Read + Glob → context.json (or RESUME)
 Step 2: SCOPE        If monorepo → ask user
 Step 3: CHOOSE       "What do you want to craft?" + describe it
 Step 4: QA CONFIG    "E2E tests?" → yes/no
 Step 5: ROUTE        PO → Architect → Dev + QA
 Step 6: VERIFY       Tests → fix loop → green
 Step 7: CAPTURE      Architecture reference (if none existed)
+Step 8: ITERATE      CRAFT session stays active — bugs/changes routed to agents
 ```
 
 ---
 
-# STEP 1: DETECT (Claude does this directly)
+# STEP 1: DETECT or RESUME
 
 **DO NOT spawn any agent. DO NOT use Bash. Claude does this with Read/Glob/Grep only.**
+
+## 1a. CHECK FOR EXISTING SESSION
+
+```
+Read("{SCOPE}/.clean-claude/state.json")
+```
+
+**IF state.json EXISTS and has `status: "iteration"` or `status: "in_progress"`:**
+
+```
+╭──────────────────────────────────────────────────────────────╮
+│                                                              │
+│   🟣 CRAFT SESSION FOUND                                     │
+│                                                              │
+│   Scope: [SCOPE]                                             │
+│   Last step: [STEP]                                          │
+│   Task: [description from state]                             │
+│   Design: [design path]                                      │
+│   Status: [iteration / in_progress at step X]                │
+│                                                              │
+╰──────────────────────────────────────────────────────────────╯
+
+AskUserQuestion:
+  "Found an existing CRAFT session. What do you want?"
+  Options:
+  - Resume this session (continue where I left off)
+  - Start fresh (new task, same scope)
+  - Start fresh (different scope)
+```
+
+**IF "Resume":**
+- Read context.json, state.json, design, spec
+- IF `status: "iteration"` → GO DIRECTLY TO STEP 8 (iteration mode)
+- IF `status: "in_progress"` → GO TO the step saved in state.json
+
+**IF "Start fresh (same scope)":**
+- Keep scope, reset state → GO TO STEP 3
+
+**IF "Start fresh (different scope)":**
+- Reset everything → Continue to Step 1b below
+
+## 1b. FRESH DETECTION (no session or user chose fresh)
 
 ```
 1. Read("package.json")
@@ -189,6 +232,33 @@ Step 7: CAPTURE      Architecture reference (if none existed)
     "language": "typescript"
   },
   "architectureRef": null
+}
+```
+
+**state.json — UPDATE AT EVERY STEP TRANSITION:**
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🚨 WRITE state.json AT EVERY STEP COMPLETION                          ║
+║                                                                           ║
+║   Path: {SCOPE}/.clean-claude/state.json                                 ║
+║   This enables /craft resume across sessions.                            ║
+║                                                                           ║
+║   Update "currentStep" after each step.                                  ║
+║   Update fields as they become available.                                ║
+║   Set "status": "iteration" after Step 7.                                ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+```json
+{
+  "status": "in_progress | iteration",
+  "currentStep": 1,
+  "description": null,
+  "qaConfig": null,
+  "specPath": null,
+  "designPath": null,
+  "stackSkillsPath": null
 }
 ```
 
@@ -999,11 +1069,11 @@ Task(
 )
 ```
 
-**Show FINAL RECAP (this is the ONLY valid end of /craft):**
+**Show RECAP then transition to ITERATION MODE:**
 ```
 ╭──────────────────────────────────────────────────────────────╮
 │                                                              │
-│   🟣 CRAFT COMPLETE                                          │
+│   🟣 CRAFT COMPLETE — Entering iteration mode                │
 │                                                              │
 │   🟢 Step 1 ─ Detect          ✓  [TYPE] · [LANG]           │
 │   🟢 Step 2 ─ Scope           ✓  [SCOPE]                   │
@@ -1021,6 +1091,153 @@ Task(
 │   ├── .clean-claude/stack-skills.md                          │
 │   ├── src/ ([X] files + [Y] tests)                          │
 │   └── [e2e/ or tests/] ([Z] test files)                     │
+│                                                              │
+│   🔄 CRAFT session active. Tell me what's next.             │
+│                                                              │
+╰──────────────────────────────────────────────────────────────╯
+```
+
+**Update state.json → status: "iteration"**
+
+**→ GO TO STEP 8**
+
+---
+
+# STEP 8: ITERATION MODE (CRAFT session stays active)
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🔄 CRAFT ITERATION MODE                                               ║
+║                                                                           ║
+║   The session does NOT end after Step 7.                                 ║
+║   Claude stays in FULL CRAFT mode:                                       ║
+║                                                                           ║
+║   - ALL CRAFT rules still apply (no any, no throw, Result<T,E>)         ║
+║   - ALL routing rules still apply (Dev, QA, Architect, PO)              ║
+║   - ALL notification templates still apply                               ║
+║   - Claude still delegates to agents via Task() — NEVER implements      ║
+║                                                                           ║
+║   THIS IS NOT "CLASSIC CLAUDE". THIS IS CRAFT.                          ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+## What the user says → What Claude does
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   USER INPUT                    │ CLAUDE ACTION                          ║
+║   ──────────────────────────────┼──────────────────────────────          ║
+║                                 │                                        ║
+║   Bug report / error message    │ Route to owning agent (Step 6 rules)  ║
+║   "Fix this: [error]"          │ → Identify file owner → Task(agent)    ║
+║   "This crashes: [stacktrace]" │ → Use Fix Loop Routing table           ║
+║                                 │                                        ║
+║   Small change / tweak          │ Route to Dev agent directly            ║
+║   "Change X to Y"              │ → frontend or backend based on file    ║
+║   "Add a tooltip here"         │ → Task(dev) with CRAFT rules           ║
+║                                 │                                        ║
+║   New feature / big change      │ Back to Step 3 (skip detect/scope)    ║
+║   "Add dark mode"              │ → Choose + QA config + full flow       ║
+║   "Create a new page"          │ → PO → Architect → Dev → Verify       ║
+║                                 │                                        ║
+║   "Run tests"                   │ Step 6 Verify (test + build)          ║
+║   "Check everything works"     │ → Fix loop if failures                 ║
+║                                 │                                        ║
+║   "Update the design"          │ Route to Architect                     ║
+║   "Refactor this module"       │ → Architect redesigns → Dev implements ║
+║                                 │                                        ║
+║   "Exit craft" / "Done"        │ End session (show final banner)        ║
+║                                 │                                        ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+## Bug Fix in Iteration Mode
+
+**User reports a bug → Claude routes to the right agent:**
+
+```
+1. Identify the file(s) involved (from error message or user description)
+2. Check OWNERSHIP table → determine agent type
+3. Read the design: {SCOPE}/.clean-claude/specs/design/design-v1.md
+4. Spawn agent with 🔔 NOTIFICATION:
+
+Task(
+  subagent_type: "[owner-agent]",
+  prompt: """
+    🔔 NOTIFICATION FROM USER (Iteration Mode)
+
+    ## Bug Report
+    [user's description or error message]
+
+    ## Context
+    - Design: {SCOPE}/.clean-claude/specs/design/design-v1.md
+    - Stack skills: {SCOPE}/.clean-claude/stack-skills.md
+
+    ## Action Required
+    Fix the bug. Write/update tests. Run tests to confirm green.
+
+    ## CRAFT RULES STILL APPLY
+    - NO `any`, NO `throw`, Result<T,E> only
+    - Read stack-skills.md for patterns
+    - Every fix MUST have a test covering the bug
+  """
+)
+```
+
+5. After agent returns → Claude runs tests (Step 6 verify)
+6. If green → report to user
+7. If failures → route to next agent (fix loop)
+
+## Small Change in Iteration Mode
+
+**User asks for a tweak → Claude routes directly to Dev:**
+
+```
+Task(
+  subagent_type: "[frontend|backend]-engineer",
+  prompt: """
+    🔔 CHANGE REQUEST (Iteration Mode)
+
+    ## What to change
+    [user's description]
+
+    ## Context
+    - Design: {SCOPE}/.clean-claude/specs/design/design-v1.md
+    - Stack skills: {SCOPE}/.clean-claude/stack-skills.md
+
+    ## CRAFT RULES STILL APPLY
+    - NO `any`, NO `throw`, Result<T,E> only
+    - Update tests if behavior changes
+    - Run tests to confirm green
+  """
+)
+```
+
+## New Feature in Iteration Mode
+
+**User asks for something big → back to Step 3:**
+
+```
+"This sounds like a new feature. Let me route through the full CRAFT flow."
+→ GO TO STEP 3 (skip Step 1-2, keep same scope)
+```
+
+## End Session
+
+**User says "exit craft" or "done" → show final banner and update state:**
+
+```
+Update state.json → status: "completed"
+
+╭──────────────────────────────────────────────────────────────╮
+│                                                              │
+│   🟣 CRAFT SESSION ENDED                                     │
+│                                                              │
+│   Run /craft anytime to start a new session                  │
+│   or resume from where you left off.                         │
 │                                                              │
 ╰──────────────────────────────────────────────────────────────╯
 ```
@@ -1126,32 +1343,33 @@ Task(frontend-engineer, "Wave 1: hooks/")
 ```
 /craft
   │
-  ├─ Step 1: Claude detects project (Read/Glob only) → context.json
-  │          Show: 🟢 Detect ✓
+  ├─ Step 1: Detect OR Resume (check state.json first)
+  │          → Resume: jump to saved step or iteration mode
+  │          → Fresh: Read/Glob → context.json + state.json
   │
   ├─ Step 2: Scope (if monorepo) → save and continue
-  │          Show: 🟢 Scope ✓
   │
   ├─ Step 3: Choose + Describe (spec? legacy? from scratch?)
-  │          Show: 🟢 Choose ✓
   │
   ├─ Step 4: QA Config
-  │          Show: 🟢 QA Config ✓ + FULL RECAP
+  │          Show: FULL RECAP
   │
   ├─ Step 5a: PO enriches/writes spec → User approves
-  │           Show: ⏳ before → 🟢 after with deliverables
   │
   ├─ Step 5b: Architect: skills + design → User approves
-  │           Show: ⏳ before → 🟢 after with deliverables
   │
   ├─ Step 5c: Dev + QA implement (parallel)
-  │           Show: ⏳ before → 🟢 after with file counts
   │
   ├─ Step 6: Coverage 100% + Tests green + Build OK → Fix loop
-  │          Show: coverage %, test/build status, fix loop progress
   │
-  └─ Step 7: Capture as arch ref (if none existed)
-             Show: 🟢 FINAL RECAP with all deliverables
+  ├─ Step 7: Capture as arch ref (if none existed)
+  │
+  └─ Step 8: ITERATION MODE (session stays active)
+             → Bug → route to agent → fix loop → green
+             → Tweak → route to Dev → verify
+             → New feature → back to Step 3
+             → "Exit craft" → end session
 ```
 
 **No learning-agent. No Explore agent. Claude orchestrates. Agents execute.**
+**Session persists. Resume works across conversations.**
