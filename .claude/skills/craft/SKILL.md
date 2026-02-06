@@ -542,6 +542,29 @@ Task(
 ```
 ╔═══════════════════════════════════════════════════════════════════════════╗
 ║                                                                           ║
+║   AGENT ROUTING PER FILE TYPE:                                           ║
+║                                                                           ║
+║   frontend-engineer or backend-engineer:                                 ║
+║      → src/ implementation code (components, hooks, services, domain)    ║
+║      → Colocated unit tests (*.test.ts next to source)                   ║
+║      → i18n / locale files (translations)                                ║
+║                                                                           ║
+║   qa-engineer:                                                            ║
+║      → Test infrastructure (MSW handlers, test fixtures, test utils)     ║
+║      → E2E tests (e2e/**)                                                ║
+║      → Integration tests (tests/integration/**)                          ║
+║      → Test configuration (playwright.config, vitest.setup, etc.)        ║
+║                                                                           ║
+║   ASK: "Is this file IMPLEMENTATION or TEST INFRASTRUCTURE?"             ║
+║      → Implementation / i18n → Dev                                       ║
+║      → Test infra / test config / E2E / integration → QA                 ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
 ║   QA AGENT LAUNCH RULE:                                                  ║
 ║                                                                           ║
 ║   Step 4 answer = "Yes, E2E" or "Yes, Integration"                      ║
@@ -845,11 +868,15 @@ AskUserQuestion:
 | Location | Owner |
 |----------|-------|
 | src/**/*.ts | Dev |
-| src/**/*.test.ts | Dev |
+| src/**/*.test.ts (colocated unit tests) | Dev |
+| src/**/translations/ (i18n, locales) | Dev |
 | e2e/** | QA |
-| .clean-claude/specs/functional/ | PO |
-| .clean-claude/specs/design/ | Architect |
-| .clean-claude/stack-skills.md | Architect |
+| tests/integration/** | QA |
+| test infrastructure (MSW, fixtures, utils) | QA |
+| test config (playwright.config, vitest.setup) | QA |
+| {SCOPE}/.clean-claude/specs/functional/ | PO |
+| {SCOPE}/.clean-claude/specs/design/ | Architect |
+| {SCOPE}/.clean-claude/stack-skills.md | Architect |
 
 ---
 
