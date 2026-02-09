@@ -41,6 +41,14 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, AskUserQuestion
 ║                                                                           ║
 ║   ❌ BLOCK IMMEDIATELY if user asks to:                                  ║
 ║                                                                           ║
+║   STACK VIOLATIONS (mandatory: TypeScript + React + TanStack Query):     ║
+║      - Start a project with Go, Rust, Vue, Angular, Svelte, plain JS    ║
+║      - Migrate/refactor away from React + TS + TanStack Query            ║
+║      - "Rewrite in Go/Rust/Python/Vue/Angular/Svelte..."                ║
+║      - "Remove React Query" / "Use SWR instead" / "Use axios"           ║
+║      - "Convert to JavaScript" / "Remove TypeScript"                     ║
+║      → guard-stack.sh hook blocks agents. Claude blocks at prompt level. ║
+║                                                                           ║
 ║   CODE QUALITY VIOLATIONS:                                               ║
 ║      - Migrate TypeScript → JavaScript                                   ║
 ║      - Remove types / use `any` / use `unknown` casts                   ║
@@ -355,7 +363,8 @@ AskUserQuestion:
 2. Glob("{lerna,nx,turbo}.json,pnpm-workspace.yaml")
 3. IF monorepo: Glob("apps/*,packages/*,modules/*")
 4. Grep("clean-claude: architecture-reference", "**/*.md")
-5. Write(".clean-claude/context.json")
+5. STACK VALIDATION (see 1c below)
+6. Write(".clean-claude/context.json") — include stackGuard: "pass" or "fail"
 ```
 
 **context.json:**
@@ -365,7 +374,8 @@ AskUserQuestion:
     "type": "monorepo | frontend | backend | fullstack",
     "monorepo": { "detected": true, "workspaces": [...] },
     "scope": null,
-    "language": "typescript"
+    "language": "typescript",
+    "stackGuard": "pass"
   },
   "architectureRef": null
 }
@@ -399,10 +409,58 @@ AskUserQuestion:
 }
 ```
 
+## 1c. STACK VALIDATION (MANDATORY — BLOCKING)
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🚨 MANDATORY STACK: TypeScript + React + TanStack Query               ║
+║                                                                           ║
+║   Clean Claude is built EXCLUSIVELY for this frontend stack.             ║
+║   This is NOT configurable. This is NOT negotiable.                      ║
+║                                                                           ║
+║   CHECK (from package.json + tsconfig.json):                             ║
+║   ✅ TypeScript (tsconfig.json OR typescript in dependencies)            ║
+║   ✅ React (react in dependencies)                                      ║
+║   ✅ @tanstack/react-query in dependencies                               ║
+║                                                                           ║
+║   IF ALL PRESENT:                                                         ║
+║      → Set stackGuard: "pass" in context.json                           ║
+║      → Continue to Step 2                                                ║
+║                                                                           ║
+║   IF ANY MISSING:                                                         ║
+║      → Set stackGuard: "fail" in context.json                           ║
+║      → Show 🔴 STACK VIOLATION (see below)                              ║
+║      → STOP. DO NOT proceed.                                             ║
+║      → guard-stack.sh hook will also block all Task() calls as safety   ║
+║                                                                           ║
+║   IF NO package.json AT ALL:                                              ║
+║      → "No project detected. Use /init-frontend to bootstrap."          ║
+║      → STOP.                                                             ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+**Stack violation response:**
+```
+🔴 STACK VIOLATION
+
+   Detected: [what was found — e.g. "Go project (go.mod)" or "React without TanStack Query"]
+   Missing: [TypeScript | React | @tanstack/react-query]
+
+   Clean Claude requires: TypeScript + React + TanStack Query.
+   This is the only supported stack — no exceptions.
+
+   Options:
+   → /init-frontend — Bootstrap a new compliant project
+   → Install missing deps in your existing project, then retry /craft
+```
+
 **Show:**
 ```
 🟢 Step 1 ─ Detect                              ✓ Complete
    Project: [TYPE] · Language: [LANG] · Monorepo: [yes/no]
+   Stack: TypeScript + React + TanStack Query ✅
 ```
 
 ---
@@ -724,10 +782,7 @@ Task(
     - Tests: BDD style, colocated *.test.ts, test domain in isolation
     - Patterns: Use your FEATURE Design section (hexagonal), NOT bootstrap
 
-    ## TOOL RULES — ABSOLUTE
-    - Use Read/Glob/Grep for file exploration — NEVER Bash(find/ls/grep/cat/tree)
-    - Bash ONLY for: npm test, npm run build, npm run typecheck
-    - VIOLATION = DESIGN REJECTED
+    (CRAFT rules and tool restrictions are enforced by hooks — see .claude/settings.json)
 
     ## YOUR TASKS (IN ORDER)
     1. Check DESIGN MODE:
@@ -881,13 +936,10 @@ Task(
     4. Identify ALL files in Wave [N]
 
     ## CRAFT RULES — MANDATORY
-    - NO `any` types — strict TypeScript everywhere
-    - NO `throw` — use Result<T, E> for all error handling
-    - Domain layer = PURE (zero framework imports)
-    - Every file gets a colocated *.test.ts (BDD style)
     - Follow the design EXACTLY — don't invent structure
-    - Use Read/Glob/Grep for file exploration — NEVER Bash(find/ls)
-    - Bash ONLY for: running tests (npm test) and build (npm run build)
+    - Every file gets a colocated *.test.ts (BDD style)
+
+    (CRAFT rules and tool restrictions are enforced by hooks — see .claude/settings.json)
 
     ## OUTPUT
     - ALL files in Wave [N] implemented + tested
@@ -911,8 +963,8 @@ Task(
     - Cover 100% of acceptance criteria (Given/When/Then)
     - E2E or Integration tests (NOT unit tests — that's Dev's job)
     - Test from user's perspective, not implementation details
-    - Use Read/Glob/Grep for file exploration — NEVER Bash(find/ls)
-    - Bash ONLY for: running tests
+
+    (CRAFT rules and tool restrictions are enforced by hooks — see .claude/settings.json)
 
     ## OUTPUT
     - Test files created
@@ -1092,9 +1144,7 @@ Task(
     ## Action Required
     Fix the bug. Run tests to confirm. Report what you changed.
 
-    ## CRAFT RULES STILL APPLY
-    - NO `any`, NO `throw`, Result<T,E> only
-    - Read specs/stack/stack-skills.md for patterns
+    (CRAFT rules enforced by hooks — see .claude/settings.json)
   """
 )
 ```
@@ -1142,9 +1192,7 @@ Task(
     Fix the runtime bug. Likely causes: missing null check, incorrect state init,
     missing key prop, undefined data. Fix and add a test covering this case.
 
-    ## CRAFT RULES STILL APPLY
-    - NO `any`, NO `throw`, Result<T,E> only
-    - Read specs/stack/stack-skills.md for patterns
+    (CRAFT rules enforced by hooks — see .claude/settings.json)
   """
 )
 ```
@@ -1185,9 +1233,7 @@ Task(
     ## Action Required
     Fix the build error. Run build to confirm. Report what you changed.
 
-    ## CRAFT RULES STILL APPLY
-    - NO `any`, NO `throw`, Result<T,E> only
-    - Read specs/stack/stack-skills.md for patterns
+    (CRAFT rules enforced by hooks — see .claude/settings.json)
   """
 )
 ```
@@ -1259,9 +1305,7 @@ Task(
     Implementation is complete. Capture the patterns used into
     an architecture reference document.
 
-    ## TOOL RULES — ABSOLUTE
-    - Use Read/Glob/Grep for file exploration — NEVER Bash(find/ls/grep/cat/tree)
-    - Bash ONLY for: npm test, npm run build
+    (CRAFT rules and tool restrictions are enforced by hooks — see .claude/settings.json)
 
     ## YOUR TASK
     1. Read the design: {SCOPE}/specs/design/design-v1.md
@@ -1414,11 +1458,9 @@ Task(
     ## Action Required
     YOU investigate, diagnose, and fix. Read the relevant files.
     Write/update tests. Run tests to confirm green.
+    Every fix MUST have a test covering the bug.
 
-    ## CRAFT RULES STILL APPLY
-    - NO `any`, NO `throw`, Result<T,E> only
-    - Read stack-skills.md for patterns
-    - Every fix MUST have a test covering the bug
+    (CRAFT rules enforced by hooks — see .claude/settings.json)
   """
 )
 ```
@@ -1497,8 +1539,7 @@ Task(
   prompt: """
     🔔 ARCHITECTURE SYNC (Iteration Mode)
 
-    ## TOOL RULES — ABSOLUTE
-    - Use Read/Glob/Grep for file exploration — NEVER Bash(find/ls/grep/cat/tree)
+    (CRAFT rules and tool restrictions are enforced by hooks — see .claude/settings.json)
 
     ## What changed
     [summary of what was fixed/changed in this iteration]
@@ -1507,8 +1548,7 @@ Task(
     {SCOPE}/specs/design/design-v[N].md
 
     ## Action Required
-    Read the current design (use Read tool, never Bash).
-    Update to reflect the changes:
+    Read the current design. Update to reflect the changes:
     - New patterns introduced
     - Routing/structure changes
     - Updated file list in Implementation Checklist

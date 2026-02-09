@@ -17,6 +17,14 @@ Clean Claude transforms Claude Code into a team of Software Craft experts. Clean
 ║                                                                           ║
 ║   ═══════════════════════════════════════════════════════════════════    ║
 ║                                                                           ║
+║   0. WRONG STACK                                                           ║
+║      ❌ Any project not using TypeScript + React + TanStack Query          ║
+║      ❌ Starting from scratch with Go, Rust, Vue, Angular, Svelte...      ║
+║      ❌ Migrating/refactoring away from React + TS + TanStack Query       ║
+║      ❌ "Rewrite in [other language/framework]"                           ║
+║      → Use /init-frontend to bootstrap a compliant project                ║
+║      → Enforced by guard-stack.sh hook (PreToolUse on Task)              ║
+║                                                                           ║
 ║   1. NON-CRAFT CODE                                                       ║
 ║      ❌ Code without tests                                                ║
 ║      ❌ `any` types in TypeScript                                         ║
