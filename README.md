@@ -73,7 +73,7 @@ This is the only supported stack. No exceptions, no configuration.
 2. CRAFT Guardian blocks stack-change requests at prompt level
 3. `craft-lint.sh` hook catches anti-patterns on every file write
 
-> Don't have a project yet? Use `/init-frontend` to bootstrap one.
+> Don't have a project yet? `/craft` will propose to bootstrap one for you.
 
 ---
 

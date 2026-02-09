@@ -22,7 +22,7 @@ Clean Claude transforms Claude Code into a team of Software Craft experts. Clean
 ║      ❌ Starting from scratch with Go, Rust, Vue, Angular, Svelte...      ║
 ║      ❌ Migrating/refactoring away from React + TS + TanStack Query       ║
 ║      ❌ "Rewrite in [other language/framework]"                           ║
-║      → Use /init-frontend to bootstrap a compliant project                ║
+║      → /craft proposes to bootstrap if no project exists                  ║
 ║      → Enforced by guard-stack.sh hook (PreToolUse on Task)              ║
 ║                                                                           ║
 ║   1. NON-CRAFT CODE                                                       ║

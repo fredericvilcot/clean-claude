@@ -1,7 +1,7 @@
 ---
 name: init-frontend
 description: "Bootstrap a new frontend project with craft principles: React + Vite + TypeScript + Vitest + clean architecture"
-user-invocable: true
+user-invocable: false
 context: fork
 agent: architect
 allowed-tools: Read, Grep, Glob, Edit, Write, Bash

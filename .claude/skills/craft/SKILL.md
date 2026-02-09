@@ -428,32 +428,54 @@ AskUserQuestion:
 ║      → Set stackGuard: "pass" in context.json                           ║
 ║      → Continue to Step 2                                                ║
 ║                                                                           ║
-║   IF ANY MISSING:                                                         ║
+║   IF ANY MISSING (package.json exists but wrong stack):                   ║
 ║      → Set stackGuard: "fail" in context.json                           ║
 ║      → Show 🔴 STACK VIOLATION (see below)                              ║
 ║      → STOP. DO NOT proceed.                                             ║
 ║      → guard-stack.sh hook will also block all Task() calls as safety   ║
 ║                                                                           ║
 ║   IF NO package.json AT ALL:                                              ║
-║      → "No project detected. Use /init-frontend to bootstrap."          ║
-║      → STOP.                                                             ║
+║      → Propose to BOOTSTRAP a new project (see below)                   ║
+║      → If user accepts → scaffold → re-detect → continue flow           ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
 ```
 
-**Stack violation response:**
+**No project detected → Bootstrap inline:**
+```
+AskUserQuestion:
+  "No package.json found. Bootstrap a new React + TypeScript + TanStack Query project here?"
+  Options:
+  - Yes, bootstrap now
+  - No, I'll set it up myself
+```
+
+**IF "Yes, bootstrap now":**
+```
+1. Bash: npm create vite@latest . -- --template react-ts
+2. Bash: npm install
+3. Bash: npm install @tanstack/react-query zod
+4. Bash: npm install -D vitest @testing-library/react @testing-library/jest-dom @testing-library/user-event jsdom @vitest/coverage-v8
+5. Re-detect: Read("package.json") → write context.json with stackGuard: "pass"
+6. CONTINUE to Step 2 (or Step 3 if not monorepo)
+```
+
+**IF "No":**
+```
+→ STOP. "Install React + TypeScript + TanStack Query, then retry /craft."
+```
+
+**Stack violation response (existing project with wrong stack):**
 ```
 🔴 STACK VIOLATION
 
-   Detected: [what was found — e.g. "Go project (go.mod)" or "React without TanStack Query"]
+   Detected: [what was found — e.g. "Go project (go.mod)" or "Vue + TS"]
    Missing: [TypeScript | React | @tanstack/react-query]
 
    Clean Claude requires: TypeScript + React + TanStack Query.
    This is the only supported stack — no exceptions.
 
-   Options:
-   → /init-frontend — Bootstrap a new compliant project
-   → Install missing deps in your existing project, then retry /craft
+   → Install the missing dependencies, then retry /craft.
 ```
 
 **Show:**

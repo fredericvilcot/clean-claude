@@ -2,7 +2,7 @@
 # Hook: PreToolUse on Task
 # STACK GUARD — Blocks ALL agent spawning if project is NOT React + TypeScript + TanStack Query.
 # Clean Claude is built exclusively for this frontend stack.
-# Use /init-frontend to bootstrap a compliant project from scratch.
+# /craft handles bootstrapping if no project exists.
 
 set -euo pipefail
 
@@ -19,7 +19,7 @@ if [ -f "$CTX" ]; then
     exit 0
   fi
   if [ "$STACK_OK" = "fail" ]; then
-    echo '{"decision":"block","reason":"STACK GUARD: This project does NOT use React + TypeScript + TanStack Query. Clean Claude only supports this stack. Use /init-frontend to bootstrap a compliant project."}'
+    echo '{"decision":"block","reason":"STACK GUARD: This project does NOT use React + TypeScript + TanStack Query. Clean Claude only supports this stack. Run /craft to bootstrap or fix your dependencies."}'
     exit 2
   fi
 fi
@@ -79,5 +79,5 @@ $HAS_REACT || MISSING="${MISSING}React, "
 $HAS_TANSTACK || MISSING="${MISSING}@tanstack/react-query, "
 MISSING="${MISSING%, }"
 
-echo "{\"decision\":\"block\",\"reason\":\"STACK GUARD: Missing ${MISSING}. Clean Claude only supports TypeScript + React + TanStack Query. Use /init-frontend to bootstrap a compliant project.\"}"
+echo "{\"decision\":\"block\",\"reason\":\"STACK GUARD: Missing ${MISSING}. Clean Claude only supports TypeScript + React + TanStack Query. Run /craft to bootstrap or fix your dependencies.\"}"
 exit 2
