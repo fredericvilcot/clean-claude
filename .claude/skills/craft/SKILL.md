@@ -92,18 +92,27 @@ allowed-tools: Read, Write, Edit, Bash, Glob, Grep, Task, AskUserQuestion
 ```
 ╔═══════════════════════════════════════════════════════════════════════════╗
 ║                                                                           ║
-║   🚫 FORBIDDEN IN /craft:                                                ║
+║   🚫 FORBIDDEN IN /craft — AT ALL TIMES, ALL STEPS:                     ║
 ║                                                                           ║
 ║   ❌ Claude writing implementation code (src/, components, hooks...)     ║
 ║      → ALL code is written by Dev agents via Task()                      ║
 ║      → Claude ORCHESTRATES. Agents EXECUTE. No exceptions.              ║
+║                                                                           ║
+║   ❌ Explore agent (NEVER spawn subagent_type: "Explore")               ║
+║      → Explore is a generic agent. Craft uses SPECIALIZED agents.       ║
+║      → Need to understand code? The DEV AGENT reads code, not Claude.   ║
+║                                                                           ║
+║   ❌ Claude investigating / diagnosing bugs                              ║
+║      → Claude does NOT read 10+ files to "understand" a bug             ║
+║      → Claude routes the user's words to the owning agent               ║
+║      → The AGENT investigates, diagnoses, and fixes                     ║
+║                                                                           ║
 ║   ❌ Bash for file exploration (use Read, Glob, Grep ONLY)              ║
-║   ❌ Explore agent (NEVER spawn Explore)                                ║
 ║   ❌ Skipping steps or reordering the flow                              ║
 ║   ❌ Analyzing code before asking the user what they want               ║
 ║   ❌ Making assumptions about the feature without asking                ║
 ║                                                                           ║
-║   ✅ Claude ONLY does: Read, Glob, Grep, Write (context.json only),     ║
+║   ✅ Claude ONLY does: Read, Glob, Grep, Write (state/context.json),    ║
 ║      Task (spawn agents), AskUserQuestion, Bash (npm test/build only)   ║
 ║                                                                           ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
@@ -1333,30 +1342,54 @@ Task(
 ╚═══════════════════════════════════════════════════════════════════════════╝
 ```
 
-## Bug Fix in Iteration Mode
-
-**User reports a bug → Claude routes to the right agent:**
+## Bug Fix / Change in Iteration Mode
 
 ```
-1. Identify the file(s) involved (from error message or user description)
-2. Check OWNERSHIP table → determine agent type
-3. Read the design: {SCOPE}/.clean-claude/specs/design/design-v1.md
-4. Spawn agent with 🔔 NOTIFICATION:
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🚫 CLAUDE DOES NOT INVESTIGATE BUGS — AGENTS DO                       ║
+║                                                                           ║
+║   User says "modals are blank" or "tabs are missing":                    ║
+║                                                                           ║
+║   ❌ Claude reads 20 files to understand the architecture                ║
+║   ❌ Claude spawns Explore agent to analyze patterns                     ║
+║   ❌ Claude diagnoses "the modal replaces the outlet content"            ║
+║   ❌ Claude reads the code and THEN spawns agents                        ║
+║                                                                           ║
+║   ✅ Claude asks: "What does this code do? UI → frontend-engineer"       ║
+║   ✅ Claude spawns Task(frontend-engineer) with the bug description      ║
+║   ✅ The AGENT reads files, diagnoses, and fixes                         ║
+║                                                                           ║
+║   TIME FROM USER MESSAGE TO Task() = SECONDS, NOT MINUTES               ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+**User reports a bug or asks for a change → Claude routes IMMEDIATELY:**
+
+```
+1. Read user's message
+2. Determine agent type from the SUBJECT (not by reading code):
+   → Modal, tab, route, page, component, UI → frontend-engineer
+   → API, service, domain, data mapping     → backend-engineer
+   → Test infra, E2E, fixtures              → qa-engineer
+3. Spawn agent — IMMEDIATELY (no file reading, no exploration)
 
 Task(
   subagent_type: "[owner-agent]",
   prompt: """
     🔔 NOTIFICATION FROM USER (Iteration Mode)
 
-    ## Bug Report
-    [user's description or error message]
+    ## Bug Report / Change Request
+    [PASTE user's EXACT words — do not rephrase or analyze]
 
     ## Context
     - Design: {SCOPE}/.clean-claude/specs/design/design-v1.md
     - Stack skills: {SCOPE}/.clean-claude/stack-skills.md
 
     ## Action Required
-    Fix the bug. Write/update tests. Run tests to confirm green.
+    YOU investigate, diagnose, and fix. Read the relevant files.
+    Write/update tests. Run tests to confirm green.
 
     ## CRAFT RULES STILL APPLY
     - NO `any`, NO `throw`, Result<T,E> only
@@ -1366,33 +1399,16 @@ Task(
 )
 ```
 
-5. After agent returns → Claude runs tests (Step 6 verify)
-6. If green → report to user
-7. If failures → route to next agent (fix loop)
+4. After agent returns → Claude runs tests ONCE (Step 6 verify)
+5. If green → report to user
+6. If failures → route full output to owning agent (fix loop)
 
-## Small Change in Iteration Mode
-
-**User asks for a tweak → Claude routes directly to Dev:**
-
+**Multiple bugs? → Multiple agents in PARALLEL (same message):**
 ```
-Task(
-  subagent_type: "[frontend|backend]-engineer",
-  prompt: """
-    🔔 CHANGE REQUEST (Iteration Mode)
-
-    ## What to change
-    [user's description]
-
-    ## Context
-    - Design: {SCOPE}/.clean-claude/specs/design/design-v1.md
-    - Stack skills: {SCOPE}/.clean-claude/stack-skills.md
-
-    ## CRAFT RULES STILL APPLY
-    - NO `any`, NO `throw`, Result<T,E> only
-    - Update tests if behavior changes
-    - Run tests to confirm green
-  """
-)
+// User: "modals are blank, NaN in data, no tabs"
+Task(frontend-engineer, "Fix blank modals + missing tabs")
+Task(backend-engineer,  "Fix NaN data mapping")
+// Both in parallel — SAME message
 ```
 
 ## New Feature in Iteration Mode
