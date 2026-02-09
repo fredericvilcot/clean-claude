@@ -724,6 +724,11 @@ Task(
     - Tests: BDD style, colocated *.test.ts, test domain in isolation
     - Patterns: Use your FEATURE Design section (hexagonal), NOT bootstrap
 
+    ## TOOL RULES — ABSOLUTE
+    - Use Read/Glob/Grep for file exploration — NEVER Bash(find/ls/grep/cat/tree)
+    - Bash ONLY for: npm test, npm run build, npm run typecheck
+    - VIOLATION = DESIGN REJECTED
+
     ## YOUR TASKS (IN ORDER)
     1. Check DESIGN MODE:
        → IF "Follow reference": Read architectureRef, FOLLOW its patterns
@@ -741,23 +746,31 @@ Task(
        → Follow your "MANDATORY: GENERATE STACK SKILLS" section
        → CRAFT patterns for EACH library (do's, don'ts, code examples)
 
-    5. Write specs/design/design-v1.md with FULL design:
-       → Architecture Decision (ADR style — why hexagonal, why these patterns)
+    5. CHOOSE hexagonal structure adapted to the STACK:
+       → Analyze the stack (state management, data fetching, backend vs frontend)
+       → Decide WHERE application logic lives naturally in this stack
+       → Apply the NO-DEAD-CODE rule: every layer MUST be used
+       → See "HEXAGONAL VARIANT — ARCHITECT DECIDES" in your agent file
+       → Justify your choice in the ADR section of design.md
+
+    6. Write specs/design/design-v1.md with FULL design:
+       → Architecture Decision (ADR style — why this structure, how it adapts hexagonal)
        → CRAFT Principles Applied (checklist: no any, Result<T,E>, etc.)
-       → File Structure (hexagonal: domain/ → application/ → infrastructure/)
+       → File Structure (hexagonal adapted to the stack — justify every layer)
        → Domain Types (entities, value objects, error types with Result<T,E>)
        → API Endpoints / routes (extracted from inputs, not invented)
-       → Port interfaces (driving + driven)
-       → Use cases (application layer)
-       → Code examples for key patterns (Result handling, port usage)
+       → Application layer (use cases, hooks, stores — whatever fits the stack)
+       → Infrastructure (adapters — level of abstraction adapted to context)
+       → Code examples for key patterns (Result handling, layer usage)
        → Implementation Checklist (MANDATORY — EVERY file with Wave number)
        → Execution Plan (waves for parallelization)
 
-    6. Ask user approval BEFORE finalizing
+    7. Ask user approval BEFORE finalizing
 
     ## QUALITY BAR
     "If this design is complete, Dev can implement WITHOUT asking questions."
     Every file, every type, every interface must be specified.
+    NO dead code layers — every file in the design MUST be imported/used by another.
   """
 )
 ```
@@ -1246,9 +1259,13 @@ Task(
     Implementation is complete. Capture the patterns used into
     an architecture reference document.
 
+    ## TOOL RULES — ABSOLUTE
+    - Use Read/Glob/Grep for file exploration — NEVER Bash(find/ls/grep/cat/tree)
+    - Bash ONLY for: npm test, npm run build
+
     ## YOUR TASK
     1. Read the design: {SCOPE}/specs/design/design-v1.md
-    2. Read key implemented files to confirm patterns
+    2. Read key implemented files to confirm patterns (use Read/Glob, NEVER Bash)
     3. Write {SCOPE}/ARCHITECTURE.md with:
        - Architecture pattern (hexagonal, layers)
        - Folder structure convention
@@ -1480,6 +1497,9 @@ Task(
   prompt: """
     🔔 ARCHITECTURE SYNC (Iteration Mode)
 
+    ## TOOL RULES — ABSOLUTE
+    - Use Read/Glob/Grep for file exploration — NEVER Bash(find/ls/grep/cat/tree)
+
     ## What changed
     [summary of what was fixed/changed in this iteration]
 
@@ -1487,7 +1507,7 @@ Task(
     {SCOPE}/specs/design/design-v[N].md
 
     ## Action Required
-    Read the current design.
+    Read the current design (use Read tool, never Bash).
     Update to reflect the changes:
     - New patterns introduced
     - Routing/structure changes

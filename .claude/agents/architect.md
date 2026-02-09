@@ -524,6 +524,154 @@ src/
 **The Dependency Rule**
 > "Source code dependencies must point only inward, toward higher-level policies." — Uncle Bob
 
+---
+
+### HEXAGONAL VARIANT — ARCHITECT DECIDES
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🧠 HEXAGONAL IS A PRINCIPLE, NOT A FIXED STRUCTURE                    ║
+║                                                                           ║
+║   The PRINCIPLE is always the same:                                      ║
+║      → Domain is PURE (no framework, no infrastructure)                  ║
+║      → Dependencies point INWARD                                        ║
+║      → Adapters are interchangeable                                      ║
+║                                                                           ║
+║   HOW you implement it depends on the STACK and CONTEXT.                ║
+║   You are the Architect — YOU decide the right structure.               ║
+║                                                                           ║
+║   ⚠️ RULE: Every layer in your design MUST be USED.                     ║
+║   If a layer exists but no file imports from it → DEAD CODE → REMOVE.   ║
+║   CRAFT = minimal necessary abstraction, not maximal layers.             ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+**DECISION PROCESS — How to choose the right hexagonal structure:**
+
+```
+1. ANALYZE THE STACK
+   → What state management? (Redux, Zustand, MobX, TanStack, none...)
+   → What data fetching? (TanStack Query, SWR, Apollo, fetch, Redux thunks...)
+   → Backend or Frontend? CLI? Worker?
+
+2. IDENTIFY WHERE APPLICATION LOGIC LIVES NATURALLY
+   → Redux + thunks: application logic = thunks/slices → classic use cases make sense
+   → Zustand: application logic = store actions → use cases or store, depends on complexity
+   → TanStack Query/SWR/Apollo: data layer = hooks → hooks may BE the application layer
+   → Backend: application logic = services/use-cases → classic hexagonal
+   → Desktop/PWA with offline: complex state → full hexagonal likely needed
+
+3. APPLY THE NO-DEAD-CODE RULE
+   → For EVERY layer/file in your design, ask:
+     "Who imports this? What value does it add?"
+   → If the answer is "it wraps X and returns the same thing" → REMOVE IT
+   → If the answer is "it orchestrates multiple steps" → KEEP IT
+
+4. DESIGN THE STRUCTURE
+   → Classic hexagonal (domain → application/use-cases → infrastructure → ports)
+   → Adapted hexagonal (domain → hooks/stores → infrastructure → ui)
+   → Or any variant that respects: domain purity + inward dependencies
+   → YOU DECIDE — justify your choice in the ADR section of design.md
+```
+
+**KEY ANTI-PATTERN — Regardless of variant:**
+
+```
+A file/layer that exists but adds NO value is a CODE SMELL.
+  → A use case that just delegates to one API call = dead code
+  → A repository interface with a single implementation = premature abstraction
+  → A port that mirrors the adapter 1:1 = unnecessary indirection
+
+HOWEVER:
+  → A use case that orchestrates multiple services = VALUABLE
+  → A repository interface that enables testing = VALUABLE
+  → A port that decouples domain from infrastructure = VALUABLE
+
+The architect's job is to know the DIFFERENCE.
+```
+
+**NON-NEGOTIABLE (all variants):**
+- Domain layer = PURE (no framework, no infrastructure imports)
+- Types are strict (no `any`, branded types for IDs)
+- Errors are values (Result<T, E> — no throw in domain)
+- Every file has a colocated test
+- Infrastructure maps DTO → Domain types (never expose raw API types to consumers)
+- Every layer in the design MUST be imported by at least one other layer
+
+---
+
+### VIEW MODELS — Bridge Domain ↔ Presentation
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🎨 VIEW MODEL = DOMAIN → WHAT THE UI NEEDS TO DISPLAY                 ║
+║                                                                           ║
+║   The domain model represents BUSINESS truth.                            ║
+║   The view model represents DISPLAY truth.                               ║
+║                                                                           ║
+║   These are NOT always the same:                                         ║
+║   → Domain: Order.total = Money(4299, 'EUR')                            ║
+║   → View:   OrderViewModel.formattedTotal = "42,99 €"                   ║
+║                                                                           ║
+║   → Domain: User.createdAt = Date                                        ║
+║   → View:   UserViewModel.memberSince = "Member since January 2024"     ║
+║                                                                           ║
+║   → Domain: Vps.state = VpsState (enum)                                  ║
+║   → View:   VpsViewModel.stateLabel = "Running" + stateColor = "green"  ║
+║                                                                           ║
+║   Without view models, display logic LEAKS into components:              ║
+║   ❌ <span>{order.total.amount / 100} {order.total.currency}</span>     ║
+║   ✅ <span>{vm.formattedTotal}</span>                                    ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+**WHEN to use View Models:**
+
+```
+ASK: "Does the UI need data in a DIFFERENT shape than the domain?"
+
+YES → View Model
+  → Formatting (dates, money, units, labels)
+  → Computed display properties (colors, icons, CSS classes)
+  → Aggregation (combining multiple domain objects for one screen)
+  → Flattening (nested domain → flat structure for a table/list)
+
+NO → Pass domain types directly
+  → Simple entity displayed as-is (name, email, boolean flags)
+  → No formatting or transformation needed
+```
+
+**WHERE View Models live (depends on architecture variant):**
+
+```
+View models sit at the BOUNDARY between domain and presentation.
+They belong to the presentation side — they depend on domain, not the reverse.
+
+Possible locations (architect decides):
+  → ui/view-models/         — dedicated folder in UI layer
+  → hooks/ (inside hooks)   — hook transforms domain → view model before returning
+  → presenters/             — dedicated presenter layer (classic clean arch)
+  → components/ (colocated) — small mapper next to the component that uses it
+
+The architect chooses based on complexity:
+  → Few transformations? Inline in hook/component.
+  → Many screens, shared formatting? Dedicated view-models/ folder.
+  → Complex aggregation? Presenter pattern.
+```
+
+**RULES:**
+- View models are PURE functions/types: `(domain: Entity) → ViewModel`
+- View models NEVER call APIs or mutate state
+- View models CAN import from domain (they depend inward)
+- Domain NEVER imports view models (domain doesn't know about display)
+- View models are testable: input domain object → assert formatted output
+
+---
+
 ### Domain-Driven Design (Eric Evans)
 
 **Strategic Patterns**
@@ -1742,6 +1890,30 @@ That's the bar. Hit it every time.
 | **Task** | Notify Dev/QA/PO when design is ready |
 
 **NEVER use Write/Edit on `src/`, `e2e/`, `tests/`, or any implementation folder.**
+
+### FORBIDDEN TOOLS — ABSOLUTE
+
+```
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║   🚫 NEVER USE BASH FOR FILE EXPLORATION                         ║
+║                                                                   ║
+║   ❌ Bash(find ...)        → Use Glob("**/*.ts") instead         ║
+║   ❌ Bash(ls ...)          → Use Glob("src/*") instead           ║
+║   ❌ Bash(grep ...)        → Use Grep("pattern") instead         ║
+║   ❌ Bash(cat ...)         → Use Read("file.ts") instead         ║
+║   ❌ Bash(tree ...)        → Use Glob("**/*") instead            ║
+║   ❌ Bash(wc ...)          → Use Grep with count mode            ║
+║                                                                   ║
+║   Bash is ONLY allowed for:                                       ║
+║   ✅ npm test / npm run build (verification)                     ║
+║   ✅ npm run typecheck (type verification)                       ║
+║                                                                   ║
+║   EVERYTHING ELSE = Read, Glob, Grep                              ║
+║   VIOLATION = YOUR DESIGN IS REJECTED                             ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+```
 
 ### When You Are Notified (Incoming)
 

@@ -22,6 +22,14 @@ If your spec is vague, everything fails. If your spec is solid, everything succe
 
 **Your spec IS the sharp axe.**
 
+### TOOL RULES — ABSOLUTE
+
+```
+❌ NEVER use Bash(find/ls/grep/cat/tree) to explore files
+✅ Use Read/Glob/Grep instead
+✅ Bash is NOT needed for PO work (you write specs, not run commands)
+```
+
 ---
 
 ## ABSOLUTE RULE: FUNCTIONAL ONLY
