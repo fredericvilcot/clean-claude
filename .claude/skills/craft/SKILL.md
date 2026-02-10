@@ -753,8 +753,31 @@ AskUserQuestion:
   Options:
   - I have a spec (give me the path)
   - I have a legacy app to migrate (give me the path)
+  - I have a reference URL (app/site to analyze)
+  - I have a Figma design
   - I'll describe it now
   - Let the PO write the spec from scratch
+```
+
+**IF "reference URL" chosen:**
+```
+AskUserQuestion:
+  "What URL should the PO analyze?"
+  [free text — user types URL]
+
+AskUserQuestion:
+  "What aspect should the PO focus on?"
+  Options:
+  - Reproduce this page/feature
+  - Improve on this (note what to change)
+  - Use as inspiration (different design, same concept)
+```
+
+**IF "Figma design" chosen:**
+```
+AskUserQuestion:
+  "Paste the Figma file URL or frame link:"
+  [free text — user types Figma URL]
 ```
 
 **Save ALL inputs in context.json for the entire chain (PO + Architect):**
@@ -767,7 +790,10 @@ Update context.json:
     "type": "[new feature | refactor | fix bug | add tests]",
     "specPath": "[path if provided]",
     "legacyPath": "[path if provided]",
-    "description": "[user description if typed]"
+    "description": "[user description if typed]",
+    "referenceUrl": "[URL if provided via 'reference URL' option]",
+    "referenceIntent": "[reproduce | improve | inspiration]",
+    "figmaUrl": "[Figma URL if provided via 'Figma design' option]"
   }
 }
 ```
@@ -906,7 +932,7 @@ Task(
 )
 ```
 
-**IF no existing spec:**
+**IF no existing spec (text description only — no reference URL/Figma):**
 ```
 Task(
   subagent_type: "product-owner",
@@ -921,6 +947,80 @@ Task(
     - Ask user approval before finalizing
   """
 )
+```
+
+**IF referenceUrl provided in context.json inputs:**
+```
+Task(
+  subagent_type: "product-owner",
+  prompt: """
+    Write functional spec for: [USER_DESCRIPTION]
+
+    ## Visual Reference
+    Reference URL: [REFERENCE_URL]
+    Intent: [reproduce | improve | inspiration]
+
+    IMPORTANT: Browse this URL first using Playwright tools.
+    Capture an accessibility snapshot to understand the page structure.
+    Use what you see to write a precise, detailed spec.
+
+    If the page requires authentication:
+    → Report "🔒 AUTH NEEDED: [URL]" and STOP
+    → Wait for further instructions.
+
+    RULES:
+    - Write in ENGLISH
+    - PURELY FUNCTIONAL — translate what you SEE into user stories
+    - DO NOT mention technical details from page analysis (DOM, CSS, etc.)
+    - User stories with Given/When/Then acceptance criteria
+    - Output: specs/functional/spec-v1.md
+    - Ask user approval before finalizing
+  """
+)
+```
+
+**IF figmaUrl provided in context.json inputs:**
+```
+Task(
+  subagent_type: "product-owner",
+  prompt: """
+    Write functional spec for: [USER_DESCRIPTION]
+
+    ## Design Reference
+    Figma URL: [FIGMA_URL]
+
+    IMPORTANT: Read this Figma design using Figma MCP tools.
+    Extract: components, layout hierarchy, user flows, interactions.
+    Use the design intent to write a precise, detailed spec.
+
+    RULES:
+    - Write in ENGLISH
+    - PURELY FUNCTIONAL — translate DESIGN into user stories
+    - DO NOT mention Figma-specific details (layers, frames, etc.)
+    - User stories with Given/When/Then acceptance criteria
+    - Output: specs/functional/spec-v1.md
+    - Ask user approval before finalizing
+  """
+)
+```
+
+**IF both referenceUrl AND figmaUrl provided:** combine both Visual Reference and Design Reference sections into a single PO prompt.
+
+### Auth Interruption Flow
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🔒 IF PO OUTPUT CONTAINS "AUTH NEEDED":                                ║
+║                                                                           ║
+║   1. Claude shows: "The PO needs to access [URL] but it requires login." ║
+║   2. AskUserQuestion:                                                     ║
+║      "Please log in to the browser window that opened, then confirm."    ║
+║      Options: "I'm logged in" / "Skip this URL"                         ║
+║   3. IF "I'm logged in" → re-launch PO with same prompt                 ║
+║   4. IF "Skip this URL" → re-launch PO WITHOUT referenceUrl             ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
 ```
 
 **PO asks user approval. Wait for approval.**

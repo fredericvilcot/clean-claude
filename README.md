@@ -323,6 +323,46 @@ If you accept, it creates an **architecture-reference** file that:
 
 ---
 
+## Visual Context (Optional)
+
+Give your PO **eyes**. With MCP servers, the Product Owner can analyze live apps and Figma designs before writing specs.
+
+| MCP | What it does |
+|-----|-------------|
+| **Playwright** | Browse live apps, analyze pages, handle auth |
+| **Figma** | Read designs, extract components, understand layout |
+
+### Setup
+
+```bash
+claude mcp add playwright -- npx @playwright/mcp@latest
+claude mcp add --transport http figma https://mcp.figma.com/mcp
+```
+
+Or let the installer handle it: `install.sh` offers this as an optional step.
+
+### Usage in /craft
+
+```
+/craft "Add dark mode"
+  → "Do you have a reference?"
+  → "I have a reference URL: https://example.com/settings"
+  → PO browses the page, understands current state
+  → Writes spec based on what they SEE + what you DESCRIBE
+```
+
+### Authentication
+
+First visit to an authenticated app:
+1. Playwright opens a browser window
+2. You log in manually
+3. Cookies are saved (persistent profile)
+4. Next time → already logged in
+
+For enterprise SSO: use `--extension` mode to connect to your already-open browser.
+
+---
+
 ## Monorepo Support
 
 Clean Claude detects your project structure and adapts:

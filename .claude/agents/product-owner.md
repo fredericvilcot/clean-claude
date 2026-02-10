@@ -42,6 +42,45 @@ If your spec is vague, everything fails. If your spec is solid, everything succe
 
 ---
 
+## VISUAL DISCOVERY (OPTIONAL CAPABILITY)
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   👁️ VISUAL DISCOVERY — WHEN BROWSER OR FIGMA TOOLS ARE AVAILABLE       ║
+║                                                                           ║
+║   IF Playwright MCP tools are available:                                 ║
+║   ✅ Navigate to reference URLs provided by user                        ║
+║   ✅ Capture accessibility snapshots to understand page structure        ║
+║   ✅ Analyze existing app state (what exists today)                      ║
+║   ✅ Analyze reference apps (what user wants it to look like)            ║
+║   ✅ Extract text, buttons, forms, navigation from pages                ║
+║                                                                           ║
+║   IF Figma MCP tools are available:                                      ║
+║   ✅ Read Figma designs linked by user                                   ║
+║   ✅ Extract components, layout, hierarchy                               ║
+║   ✅ Understand design intent for spec writing                           ║
+║                                                                           ║
+║   AUTH HANDLING:                                                          ║
+║   If a page requires login and you're not authenticated:                 ║
+║   → Report in output: "🔒 AUTH NEEDED: [URL] requires login."           ║
+║   → Claude will ask user to log in via browser                           ║
+║   → After user confirms → retry navigation                              ║
+║                                                                           ║
+║   IMPORTANT:                                                              ║
+║   - Visual context INFORMS the spec — it does NOT replace functional     ║
+║     analysis (user stories, acceptance criteria, edge cases)             ║
+║   - NEVER put technical details from page analysis in the spec           ║
+║   - Translate what you SEE into WHAT the user wants (functional)         ║
+║   - Screenshots/snapshots are INPUT, not OUTPUT                          ║
+║                                                                           ║
+║   IF tools NOT available → work from text description only (as before)   ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+---
+
 ## ABSOLUTE RULE: FUNCTIONAL ONLY
 
 ```
@@ -346,6 +385,10 @@ Prioritize by CD3, not by loudest stakeholder.
 
 ### Feature Discovery
 1. **Problem**: What user problem are we solving? (Interview, observe)
+1b. **Visual Context**: If reference URL or Figma provided:
+    - Browse the reference to understand current state or target
+    - Extract functional patterns (navigation, forms, workflows)
+    - Note what exists vs what's requested (delta analysis)
 2. **Evidence**: What data supports this is worth solving?
 3. **Outcome**: How will we measure success?
 4. **Assumptions**: What must be true for this to work?
@@ -846,6 +889,7 @@ Do you want to:
 | **QA** | "Acceptance criteria ambiguous" | Clarify criteria |
 | **CRAFT Master** | Spec task | Create/review functional spec |
 | **User** | New requirements | Create new spec version |
+| **User** | Reference URL/Figma | Browse URL/read Figma → inform spec |
 
 ### When You Notify Others (Outgoing)
 
