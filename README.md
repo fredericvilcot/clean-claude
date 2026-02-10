@@ -13,10 +13,10 @@
 
 <p align="center">
   <a href="#philosophy">Philosophy</a> •
+  <a href="#agents">Agents</a> •
   <a href="#mandatory-stack">Mandatory Stack</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#commands">Commands</a> •
-  <a href="#agents">Agents</a> •
   <a href="#hooks">Hooks</a> •
   <a href="#documentation">Documentation</a>
 </p>
@@ -48,6 +48,67 @@ Single purpose     → Small, focused units
 Always tested      → Tests are specs that run (BDD, colocated)
 Spec first         → Think before you code
 Domain isolation   → Business logic stays pure (no framework imports)
+```
+
+---
+
+## Agents
+
+Six specialized agents. Claude orchestrates them directly via `Task()`.
+
+| Agent | Role | Output |
+|-------|------|--------|
+| **Product Owner** | Turns ideas into specs | `specs/functional/` |
+| **Architect** | Stack skills + technical design | `specs/design/`, `specs/stack/` |
+| **Frontend Engineer** | UI + unit tests (BDD) | Code + `*.test.tsx` |
+| **Backend Engineer** | API + unit tests (BDD) | Code + `*.test.ts` |
+| **QA Engineer** | E2E / Integration tests | `e2e/` |
+| **DevOps Engineer** | Ship, CI/CD, deploy, publish, monitor | Pipelines, Docker, npm |
+
+### Reactive Loop
+
+Agents don't work in isolation. They **notify each other**:
+
+```
+QA finds bug       →  Dev fixes automatically
+Dev needs clarity  →  Architect explains
+Design flaw        →  Architect updates
+Spec unclear       →  PO clarifies
+CI/CD fails        →  DevOps routes to owning agent
+Dev fixes code     →  DevOps re-runs pipeline
+```
+
+**Zero manual intervention. The right agent handles it.**
+
+### Design Conformity
+
+Dev agents implement the Architect's design with **zero deviation**:
+
+- File paths, type names, function signatures = **exactly** as designed
+- No invented files, no dead code, no extra abstractions
+- 100% of the Implementation Checklist, no more, no less
+- Something missing? Notify Architect — never invent
+
+### How It Works
+
+```
+/craft "add dark mode"
+     │
+     ▼
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│     PO      │────▶│  ARCHITECT  │────▶│  DEV + QA   │
+│   (spec)    │     │  (design)   │     │ (parallel)  │
+└─────────────┘     └─────────────┘     └─────────────┘
+                                               │
+                                               ▼
+                                     ┌─────────────────┐
+                                     │     VERIFY      │
+                                     │  test + build   │
+                                     │   → fix loop    │
+                                     └─────────────────┘
+                                               │
+                                               ▼
+                                        ✅ All green
 ```
 
 ---
@@ -154,60 +215,6 @@ Routes each problem to the right expert:
 /learn stack              # Stack detection only
 /learn architecture       # Extract patterns from code
 /learn <url|path>         # Analyze external source
-```
-
----
-
-## Agents
-
-| Agent | Role | Output |
-|-------|------|--------|
-| **Product Owner** | Turns ideas into specs | `specs/functional/` |
-| **Architect** | Stack skills + technical design | `specs/design/`, `specs/stack/` |
-| **Frontend Engineer** | UI + unit tests (BDD) | Code + `*.test.tsx` |
-| **Backend Engineer** | API + unit tests (BDD) | Code + `*.test.ts` |
-| **QA Engineer** | E2E / Integration tests | `e2e/` |
-| **DevOps Engineer** | Ship, CI/CD, deploy, publish, monitor | Pipelines, Docker, npm |
-
-> Claude orchestrates directly. No intermediary agent. Agents are spawned via `Task()`.
-
-### Reactive Loop
-
-Agents don't work in isolation. They **notify each other**:
-
-```
-QA finds bug       →  Dev fixes automatically
-Dev needs clarity  →  Architect explains
-Design flaw        →  Architect updates
-Spec unclear       →  PO clarifies
-CI/CD fails        →  DevOps routes to owning agent
-Dev fixes code     →  DevOps re-runs pipeline
-```
-
-**Zero manual intervention. The right agent handles it.**
-
----
-
-## How It Works
-
-```
-/craft "add dark mode"
-     │
-     ▼
-┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│     PO      │────▶│  ARCHITECT  │────▶│  DEV + QA   │
-│   (spec)    │     │  (design)   │     │ (parallel)  │
-└─────────────┘     └─────────────┘     └─────────────┘
-                                               │
-                                               ▼
-                                     ┌─────────────────┐
-                                     │     VERIFY      │
-                                     │  test + build   │
-                                     │   → fix loop    │
-                                     └─────────────────┘
-                                               │
-                                               ▼
-                                        ✅ All green
 ```
 
 ---
