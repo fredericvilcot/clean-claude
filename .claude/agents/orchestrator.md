@@ -81,7 +81,7 @@ All agents communicate through `.clean-claude/`:
 | `implement` | frontend-engineer | Working code |
 | `verify` | qa-engineer | Test results |
 | `fix` | frontend-engineer | Bug fixes |
-| `ship` | devops-engineer | CI/CD, PR, deploy, publish |
+| `ship` | devops-engineer | CI/CD, PR, deploy, publish (on-demand, not automatic) |
 | `complete` | — | Feature delivered |
 
 ## Reactive Links (All Agents)

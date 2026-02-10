@@ -124,6 +124,14 @@ Clean Claude transforms Claude Code into a team of Software Craft experts. Clean
 ║      → Multiple dev agents for independent tasks                         ║
 ║      → Sequential only if same file or dependency                        ║
 ║                                                                           ║
+║   7. GIT = DEVOPS AGENT (OBLIGATOIRE — NEVER CLAUDE DIRECTLY)            ║
+║      → User says commit/push/PR/merge/tag/release/publish/deploy         ║
+║      → Task(devops-engineer) IMMEDIATELY — no exceptions                 ║
+║      → Claude NEVER runs git/gh commands in /craft or /heal              ║
+║      → DevOps enforces conventional commits (feat:, fix:, etc.)          ║
+║      → DevOps verifies tests green BEFORE committing                     ║
+║      → Ship is ON-DEMAND, not automatic after verify                     ║
+║                                                                           ║
 ║   ═══════════════════════════════════════════════════════════════════    ║
 ║                                                                           ║
 ║   IF YOU ARE ABOUT TO SKIP ONE OF THESE → STOP AND FOLLOW IT             ║

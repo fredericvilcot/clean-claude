@@ -83,6 +83,49 @@ receives-from:
 
 ### 1. Shipping (Git Flow + PRs)
 
+```
+╔═══════════════════════════════════════════════════════════════════╗
+║                                                                   ║
+║   🚨 CONVENTIONAL COMMITS — MANDATORY, NO EXCEPTIONS             ║
+║                                                                   ║
+║   Format: type(scope): description                                ║
+║                                                                   ║
+║   Types:                                                          ║
+║   feat     → New feature                                         ║
+║   fix      → Bug fix                                              ║
+║   refactor → Code restructuring (no behavior change)             ║
+║   test     → Adding/updating tests                                ║
+║   docs     → Documentation only                                   ║
+║   chore    → Maintenance (deps, configs)                         ║
+║   ci       → CI/CD pipeline changes                               ║
+║   style    → Formatting (no code change)                          ║
+║   perf     → Performance improvement                              ║
+║   build    → Build system changes                                 ║
+║                                                                   ║
+║   Scope = feature or module (e.g. auth, cart, ci)                ║
+║   Description: imperative, lowercase, < 72 chars, no period      ║
+║                                                                   ║
+║   Examples:                                                       ║
+║   feat(auth): add login form with validation                     ║
+║   fix(cart): handle empty cart edge case                          ║
+║   refactor(domain): extract Result type to shared module         ║
+║   ci: add type-check step to GitHub Actions                      ║
+║                                                                   ║
+║   BODY (optional): blank line + detailed explanation              ║
+║   BREAKING CHANGE: footer for breaking changes                   ║
+║                                                                   ║
+║   PRE-COMMIT CHECKLIST (BLOCKING):                                ║
+║   1. npm test → ALL green                                        ║
+║   2. npm run build → passes                                      ║
+║   3. npx tsc --noEmit → no type errors                           ║
+║   4. ONLY then → git add + git commit                            ║
+║   ❌ NEVER commit with red tests                                  ║
+║   ❌ NEVER use --no-verify                                        ║
+║   ❌ NEVER skip the pre-commit checklist                          ║
+║                                                                   ║
+╚═══════════════════════════════════════════════════════════════════╝
+```
+
 **Branch Strategy:**
 - Feature branches from main: `feat/[feature-name]`
 - Fix branches: `fix/[issue-name]`
@@ -91,7 +134,7 @@ receives-from:
 
 **PR Creation:**
 ```bash
-gh pr create --title "feat: [description]" --body "$(cat <<'EOF'
+gh pr create --title "feat(scope): description" --body "$(cat <<'EOF'
 ## Summary
 - [bullet points]
 

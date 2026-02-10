@@ -1693,6 +1693,25 @@ Task(
 ║   "Update the design"          │ Route to Architect                     ║
 ║   "Refactor this module"       │ → Architect redesigns → Dev implements ║
 ║                                 │                                        ║
+║   ═══════════════════════════════════════════════════════════════════    ║
+║                                 │                                        ║
+║   🚨 GIT / SHIP = DEVOPS (OBLIGATOIRE — NEVER CLAUDE DIRECTLY)        ║
+║                                 │                                        ║
+║   "Commit" / "commit this"     │ Task(devops-engineer) IMMEDIATELY      ║
+║   "Push" / "push to remote"    │ → DevOps: conventional commit + push   ║
+║   "Create a PR"                │ → DevOps: branch + PR via gh           ║
+║   "Merge" / "ship it"          │ → DevOps: CI check + merge             ║
+║   "Tag" / "release" / "publish"│ → DevOps: version + changelog + publish║
+║   "Set up CI" / "add pipeline" │ → DevOps: GitHub Actions / CDS         ║
+║   "Deploy"                     │ → DevOps: deploy pipeline              ║
+║                                 │                                        ║
+║   ❌ Claude NEVER runs git commands directly                            ║
+║   ❌ Claude NEVER commits, pushes, or creates PRs                      ║
+║   ✅ ALL git operations go through DevOps agent                        ║
+║   ✅ DevOps enforces conventional commits (feat:, fix:, etc.)          ║
+║                                 │                                        ║
+║   ═══════════════════════════════════════════════════════════════════    ║
+║                                 │                                        ║
 ║   "Exit craft" / "Done"        │ End session (show final banner)        ║
 ║                                 │                                        ║
 ╚═══════════════════════════════════════════════════════════════════════════╝
@@ -1756,6 +1775,53 @@ Task(
 4. After agent returns → Claude runs tests ONCE (Step 6 verify)
 5. If failures → route full output to owning agent (fix loop)
 6. If green → report to user → THEN ask doc sync (MANDATORY, see below)
+
+**Git request? → DevOps agent IMMEDIATELY (MANDATORY):**
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🚨 GIT = DEVOPS — OBLIGATOIRE, SANS EXCEPTION                         ║
+║                                                                           ║
+║   User mentions: commit, push, PR, merge, tag, release, publish, deploy  ║
+║   → Task(devops-engineer) IMMEDIATELY                                    ║
+║   → Claude NEVER runs git/gh commands directly                           ║
+║   → DevOps enforces conventional commits                                 ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+```
+// User: "commit this" / "push" / "create a PR"
+Task(
+  subagent_type: "devops-engineer",
+  prompt: """
+    🔔 GIT REQUEST FROM USER (Iteration Mode)
+
+    ## User Request
+    [PASTE user's EXACT words]
+
+    ## Context
+    - Scope: {SCOPE}
+    - Design: {SCOPE}/specs/design/design-v1.md
+    - State: .clean-claude/state.json
+
+    ## RULES — MANDATORY
+    - Conventional Commits: type(scope): description
+      Types: feat, fix, refactor, test, docs, chore, ci, style, perf, build
+    - BEFORE committing: verify tests pass (npm test) and build passes (npm run build)
+    - NEVER commit if tests are red
+    - NEVER force-push to main
+    - NEVER skip hooks (--no-verify)
+    - PR body must include: Summary + Test plan
+    - Commit message must be concise (< 72 chars first line)
+
+    ## Action Required
+    Execute the git operation following CRAFT rules.
+    Report what you did (branch, commit hash, PR URL if applicable).
+  """
+)
+```
 
 **Multiple bugs? → Multiple agents in PARALLEL (same message):**
 ```
