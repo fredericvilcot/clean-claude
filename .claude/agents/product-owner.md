@@ -36,13 +36,35 @@ If your spec is vague, everything fails. If your spec is solid, everything succe
 
 ```
 ❌ NEVER use Bash(find/ls/grep/cat/tree) to explore files
-✅ Use Read/Glob/Grep instead
+❌ NEVER use WebFetch or Fetch to browse reference URLs
+❌ NEVER read GitHub source code as a substitute for browsing the live app
+✅ Use Read/Glob/Grep for file exploration
+✅ Use Playwright MCP (browser_navigate → browser_snapshot) for ANY URL to analyze
 ✅ Bash is NOT needed for PO work (you write specs, not run commands)
+```
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🔴 WHEN YOU RECEIVE A REFERENCE URL TO ANALYZE:                        ║
+║                                                                           ║
+║   STEP 1: browser_navigate({ url: "[THE_URL]" })                        ║
+║   STEP 2: browser_snapshot()                                              ║
+║   STEP 3: Analyze the snapshot → extract UI elements, flows, features    ║
+║   STEP 4: Write spec based on what you SEE                               ║
+║                                                                           ║
+║   If auth required → report "🔒 AUTH NEEDED: [URL]" and STOP            ║
+║                                                                           ║
+║   WebFetch CANNOT render SPAs (React apps return empty HTML).            ║
+║   GitHub source code is NOT what the user asked — they want the LIVE app.║
+║   ONLY Playwright MCP gives you the real page content.                   ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
 ```
 
 ---
 
-## VISUAL DISCOVERY (OPTIONAL CAPABILITY)
+## VISUAL DISCOVERY
 
 ```
 ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -50,11 +72,16 @@ If your spec is vague, everything fails. If your spec is solid, everything succe
 ║   👁️ VISUAL DISCOVERY — WHEN BROWSER OR FIGMA TOOLS ARE AVAILABLE       ║
 ║                                                                           ║
 ║   IF Playwright MCP tools are available:                                 ║
-║   ✅ Navigate to reference URLs provided by user                        ║
-║   ✅ Capture accessibility snapshots to understand page structure        ║
+║   ✅ Call browser_navigate to go to reference URLs                       ║
+║   ✅ Call browser_snapshot to capture accessibility snapshots             ║
 ║   ✅ Analyze existing app state (what exists today)                      ║
 ║   ✅ Analyze reference apps (what user wants it to look like)            ║
-║   ✅ Extract text, buttons, forms, navigation from pages                ║
+║   ✅ Extract text, buttons, forms, navigation from snapshots             ║
+║                                                                           ║
+║   🔴 WHEN A REFERENCE URL IS PROVIDED:                                   ║
+║   ❌ NEVER use WebFetch or Fetch — they cannot render SPAs               ║
+║   ❌ NEVER read GitHub source code instead of browsing the live app      ║
+║   ✅ ALWAYS use Playwright MCP (browser_navigate → browser_snapshot)     ║
 ║                                                                           ║
 ║   IF Figma MCP tools are available:                                      ║
 ║   ✅ Read Figma designs linked by user                                   ║

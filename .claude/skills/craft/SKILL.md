@@ -600,12 +600,40 @@ AskUserQuestion:
 ╚═══════════════════════════════════════════════════════════════════════════╝
 ```
 
+## 1d. MCP AUTO-SETUP (ensure tools are available)
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   MCPs are INCLUDED with Clean Claude — auto-install if missing.         ║
+║                                                                           ║
+║   Check each MCP and install silently if not configured:                 ║
+║                                                                           ║
+║   1. Playwright (browser_navigate tool):                                 ║
+║      → IF missing: Bash: claude mcp add playwright \                     ║
+║          -- npx @playwright/mcp@latest                                   ║
+║                                                                           ║
+║   2. Figma (figma tools):                                                ║
+║      → IF missing: Bash: claude mcp add --transport http figma \         ║
+║          https://mcp.figma.com/mcp                                       ║
+║                                                                           ║
+║   3. OpenAPI (openapi tools):                                            ║
+║      → IF missing: Bash: claude mcp add openapi \                        ║
+║          -- npx -y @ivotoby/openapi-mcp-server                          ║
+║                                                                           ║
+║   HOW TO CHECK: Try to reference the tool. If not in available tools     ║
+║   list → install it. No questions asked. MCPs are part of Clean Claude.  ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
 **Show:**
 ```
 🟢 Step 1 ─ Detect                              ✓ Complete
    Project: [TYPE] · Language: [LANG] · Monorepo: [yes/no]
    Stack: TypeScript + React + TanStack Query ✅
    (or: "Bootstrap mode — Architect will set up the project")
+   MCPs: Playwright ✅ · Figma ✅ · OpenAPI ✅
 ```
 
 ---
@@ -767,46 +795,57 @@ AskUserQuestion:
   - Add tests
 ```
 
-**Question 2: Describe it + spec?**
+**Question 2: Do you have references?**
+
 ```
-AskUserQuestion:
-  "Describe what you want. Do you have an existing spec or reference?"
-  Options:
-  - I have a spec (give me the path)
-  - I have a legacy app to migrate (give me the path)
-  - I have a reference URL (app/site to analyze)
-  - I have a Figma design
-  - I have an OpenAPI/Swagger spec (API discovery)
-  - I'll describe it now
-  - Let the PO write the spec from scratch
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🔴 AskUserQuestion supports MAX 4 options.                            ║
+║   Structure questions to fit this constraint.                            ║
+║   "Other" is always added automatically for free text.                  ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
 ```
 
-**IF "reference URL" chosen:**
 ```
 AskUserQuestion:
-  "What URL should the PO analyze?"
+  "Do you have references or existing specs?" (multiSelect: true)
+  Options:
+  - Reference URL (live app — Playwright MCP)
+  - Figma design (Figma MCP)
+  - OpenAPI/Swagger spec (API discovery MCP)
+  - Existing spec or legacy code (local path)
+  (user can also select "Other" to type freely or say "no reference")
+```
+
+**THEN for each selected reference, ask details (one question per selection):**
+
+**IF "Reference URL" selected:**
+```
+AskUserQuestion:
+  "Paste the URL to browse:"
   [free text — user types URL]
 
 AskUserQuestion:
-  "What aspect should the PO focus on?"
+  "What should the PO do with this reference?"
   Options:
   - Reproduce this page/feature
   - Improve on this (note what to change)
   - Use as inspiration (different design, same concept)
 ```
 
-**IF "Figma design" chosen:**
+**IF "Figma design" selected:**
 ```
 AskUserQuestion:
   "Paste the Figma file URL or frame link:"
   [free text — user types Figma URL]
 ```
 
-**IF "OpenAPI/Swagger spec" chosen:**
+**IF "OpenAPI/Swagger spec" selected:**
 ```
 AskUserQuestion:
   "Paste the OpenAPI spec URL or local path:"
-  [free text — user types URL like https://api.example.com/openapi.json or ./openapi.yaml]
+  [free text — user types URL or path]
 
 AskUserQuestion:
   "What should we focus on?"
@@ -814,6 +853,21 @@ AskUserQuestion:
   - Build a frontend for this entire API
   - Build a feature using specific endpoints
   - Discover what's available (explore first)
+```
+
+**IF "Existing spec or legacy code" selected:**
+```
+AskUserQuestion:
+  "Paste the path to your spec or legacy code:"
+  [free text — user types path]
+```
+
+**Question 3: Describe what you want**
+```
+AskUserQuestion:
+  "Now describe what you want to build:"
+  [free text — user types description]
+  (This is ALWAYS asked, regardless of references above)
 ```
 
 **Save ALL inputs in context.json for the entire chain (PO + Architect):**
@@ -948,112 +1002,55 @@ Launching Step 5...
    Launching product-owner...
 ```
 
-**IF user provided an existing spec:**
-```
-Task(
-  subagent_type: "product-owner",
-  prompt: """
-    ENRICH this existing spec: [SPEC_PATH]
-    Read it, then ENRICH with missing functional requirements.
+**ONE unified PO prompt — include ALL available inputs:**
 
-    IF there is legacy code at [LEGACY_PATH]:
-      → Read it to find ALL features
-      → Add EVERY missing feature to the spec
-
-    RULES:
-    - Write in ENGLISH
-    - PURELY FUNCTIONAL — no API endpoints, no code, no tech details
-    - User stories with Given/When/Then acceptance criteria
-    - Output: specs/functional/spec-v[N].md
-    - Ask user approval before finalizing
-  """
-)
-```
-
-**IF no existing spec (text description only — no reference URL/Figma):**
 ```
 Task(
   subagent_type: "product-owner",
   prompt: """
     Write functional spec for: [USER_DESCRIPTION]
 
-    RULES:
-    - Write in ENGLISH
-    - PURELY FUNCTIONAL — no API endpoints, no code, no tech details
-    - User stories with Given/When/Then acceptance criteria
-    - Output: specs/functional/spec-v1.md
-    - Ask user approval before finalizing
-  """
-)
-```
+    ## AVAILABLE INPUTS (include each section ONLY if the input exists)
 
-**IF referenceUrl provided in context.json inputs:**
-```
-Task(
-  subagent_type: "product-owner",
-  prompt: """
-    Write functional spec for: [USER_DESCRIPTION]
+    ### Existing Spec (if specPath in context.json)
+    Existing spec: [SPEC_PATH]
+    → Read it, ENRICH with missing functional requirements.
 
-    ## Visual Reference
+    ### Legacy Code (if legacyPath in context.json)
+    Legacy code: [LEGACY_PATH]
+    → Read it to find ALL features, add EVERY missing feature to the spec.
+
+    ### Live Reference URL (if referenceUrl in context.json)
     Reference URL: [REFERENCE_URL]
     Intent: [reproduce | improve | inspiration]
 
-    IMPORTANT: Browse this URL first using Playwright tools.
-    Capture an accessibility snapshot to understand the page structure.
-    Use what you see to write a precise, detailed spec.
+    🔴 MANDATORY: Use Playwright MCP tools to browse this URL.
+    Step 1: Call browser_navigate to go to the URL
+    Step 2: Call browser_snapshot to capture the accessibility snapshot
+    Step 3: Analyze the snapshot to understand the page structure
+    Step 4: Use what you SEE to write a precise, detailed spec
+
+    ❌ DO NOT use WebFetch or Fetch — they cannot render SPAs
+    ❌ DO NOT read GitHub source code instead of browsing the live app
+    ✅ ONLY use Playwright MCP tools (browser_navigate, browser_snapshot)
 
     If the page requires authentication:
-    → Report "🔒 AUTH NEEDED: [URL]" and STOP
+    → Report "🔒 AUTH NEEDED: [REFERENCE_URL]" and STOP
     → Wait for further instructions.
 
-    RULES:
-    - Write in ENGLISH
-    - PURELY FUNCTIONAL — translate what you SEE into user stories
-    - DO NOT mention technical details from page analysis (DOM, CSS, etc.)
-    - User stories with Given/When/Then acceptance criteria
-    - Output: specs/functional/spec-v1.md
-    - Ask user approval before finalizing
-  """
-)
-```
-
-**IF figmaUrl provided in context.json inputs:**
-```
-Task(
-  subagent_type: "product-owner",
-  prompt: """
-    Write functional spec for: [USER_DESCRIPTION]
-
-    ## Design Reference
+    ### Figma Design (if figmaUrl in context.json)
     Figma URL: [FIGMA_URL]
 
-    IMPORTANT: Read this Figma design using Figma MCP tools.
+    🔴 MANDATORY: Use Figma MCP tools to read the design.
     Extract: components, layout hierarchy, user flows, interactions.
     Use the design intent to write a precise, detailed spec.
+    DO NOT mention Figma-specific details (layers, frames, etc.)
 
-    RULES:
-    - Write in ENGLISH
-    - PURELY FUNCTIONAL — translate DESIGN into user stories
-    - DO NOT mention Figma-specific details (layers, frames, etc.)
-    - User stories with Given/When/Then acceptance criteria
-    - Output: specs/functional/spec-v1.md
-    - Ask user approval before finalizing
-  """
-)
-```
-
-**IF openApiSpec provided in context.json inputs:**
-```
-Task(
-  subagent_type: "product-owner",
-  prompt: """
-    Write functional spec for: [USER_DESCRIPTION]
-
-    ## API Discovery
+    ### OpenAPI Spec (if openApiSpec in context.json)
     OpenAPI Spec: [OPENAPI_SPEC]
     Intent: [full api | specific endpoints | explore]
 
-    IMPORTANT: Read this OpenAPI/Swagger spec using OpenAPI MCP tools.
+    🔴 MANDATORY: Use OpenAPI MCP tools to read the spec.
     Discover: available endpoints, operations, data models, capabilities.
     Map each API operation to a USER-FACING feature.
 
@@ -1061,20 +1058,20 @@ Task(
     - "GET /users/{id}" → "User can view their profile details"
     - "POST /orders" → "User can place a new order"
     - "GET /products?category=X" → "User can browse products by category"
+    DO NOT mention endpoints, HTTP methods, schemas — that's the Architect's job.
 
-    RULES:
+    ## RULES (ALWAYS APPLY)
     - Write in ENGLISH
-    - PURELY FUNCTIONAL — translate API capabilities into user stories
-    - DO NOT mention endpoints, HTTP methods, schemas, or technical API details
-    - That's the Architect's job — you extract the FUNCTIONAL intent
+    - PURELY FUNCTIONAL — no API endpoints, no code, no tech details
     - User stories with Given/When/Then acceptance criteria
-    - Output: specs/functional/spec-v1.md
+    - Translate what you SEE/READ into WHAT the user wants (functional)
+    - Output: specs/functional/spec-v1.md (or spec-v[N].md if enriching)
     - Ask user approval before finalizing
   """
 )
 ```
 
-**IF multiple inputs provided (referenceUrl, figmaUrl, openApiSpec):** combine all relevant sections into a single PO prompt. Each source adds context — they complement each other.
+**Claude builds the prompt dynamically:** include only the sections that have values in context.json. If no inputs at all → just the description + rules. If all four inputs → all four sections in one prompt.
 
 ### Auth Interruption Flow
 

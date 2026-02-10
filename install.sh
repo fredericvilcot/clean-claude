@@ -149,39 +149,24 @@ main() {
     fi
     done_step "Installed ${BOLD}${AGENTS_COUNT}${NC} agents + ${BOLD}${SKILLS_COUNT}${NC} skills"
 
-    # Optional: MCP setup for visual context
+    # MCP setup — installed by default
     echo ""
-    echo -e "${PURPLE}┌─────────────────────────────────────────────────────────┐${NC}"
-    echo -e "${PURPLE}│${NC}                                                         ${PURPLE}│${NC}"
-    echo -e "${PURPLE}│${NC}   ${WHITE}Optional: Visual Context + API Discovery${NC}               ${PURPLE}│${NC}"
-    echo -e "${PURPLE}│${NC}   ${DIM}Enable MCP servers for smarter specs${NC}                   ${PURPLE}│${NC}"
-    echo -e "${PURPLE}│${NC}                                                         ${PURPLE}│${NC}"
-    echo -e "${PURPLE}│${NC}   ${DIM}Playwright MCP: browse live apps, handle auth${NC}          ${PURPLE}│${NC}"
-    echo -e "${PURPLE}│${NC}   ${DIM}Figma MCP: read designs, extract components${NC}            ${PURPLE}│${NC}"
-    echo -e "${PURPLE}│${NC}   ${DIM}OpenAPI MCP: discover API endpoints from specs${NC}         ${PURPLE}│${NC}"
-    echo -e "${PURPLE}│${NC}                                                         ${PURPLE}│${NC}"
-    echo -e "${PURPLE}└─────────────────────────────────────────────────────────┘${NC}"
+    step "Installing MCP servers (Visual Context + API Discovery)..."
     echo ""
-    read -p "  Enable visual context + API discovery? [y/N] " -n 1 -r
+    echo "  Which browser for Playwright?"
+    echo "  1) Chrome (default)"
+    echo "  2) Firefox"
+    echo "  3) Edge"
+    read -p "  Choice [1]: " browser_choice
+    case "${browser_choice:-1}" in
+        2) BROWSER="firefox" ;;
+        3) BROWSER="msedge" ;;
+        *) BROWSER="chrome" ;;
+    esac
     echo ""
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        echo ""
-        echo "  Which browser for Playwright?"
-        echo "  1) Chrome (default)"
-        echo "  2) Firefox"
-        echo "  3) Edge"
-        read -p "  Choice [1]: " browser_choice
-        case "${browser_choice:-1}" in
-            2) BROWSER="firefox" ;;
-            3) BROWSER="msedge" ;;
-            *) BROWSER="chrome" ;;
-        esac
-        echo ""
-        claude mcp add playwright -- npx @playwright/mcp@latest --browser "$BROWSER" 2>/dev/null && done_step "Playwright MCP added ($BROWSER)"
-        claude mcp add --transport http figma https://mcp.figma.com/mcp 2>/dev/null && done_step "Figma MCP added"
-        claude mcp add openapi -- npx -y @ivotoby/openapi-mcp-server 2>/dev/null && done_step "OpenAPI MCP added"
-        echo ""
-    fi
+    claude mcp add playwright -- npx @playwright/mcp@latest --browser "$BROWSER" 2>/dev/null && done_step "Playwright MCP ($BROWSER)"
+    claude mcp add --transport http figma https://mcp.figma.com/mcp 2>/dev/null && done_step "Figma MCP"
+    claude mcp add openapi -- npx -y @ivotoby/openapi-mcp-server 2>/dev/null && done_step "OpenAPI MCP"
 
     # Success
     echo ""

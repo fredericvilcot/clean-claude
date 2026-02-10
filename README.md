@@ -14,7 +14,7 @@
 <p align="center">
   <a href="#philosophy">Philosophy</a> •
   <a href="#agents">Agents</a> •
-  <a href="#visual-context-optional">Visual Context</a> •
+  <a href="#visual-context-included">Visual Context</a> •
   <a href="#mandatory-stack">Mandatory Stack</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#commands">Commands</a> •
@@ -136,9 +136,9 @@ DevOps enforces **conventional commits** (`feat:`, `fix:`, `refactor:`, etc.) an
 
 ---
 
-## Visual Context (Optional)
+## Visual Context (Included)
 
-> **Your PO can now see — and discover APIs.** Point it at a live app, a Figma design, or a Swagger spec — it writes the spec from what it *sees* and *discovers*, not just what you describe.
+> **Your PO can see — and discover APIs.** Point it at a live app, a Figma design, or a Swagger spec — it writes the spec from what it *sees* and *discovers*, not just what you describe. All three MCPs are **installed by default**.
 
 ```
 Without Visual Context              With Visual Context
@@ -158,15 +158,16 @@ meant"
 | **Figma** | Read designs, extract components, understand layout | *"Read the Figma for the new checkout flow"* |
 | **OpenAPI** | Discover API endpoints, models, capabilities | *"Build a frontend for https://api.example.com/openapi.json"* |
 
-### Setup (3 commands)
+### Installed by Default
 
+All three MCPs are installed automatically by `install.sh`. If any is missing at runtime, `/craft` detects and installs it during Step 1.
+
+Manual install if needed:
 ```bash
 claude mcp add playwright -- npx @playwright/mcp@latest
 claude mcp add --transport http figma https://mcp.figma.com/mcp
 claude mcp add openapi -- npx -y @ivotoby/openapi-mcp-server
 ```
-
-Or let the installer handle it — `install.sh` offers this as an optional step.
 
 ### How It Looks in /craft
 
@@ -209,9 +210,9 @@ Next visits:   Already authenticated → PO browses freely
 Enterprise:    --extension mode → connects to your existing browser (SSO, VPN)
 ```
 
-### Without MCP? No Problem
+### Fallback
 
-Visual Context is **optional**. Without Playwright/Figma/OpenAPI, the PO works exactly as before — from your text description. No regression, no dependency.
+If an MCP server can't start (network issue, missing dependency), the PO falls back to text description. No crash, no dependency — just less context.
 
 ---
 
