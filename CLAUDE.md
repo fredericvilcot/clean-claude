@@ -442,7 +442,11 @@ Non-negotiable rules for ALL agents:
 
 specs/                                 # COMMITTED ✅ — shared documentation
 ├── functional/                        # PO specs
-│   └── spec-v1.md
+│   ├── spec-v1.md
+│   └── reference/                     # Snapshots from visual exploration
+│       ├── catalog.md                 # Summary of all discovered pages/actions
+│       ├── 01-list-page.md            # Accessibility snapshots
+│       └── ...
 ├── design/                            # Architect designs
 │   └── design-v1.md
 └── stack/                             # Stack skills

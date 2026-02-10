@@ -1096,14 +1096,20 @@ Task(
     → Check pagination, search, sorting if present
     → MINIMUM: 10+ snapshots. Complex apps: 20-50+.
 
-    PHASE 3 — Catalog before writing:
-    → List ALL pages/views discovered
-    → List ALL actions per page and what they open
-    → List ALL forms with their fields
-    → List ALL data displayed (tables, cards, stats)
-    → List navigation structure (sidebar, tabs, breadcrumbs)
+    PHASE 3 — Save snapshots + Catalog:
+    → Save each accessibility snapshot to specs/functional/reference/
+      (01-list-page.md, 02-actions-menu.md, 03-create-modal.md, etc.)
+    → Write specs/functional/reference/catalog.md summarizing:
+      - ALL pages/views discovered + snapshot file
+      - ALL actions per page and what they open
+      - ALL forms with their fields
+      - ALL data displayed (tables, cards, stats)
+      - Navigation structure (sidebar, tabs, breadcrumbs)
 
-    PHASE 4 — Write spec from the COMPLETE catalog
+    PHASE 4 — Write spec referencing the catalog:
+    → specs/functional/spec-v1.md references catalog.md
+    → User stories link to the snapshot that inspired them
+    → Architect uses reference/ folder for design decisions
 
     ❌ DO NOT use WebFetch or Fetch — they cannot render SPAs
     ❌ DO NOT read GitHub source code instead of browsing the live app

@@ -68,15 +68,24 @@ If your spec is vague, everything fails. If your spec is solid, everything succe
 ║   → Look for empty states, error states, loading states                  ║
 ║   → Check pagination if present                                          ║
 ║                                                                           ║
-║   PHASE 3: CATALOG WHAT YOU FOUND                                        ║
-║   Before writing the spec, list:                                         ║
-║   → Pages discovered: [list each URL/view]                               ║
-║   → Actions per page: [list each button/action and what it opens]       ║
+║   PHASE 3: SAVE & CATALOG WHAT YOU FOUND                                 ║
+║                                                                           ║
+║   Save ALL snapshots to specs/functional/reference/:                     ║
+║   → Name each file descriptively:                                        ║
+║     01-list-page.md, 02-actions-menu.md, 03-create-modal.md, etc.       ║
+║   → Each file = the accessibility snapshot text from browser_snapshot    ║
+║   → This is the EVIDENCE the Architect will use for design              ║
+║                                                                           ║
+║   Write specs/functional/reference/catalog.md:                           ║
+║   → Pages discovered: [list each URL/view + snapshot file]              ║
+║   → Actions per page: [list each button/action + what it opens]         ║
 ║   → Forms found: [list each form with its fields]                       ║
 ║   → Data displayed: [list tables, cards, stats]                          ║
 ║   → Navigation structure: [sidebar, tabs, breadcrumbs]                   ║
 ║                                                                           ║
-║   PHASE 4: WRITE SPEC from the complete catalog                          ║
+║   PHASE 4: WRITE SPEC referencing the catalog                            ║
+║   → specs/functional/spec-v1.md references catalog.md                   ║
+║   → Each user story can link to the snapshot that inspired it            ║
 ║   → Now you have EVERYTHING → write comprehensive spec                   ║
 ║                                                                           ║
 ║   MINIMUM: 10+ snapshots for a typical page. Complex apps: 20-50+.      ║
