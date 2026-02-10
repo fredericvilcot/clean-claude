@@ -785,6 +785,24 @@ AskUserQuestion:
 **Two questions in this step:**
 
 **Question 1: What type?**
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   ADAPT choices to project state — don't offer what makes no sense.      ║
+║                                                                           ║
+║   IF stackGuard = "bootstrap" (no project yet):                          ║
+║      → SKIP this question entirely                                       ║
+║      → Set type = "new feature" automatically                            ║
+║      → There's nothing to refactor, fix, or test yet                     ║
+║                                                                           ║
+║   IF existing project:                                                    ║
+║      → Show all 4 options                                                ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+**IF existing project (stackGuard = "pass"):**
 ```
 AskUserQuestion:
   "What do you want to craft?"
@@ -793,6 +811,12 @@ AskUserQuestion:
   - Refactor
   - Fix bug
   - Add tests
+```
+
+**IF bootstrap mode (stackGuard = "bootstrap"):**
+```
+→ type = "new feature" (automatic — no question needed)
+→ Proceed directly to Question 2 (references)
 ```
 
 **Question 2: Do you have references?**
