@@ -14,6 +14,7 @@
 <p align="center">
   <a href="#philosophy">Philosophy</a> •
   <a href="#agents">Agents</a> •
+  <a href="#visual-context-optional">Visual Context</a> •
   <a href="#mandatory-stack">Mandatory Stack</a> •
   <a href="#quick-start">Quick Start</a> •
   <a href="#commands">Commands</a> •
@@ -325,41 +326,68 @@ If you accept, it creates an **architecture-reference** file that:
 
 ## Visual Context (Optional)
 
-Give your PO **eyes**. With MCP servers, the Product Owner can analyze live apps and Figma designs before writing specs.
+> **Your PO can now see.** Point it at a live app or a Figma design — it writes the spec from what it *sees*, not just what you describe.
 
-| MCP | What it does |
-|-----|-------------|
-| **Playwright** | Browse live apps, analyze pages, handle auth |
-| **Figma** | Read designs, extract components, understand layout |
+```
+Without Visual Context              With Visual Context
+─────────────────────               ─────────────────────
+You describe in words    →          You paste a URL
+PO imagines what you mean           PO browses the actual page
+Spec misses half the UI             Spec covers every button, form, flow
+3 rounds of "that's not what I      First spec nails it
+meant"
+```
 
-### Setup
+### Two MCP Servers, One Superpower
+
+| MCP | What it does | Example |
+|-----|-------------|---------|
+| **Playwright** | Browse live apps, capture structure, handle auth | *"Analyze https://app.example.com/dashboard"* |
+| **Figma** | Read designs, extract components, understand layout | *"Read the Figma for the new checkout flow"* |
+
+### Setup (2 commands)
 
 ```bash
 claude mcp add playwright -- npx @playwright/mcp@latest
 claude mcp add --transport http figma https://mcp.figma.com/mcp
 ```
 
-Or let the installer handle it: `install.sh` offers this as an optional step.
+Or let the installer handle it — `install.sh` offers this as an optional step.
 
-### Usage in /craft
+### How It Looks in /craft
 
 ```
 /craft "Add dark mode"
   → "Do you have a reference?"
   → "I have a reference URL: https://example.com/settings"
-  → PO browses the page, understands current state
-  → Writes spec based on what they SEE + what you DESCRIBE
+  → PO browses the page, captures accessibility snapshot
+  → Extracts: toggle, color scheme, user preferences
+  → Writes spec based on what it SEES + what you DESCRIBE
+  → Result: precise spec, first try
+```
+
+```
+/craft "Redesign the checkout"
+  → "I have a Figma design"
+  → Paste Figma URL
+  → PO reads components, layout hierarchy, user flows
+  → Translates design intent into Given/When/Then criteria
+  → No Figma details leak into the spec — purely functional
 ```
 
 ### Authentication
 
-First visit to an authenticated app:
-1. Playwright opens a browser window
-2. You log in manually
-3. Cookies are saved (persistent profile)
-4. Next time → already logged in
+Playwright uses a **persistent browser profile** — log in once, stay logged in:
 
-For enterprise SSO: use `--extension` mode to connect to your already-open browser.
+```
+First visit:   Browser opens → you log in → cookies saved
+Next visits:   Already authenticated → PO browses freely
+Enterprise:    --extension mode → connects to your existing browser (SSO, VPN)
+```
+
+### Without MCP? No Problem
+
+Visual Context is **optional**. Without Playwright/Figma, the PO works exactly as before — from your text description. No regression, no dependency.
 
 ---
 
