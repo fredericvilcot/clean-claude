@@ -295,6 +295,37 @@ Task(qa-engineer,       "E2E tests",  run_in_background: true)  → task_id_3
 
 ---
 
+# RESILIENCE RULES
+
+```
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                           ║
+║   🔄 IF USER CANCELS OR DECLINES A QUESTION:                            ║
+║                                                                           ║
+║   → DO NOT stop the flow or go silent                                    ║
+║   → Re-ask the same question with a short explanation:                   ║
+║     "I need this to continue. Cancel again to exit /craft."              ║
+║   → IF cancelled a SECOND time → exit gracefully:                        ║
+║     "No worries! Type /craft when you're ready."                         ║
+║                                                                           ║
+║   🔄 IF AN AGENT FAILS OR RETURNS AN ERROR:                             ║
+║                                                                           ║
+║   → DO NOT stop the flow                                                 ║
+║   → Show the error to the user                                           ║
+║   → AskUserQuestion: "Retry?" / "Skip this step" / "Exit /craft"        ║
+║                                                                           ║
+║   🔄 IF USER SENDS A MESSAGE DURING A STEP:                             ║
+║                                                                           ║
+║   → Treat it as input for the current question                           ║
+║   → If it doesn't match expected input, re-ask with context              ║
+║                                                                           ║
+║   THE FLOW NEVER DIES SILENTLY. Always communicate, always recover.      ║
+║                                                                           ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+```
+
+---
+
 # FLOW OVERVIEW
 
 ```
